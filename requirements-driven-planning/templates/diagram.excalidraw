@@ -1,0 +1,56 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "requirements-driven-planning skill — clone this scene, keep boxes ≤6, label each with its spine ID",
+  "elements": [
+    {
+      "type": "rectangle", "id": "box-a", "x": 120, "y": 160, "width": 200, "height": 90,
+      "angle": 0, "strokeColor": "#1e1e1e", "backgroundColor": "#e7f5ff", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 1, "opacity": 100, "groupIds": [],
+      "frameId": null, "roundness": { "type": 3 }, "seed": 101, "version": 1, "versionNonce": 101,
+      "isDeleted": false, "boundElements": [{ "type": "text", "id": "text-a" }, { "type": "arrow", "id": "arrow-ab" }],
+      "updated": 1, "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "text-a", "x": 140, "y": 190, "width": 160, "height": 30,
+      "angle": 0, "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 1, "opacity": 100, "groupIds": [],
+      "frameId": null, "roundness": null, "seed": 102, "version": 1, "versionNonce": 102,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false,
+      "text": "ENT-001 User", "fontSize": 18, "fontFamily": 1, "textAlign": "center",
+      "verticalAlign": "middle", "containerId": "box-a", "originalText": "ENT-001 User",
+      "lineHeight": 1.25, "baseline": 22
+    },
+    {
+      "type": "rectangle", "id": "box-b", "x": 480, "y": 160, "width": 200, "height": 90,
+      "angle": 0, "strokeColor": "#1e1e1e", "backgroundColor": "#fff3bf", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 1, "opacity": 100, "groupIds": [],
+      "frameId": null, "roundness": { "type": 3 }, "seed": 103, "version": 1, "versionNonce": 103,
+      "isDeleted": false, "boundElements": [{ "type": "text", "id": "text-b" }, { "type": "arrow", "id": "arrow-ab" }],
+      "updated": 1, "link": null, "locked": false
+    },
+    {
+      "type": "text", "id": "text-b", "x": 500, "y": 190, "width": 160, "height": 30,
+      "angle": 0, "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 1, "opacity": 100, "groupIds": [],
+      "frameId": null, "roundness": null, "seed": 104, "version": 1, "versionNonce": 104,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false,
+      "text": "ENT-002 Order", "fontSize": 18, "fontFamily": 1, "textAlign": "center",
+      "verticalAlign": "middle", "containerId": "box-b", "originalText": "ENT-002 Order",
+      "lineHeight": 1.25, "baseline": 22
+    },
+    {
+      "type": "arrow", "id": "arrow-ab", "x": 330, "y": 205, "width": 140, "height": 0,
+      "angle": 0, "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 1, "opacity": 100, "groupIds": [],
+      "frameId": null, "roundness": { "type": 2 }, "seed": 105, "version": 1, "versionNonce": 105,
+      "isDeleted": false, "boundElements": null, "updated": 1, "link": null, "locked": false,
+      "points": [[0, 0], [140, 0]], "lastCommittedPoint": null,
+      "startBinding": { "elementId": "box-a", "focus": 0, "gap": 10 },
+      "endBinding": { "elementId": "box-b", "focus": 0, "gap": 10 },
+      "startArrowhead": null, "endArrowhead": "arrow"
+    }
+  ],
+  "appState": { "gridSize": null, "viewBackgroundColor": "#ffffff" },
+  "files": {}
+}
