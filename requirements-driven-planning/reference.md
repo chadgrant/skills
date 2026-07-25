@@ -113,6 +113,76 @@ The most rigid doc: an agent must execute each task with **no interpretation**. 
 
 **Difficulty → model tier** (from `multi-model-implementation`): rate each task on its *hardest* aspect. Easy (mechanical, single-file, well-specified) → small tier. Medium (multi-file, some design judgement) → mid tier. Hard (security/money/auth/data-integrity, concurrency, novel algorithm, high blast radius, many tasks depend on it) → top tier; additionally flag **`observe`** (mandatory adversarial review) when the task sits on the security/money/auth/data-integrity spine. Security-small is still Hard. The concrete tier→model mapping lives in `multi-model-implementation`, not here — record tiers, not model names.
 
+## User flows — IA & journeys ("where things live, how you move")
+
+The map (information architecture) plus the paths across it. Screens derive from the PRD's `REQ-`; a flow is a journey toward one of them.
+
+| Section | Intent |
+|---|---|
+| Information architecture `NAV-###` | Sitemap, navigation model, labels, URL/route structure. The reader should grasp *where things are* in ten seconds. |
+| User flows `FLOW-###` | One flow per task: entry point, happy path, branches, and **error/empty/permission exits**. Each flow cites the `REQ` it serves and names the `SCR`s it traverses. |
+
+**Anti-patterns:** flows that only show the happy path (no error/empty exits); a diagram that crams the whole app instead of one journey; screens invented with no flow (unreachable UI); IA that drifts from the actual routes.
+
+## Wireframes — layout & interaction ("what the screen shows, and does")
+
+Lo-fi only. Layout and priority, **not** final visual design — that's the style guide's job, and the build is Impeccable's.
+
+| Section | Intent |
+|---|---|
+| Screens `SCR-###` | One lo-fi wireframe per screen; cites a `REQ`, appears in a `FLOW`, references `CMP-` (flagging net-new). |
+| Interaction spec | Per interactive screen: **states** (default/hover/focus/disabled/**loading/empty/error/success**), trigger→response, transitions, async, keyboard/focus. |
+
+**Anti-patterns:** pushing wireframes to hi-fi (pixel polish belongs to Impeccable + the style guide); an interactive screen with no empty/error/loading state; a screen with no flow; re-defining components the style guide owns.
+
+## Style guide — the design system ("the visual language")
+
+A **cross-project, long-lived** asset in `design-system/`. Features reference it and record only net-new `CMP-`/`TOK-`. Implemented via Impeccable.
+
+| Section | Intent |
+|---|---|
+| Brand & voice | Personality + copy tone. |
+| Design tokens `TOK-###` | The atoms — color (prefer OKLCH), type, spacing — each an id so components/code reference it, not raw values. |
+| Components `CMP-###` | Reusable components, their states, the tokens they consume. |
+| Usage & accessibility | Grid/breakpoints; WCAG target and contrast minimums verifiable against the OKLCH tokens. |
+
+**Anti-patterns:** regenerating the whole system per feature (reference it); raw hex/px scattered instead of tokens; components with no state coverage; an a11y target with no verifiable contrast rule.
+
+## Release plan — ship it ("how it reaches prod, and how we undo it")
+
+Deployment/runtime view (the ERD owns the logical one) plus the rollout runbook.
+
+| Section | Intent |
+|---|---|
+| Deployment architecture | Environments, infra, the deploy path — a ≤6-box diagram. |
+| Rollout steps `REL-###` | Ordered runbook: flag flips, staged/canary %, cutover gates, each with a trigger and owner. |
+| Migration & backfill | Schema-change strategy and backfill ordering vs. deploy (ref DRD; don't restate the schema). |
+| Rollback | **Per irreversible step:** the reversal, or an explicit "no rollback — forward-fix only". |
+
+**Anti-patterns:** an irreversible step with no rollback or forward-fix; migration ordering left implicit; no go/no-go gate; pasting the DRD schema.
+
+## Observability — is it healthy? ("how we'd know it broke")
+
+| Section | Intent |
+|---|---|
+| SLIs / SLOs `SLO-###` | What we measure and the target on it; each `SLO` protects a PRD `NFR`. |
+| Dashboards | What each shows and who watches; link dashboard-as-code, don't paste screenshots. |
+| Alerts | Each fires on an `SLO` breach, cites the `NFR`, names threshold/severity/owner. |
+
+**Anti-patterns:** an `NFR` with no `SLO` (unmonitored) or an `SLO` with no `NFR` (unmoored); an alert with no owner or no action; dashboards described but never linked.
+
+## User docs — the deliverable ("what ships to end users")
+
+A tracked deliverable, not a requirements doc — no spine prefix; it *cites* the `REQ-`/`SCR-` it documents.
+
+| Section | Intent |
+|---|---|
+| Audience & scope | Who reads it; what user-visible behavior changed (if nothing did, the doc shouldn't exist). |
+| Deliverables | Each doc (guide, release note, in-app copy) mapped to the `REQ`/`SCR` it explains and where it's published. |
+| Voice & sources | Tone (ref the style guide); which screens/flows the steps/screenshots draw from, so they stay in sync. |
+
+**Anti-patterns:** docs written for a change that isn't user-visible; deliverables that cite no `REQ`/`SCR` (untraceable coverage); screenshots with no source screen (rot on the next UI change).
+
 ---
 
 ## Which diagram belongs where
@@ -121,10 +191,14 @@ Every diagram obeys the rules in SKILL.md → Diagrams (≤6 boxes, C4 split, EL
 
 | Doc | Diagram(s) | Split rule when it grows |
 |---|---|---|
-| **PRD** | **User flow / journey** (happy path, ≤6 steps); optional **system-context** (who uses it, what it touches) | One flow per diagram — a branch becomes its own flow |
+| **PRD** | **User flow / journey** — a single **directional overview** (happy path, ≤6 steps); optional **system-context** (who uses it, what it touches). The full flow set + IA live in **user-flows.md**, not the PRD | One flow per diagram — a branch becomes its own flow |
 | **ERD** | **C4 Context → Container → Component** (each its own ≤6-box diagram); optional **sequence** for one key interaction | Drill down a C4 level rather than adding boxes |
 | **DRD** | **ER diagram** (entities + relationships, ≤6 entities per view); optional **data-flow** (collect → store → delete) for the privacy/lifecycle story | Split the ER view by subdomain (e.g. billing vs. identity) |
 | **API contract** | **Sequence diagram** for one key operation (client → service → store, ≤6 boxes) | One operation per diagram |
+| **User flows** | **Sitemap** (IA, ≤6 nodes) + one **user-flow** per flow (≤6 steps) | One flow per diagram; split the sitemap by section |
+| **Wireframes** | One **lo-fi wireframe** per `SCR-` (Excalidraw scene, not a C4 diagram) | One screen per scene |
+| **Release plan** | **Deployment diagram** (environments/services/stores, ≤6 boxes) | Split by environment or tier |
+| **Observability** | optional **signal-flow** (service → metric/log → dashboard/alert, ≤6 boxes) | One story per diagram |
 
 The ELI5 caption matters most on the DRD data-flow and the ERD Context diagram — those are what a non-engineer (or a five-year-old) should still follow.
 
@@ -137,5 +211,7 @@ The shared ID namespace is what lets you *mechanically* prove nothing is orphane
 - ERD **entities/APIs** ↔ DRD **tables/fields** ↔ plan **file paths**.
 - PRD **`NFR-` + PII** ↔ ERD **cross-cutting concerns** ↔ DRD **classification/retention**.
 - **`ADR-`** cited by ID from both the ERD and the tasks that implement the decision.
+- PRD **user-facing `REQ-`** ↔ **`SCR-`** (wireframes) ↔ **`FLOW-`** (user-flows); screens reference the style guide's **`CMP-`/`TOK-`**.
+- PRD **`NFR-`** ↔ observability **`SLO-`/alerts**; DRD **migration** ↔ release-plan **`REL-`** rollback.
 
 If every ID resolves both directions, the docs are in sync. Any dangling ID is drift — fix it in Path B re-sync.

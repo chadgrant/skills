@@ -31,7 +31,7 @@ jira_project_key: null   # set by the Jira connector
 ## 5. Proposed solution
 <Directional — flows, wireframes, mockups. The *what*, not the *how* (that's the ERD).>
 
-**User flow** (≤6 steps; clone `templates/diagram.excalidraw`):
+**User flow** — directional overview only, ≤6 steps (clone `templates/diagram.excalidraw`; the full flow set + IA live in [user flows](./user-flows.md) when that doc is produced):
 ![user flow](diagrams/user-flow.excalidraw.svg)
 > *In plain terms: <one jargon-free sentence — what the user does, start to finish>.*
 

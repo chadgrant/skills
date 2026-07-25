@@ -1,11 +1,11 @@
 ---
 name: requirements-driven-planning
-description: Use when planning a feature, project, or migration and you need durable, human-readable requirements documents — a product requirements doc (PRD), an engineering requirements doc (ERD — architecture/infra/patterns), and/or a data requirements doc (DRD — data model, schemas, entity relationships, PII/retention) — that stay in sync with the implementation plan and the code, not a throwaway plan. Also use to reconcile existing requirements docs against the current code (re-sync / drift check). Triggers: "write a PRD", "requirements doc", "spec this out", "keep the docs in sync", "planning loop".
+description: Use when planning a feature, project, or migration and you need durable, human-readable requirements documents — a product requirements doc (PRD), an engineering requirements doc (ERD — architecture/infra/patterns), a data requirements doc (DRD — data model, schemas, PII/retention), UX docs (user flows + IA, lo-fi wireframes + interaction spec, a referenced style guide), and ops docs (release plan — deploy/migration/rollback, observability — SLOs/dashboards/alerts, user docs) — that stay in sync with the implementation plan and the code, not a throwaway plan. Also use to iterate one doc at a time (focused-loop), or reconcile docs with the current code (re-sync) — a drift check when docs exist, or reverse-engineering a brownfield repo into the doc set when they don't. Triggers: "write a PRD", "requirements doc", "spec this out", "let's do the wireframes", "user flows", "release plan", "observability doc", "reconstruct docs for this repo", "keep the docs in sync", "planning loop".
 ---
 
 # Requirements-driven planning
 
-Announce at the start: **"Using requirements-driven-planning: clarify → pick the doc set → write living requirements → route the implementation plan → hand off."**
+Announce at the start: **"Using requirements-driven-planning: pick the mode → clarify → write living docs → route the plan → hand off."** ([Modes](#modes): author · focused-loop · re-sync.)
 
 **Core principle: the requirements are the source of truth, and the code is downstream of them.** An implementation plan is for machines to execute and humans to throw away. A **PRD/ERD/DRD** is what a human reads in six months to understand *what we promised, how we built it, and what the data means* — so it must outlive the plan and stay true to the code. This skill produces that living family of docs and keeps them honest with one **shared ID spine** ([the spine](#the-spine)), then feeds a routed implementation plan to `multi-model-implementation` (model-routed-delivery).
 
@@ -17,15 +17,19 @@ This is a **self-contained planning loop** — it runs its own clarify → desig
 - **Use** in re-sync mode when code has drifted from the docs, or docs exist but were never reconciled.
 - **Don't** use for a one-line fix, a copy tweak, or throwaway spikes — there's nothing to keep in sync. A PRD for a typo fix is waste.
 
-## Two entry paths
+## Modes
+
+Three ways to run this skill. **Focused-loop (C) is the everyday one** — one doc, one unit at a time. Author (A) is the up-front pass for new work. **Re-sync (B) reconciles docs with code** — whether they've drifted *or don't exist yet*: reverse-engineering a brownfield repo into the doc set is the same job, started from empty, because code is the source of truth either way.
 
 ```dot
-digraph paths {
-  "Docs already exist?" [shape=diamond];
-  "Author path" [shape=box];
-  "Re-sync path" [shape=box];
-  "Docs already exist?" -> "Author path" [label="no / new work"];
-  "Docs already exist?" -> "Re-sync path" [label="yes, reconcile"];
+digraph modes {
+  "What are you doing?" [shape=diamond];
+  "A · Author" [shape=box];
+  "C · Focused loop" [shape=box];
+  "B · Re-sync" [shape=box];
+  "What are you doing?" -> "A · Author" [label="new work, whole set"];
+  "What are you doing?" -> "C · Focused loop" [label="one doc, iterate"];
+  "What are you doing?" -> "B · Re-sync" [label="reconcile with code — drifted OR brownfield"];
 }
 ```
 
@@ -47,16 +51,22 @@ Produce **only what the project warrants**. Decide with the requester, then conf
 | **ERD** (`templates/erd.md`) | A **new external dependency**, a **new service/module boundary**, a cross-cutting concern (security/observability/cost), or a **rejected alternative worth recording** exists | None of those apply — an obvious single-pattern change with no trade-off to weigh |
 | **DRD** (`templates/drd.md`) | Work adds or changes **persistent data**: schemas, entities, relationships, or anything touching **PII/retention** | No data model change (stateless, read-only, or reuses existing schema unchanged) |
 | **API contract** (`templates/api-contract.md`) | Work **exposes or changes a service boundary or a public/consumed API** | No API surface changes |
+| **User flows** (`templates/user-flows.md`) | Work has a **user-facing surface** — screens, navigation, forms | Headless/API-only, CLI, or backend job (no UI) |
+| **Wireframes** (`templates/wireframes.md`) | There are **screens to lay out** (usually whenever user flows exist) | No UI, or a copy/style-only tweak |
+| **Style guide** (`design-system/style-guide.md`) | Introducing **net-new visual language**, or the org has no design system yet | A UI exists and the org design system already covers it — **reference it, list only net-new `CMP-`** |
+| **Release plan** (`templates/release-plan.md`) | **Prod-facing deploy, migration, cutover, or rollback** | Internal library / no-deploy change |
+| **Observability** (`templates/observability.md`) | Runs as a **live service with health to watch** | Pure library, build-time, or one-shot |
+| **User docs** (`templates/user-docs.md`) | **End-user-visible behavior changes** | Internal-only refactor |
 | **Test & QA plan** (`templates/test-qa-plan.md`) | Feature has **non-trivial behavior or integration** to verify beyond unit tests | Trivial change fully covered by per-task `TEST-` |
 | **Implementation plan** (`templates/implementation-plan.md`) | More than one obvious task | A single self-evident task |
 
-*(Other docs worth adding by hand when the work warrants: a **threat model** on the security spine, an **ops readiness / rollout** doc for prod-facing changes and migrations, an **RFC** to precede the ERD on a contentious decision.)*
+*(Other docs worth adding by hand when the work warrants: a **threat model** on the security spine, an **RFC** to precede the ERD on a contentious decision. Rollout/ops-readiness now has its own doc — the **release plan**.)*
 
 State which docs you're producing and **why each other one is skipped** — a skipped DRD on a feature that stores user data is a red flag, not a shortcut.
 
 ### A2. Write the docs
 
-Fill the templates in `templates/`. Read `reference.md` for the per-section intent and the anti-patterns that kill each doc type (PRDs that prescribe solutions instead of stating problems; ERDs with no *alternatives-considered*; DRDs whose diagram and data-dictionary drift apart). Requirements docs go in **`docs/requirements/`**, the plan in **`docs/plans/`** (project conventions override these defaults).
+Fill the templates in `templates/`. Read `reference.md` for the per-section intent and the anti-patterns that kill each doc type (PRDs that prescribe solutions instead of stating problems; ERDs with no *alternatives-considered*; DRDs whose diagram and data-dictionary drift apart). Requirements docs go in **`docs/requirements/`**, the plan in **`docs/plans/`** (project conventions override these defaults). The **style guide is the exception** — it's cross-project and long-lived, so it lives in **`design-system/`** and is *referenced, not regenerated* per feature.
 
 Every requirement, entity, decision, and task gets a **stable ID from the spine**. This is not optional bookkeeping — it is the mechanism that makes the docs syncable. Give each doc its **diagrams** ([Diagrams](#diagrams)) as you write it.
 
@@ -64,20 +74,48 @@ Every requirement, entity, decision, and task gets a **stable ID from the spine*
 
 Decompose into atomic `TASK-###`s (exact file paths, the interface each produces, a `TEST-###` verify step that needs **no human interpretation**). Then rate each task's **difficulty on its hardest aspect** and route it to a model tier — this is exactly the Phase 1–2 discipline of the **`multi-model-implementation`** skill (Easy→small, Medium→mid, Hard→top; anything on the security/money/auth/data-integrity spine is Hard regardless of size, and is additionally flagged **`observe`** for a mandatory adversarial review). Record the tier and any `observe` flag in each task. The concrete **tier→model mapping is owned by `multi-model-implementation`**, not this skill — record tiers, not model names. **When a plan exists, hand it to `multi-model-implementation`** to orchestrate the build (a single self-evident task needs no plan and no handoff).
 
+**UI build constraint.** For work with a user-facing surface, add a **global constraint** to the plan: *UI/site tasks are built with the [Impeccable](https://github.com/pbakaus/impeccable) skill* — it extends `frontend-design` with an anti-slop design vocabulary and builds against the [style guide](#a1-pick-the-doc-set-adaptive)'s tokens/components. `multi-model-implementation` copies global constraints verbatim into every implementer's brief, so each frontend agent inherits it without per-task repetition.
+
 ### A4. Traceability check (do this every time)
 
 Run the [checklist](#traceability-checklist) by hand. Fix gaps inline. Then hand off.
 
 ---
 
-## Path B — Re-sync
+## Path B — Re-sync (reconcile docs with code)
 
-When docs already exist and may have drifted:
+**Code is ground truth for what *is*; the PRD is ground truth for what was *promised*.** This one path covers both the drift check (docs exist) and reverse-engineering a **brownfield repo with no docs yet** — the skill knows how to read a project *back into* the doc set. The only difference is the starting point: existing docs to reconcile, or an empty `docs/requirements/` to fill.
 
-1. **Read** the current PRD/ERD/DRD/plan and the relevant code.
-2. **Run the [traceability checklist](#traceability-checklist)** against reality — treat code as ground truth for *what is*, and the PRD as ground truth for *what was promised*.
-3. **Report drift** explicitly before editing: orphan requirements (no task/code), untraceable code (no requirement), schema ↔ data-dictionary mismatches, missing PII/retention on stored data, `ADR`s contradicted by the code.
-4. **Reconcile** — update the docs to match reality where the code is correct; open follow-up tasks where the code is wrong. Never silently rewrite a promise; call out what changed and why.
+1. **Read** the current docs (if any) and the relevant code — schema/migrations, routes, module graph, IaC/CI, dashboards/alerts, and **tests** (the richest signal for intended behavior).
+2. **Reconstruct or reconcile**, assigning spine IDs. Pull each doc from its highest-signal source: schema→`ENT`, routes/OpenAPI→`API`, module graph/IaC→ERD C4, deploy config→release-plan, alert rules→`SLO`, routes+components→sitemap/flows (lossy), tests+guards+validation+config→candidate `REQ`/`NFR`.
+3. **Mark what code can't tell you.** Code holds the *what* and *how*, almost never the *why*. Label each item `[extracted]` (read from code) · `[inferred]` (guessed — confirm) · `⚠ [needs-confirmation]` (unknowable from code: retention, success metrics, PII sensitivity, ADR alternatives, SLO targets, UX intent). **Never fabricate intent** — a `⚠` is honest; an invented retention rule or metric is drift shipped as truth. Default to leaving `⚠` markers **inline** rather than interrogating; hand those gaps to a focused loop (Path C) to fill when you want.
+4. **Report drift / gaps** before editing: orphan requirements (no task/code), untraceable code (no requirement), schema ↔ data-dictionary mismatches, missing PII/retention on stored data, `ADR`s the code contradicts, and every `⚠`.
+5. **Reconcile** — update the docs to match reality where the code is correct; open follow-up tasks where the code is wrong. Never silently rewrite a promise; call out what changed and why.
+
+---
+
+## Path C — Focused (one doc, loop-until-done)
+
+The everyday mode. You name a doc and drive it forward one unit at a time — *"let's do the wireframes"*, *"add a wireframe for checkout"*, *"work on observability"*.
+
+1. **Locate** the doc; scaffold it from its template if it doesn't exist yet.
+2. **Load upstream context** so the doc derives from real inputs, not invention:
+   - wireframes ← user-flows (`FLOW-`) ← PRD (`REQ-`) · user-flows ← PRD (`REQ-`) · release-plan ← ERD + DRD (migrations) · observability ← PRD (`NFR-`) + ERD.
+   - Missing prerequisite? **Offer** to sketch it first or proceed from `REQ-` — never hard-block. (Asked for wireframes with no flows → *"rough the flow first, or go straight from the requirements?"*)
+3. **Pick one unit** — a single screen / flow / SLO. Enumerate candidates from upstream (each `FLOW-` implies its screens), or take the unit the user named.
+4. **Clarify** — ask questions until *that* unit is complete, then draft it (Excalidraw scene + section).
+5. **Refine** — show the drafted unit; refine until the user approves it.
+6. **Loop** — go to the next unit. Repeat until the user says done.
+7. **Write** — allocate the next spine IDs and insert/update each unit **in place** (append — never regenerate the whole doc); add the diagram files; bump `last_synced`.
+8. **Scoped check** — run only the [checklist](#traceability-checklist) rows touching the changed IDs (every new `SCR-` maps to a `FLOW-` and a `REQ-`); report drift.
+
+**Loop discipline** (sourced from `superpowers` — `brainstorming`, `subagent-driven-development`, `executing-plans`):
+
+- Ask **one question at a time**; multiple-choice when you can.
+- After a unit is approved, go straight to the next — **do not ask "should I continue?"** The user ends the loop by saying done.
+- A unit is complete only when its required states are filled (a screen with no empty/error state is not done). **No placeholders.**
+- **Stop and ask only when**: genuinely ambiguous and unguessable, a prerequisite is missing, or the user says done.
+- **Ask, never guess.** Never fabricate intent — an unknown becomes a question or a `⚠` marker, not an invented value.
 
 ---
 
@@ -106,10 +144,17 @@ One shared ID namespace links every doc. This is what turns "keep them in sync" 
 | `NFR-###` | PRD | Non-functional requirement (perf, security, a11y, compliance) |
 | `ADR-###` | ERD | An architecture decision (one decision each; supersede, never edit) |
 | `ENT-###` | DRD | A data entity / table |
+| `NAV-###` | User flows | An IA / navigation node |
+| `FLOW-###` | User flows | A user flow (cites the `REQ`s it stitches) |
+| `SCR-###` | Wireframes | A screen / view (cites a `REQ`, appears in a `FLOW`) |
+| `CMP-###` | Style guide | A design-system component |
+| `TOK-###` | Style guide | A design token |
+| `REL-###` | Release plan | A release / rollout step or gate |
+| `SLO-###` | Observability | A service-level objective (cites the `NFR` it protects) |
 | `TASK-###` | Plan | An atomic unit of work (its file paths are their own identifiers) |
 | `TEST-###` | Plan | A task's verify step / acceptance check, cited by the `REQ` it proves |
 
-**Linking rules:** every `TASK` cites the `REQ`/`NFR` it satisfies → every `REQ` has ≥1 `TASK` and a `TEST-` → `ENT`s trace to the `REQ`s that need them → `ADR`s are cited by the tasks that implement them → PII `ENT`s carry a classification and a retention rule.
+**Linking rules:** every `TASK` cites the `REQ`/`NFR` it satisfies → every `REQ` has ≥1 `TASK` and a `TEST-` → `ENT`s trace to the `REQ`s that need them → `ADR`s are cited by the tasks that implement them → PII `ENT`s carry a classification and a retention rule. **UX/ops:** every user-facing `REQ` has ≥1 `SCR` → every `SCR` traces to a `REQ` and appears in a `FLOW` → every `SLO`/alert cites the `NFR` it protects → every irreversible `REL` step has a rollback.
 
 **Extension IDs** (only when their doc exists — same linking discipline): `API-###` (API operations in the contract; each cites the `REQ` it serves and the `ENT` it touches) · `TC-###` (scenario test cases in the Test & QA plan; each cites a `REQ`/`NFR`).
 
@@ -125,6 +170,9 @@ One shared ID namespace links every doc. This is what turns "keep them in sync" 
 - [ ] Every `ADR` is referenced by the task(s) that implement it; no code contradicts an accepted `ADR`.
 - [ ] Every diagram has ≤6 boxes and an ELI5 caption; anything bigger is split by C4 level, not crammed.
 - [ ] Every `ENT`/major component is an ID-labeled box, and every box maps to a spine ID.
+- [ ] Every user-facing `REQ` has ≥1 `SCR`; every `SCR` traces to a `REQ` and appears in ≥1 `FLOW`; every `FLOW` cites the `REQ`s it stitches.
+- [ ] Every interactive `SCR` covers empty / error / loading states; every net-new `CMP` a screen uses exists in the style guide (or is flagged net-new).
+- [ ] Every `SLO`/alert cites the `NFR` it protects; every irreversible `REL` step has a rollback (or an explicit forward-fix-only note).
 - [ ] No placeholders (`TBD`, "similar to above", "add error handling") in any doc.
 
 ## Built to sync outward (connectors)
@@ -144,6 +192,9 @@ These docs are designed to leave the repo and live in a knowledge base without l
 | "I'll assign IDs later." | IDs are the spine. No IDs, no traceability, no sync. Assign them as you write. |
 | "One design; no need for alternatives-considered." | If there were truly no alternatives, say so in one line. Usually there were, and the reader needs the reasoning. |
 | "The code changed; I'll update the docs eventually." | 'Eventually' is how docs die. Run re-sync now, or the requirements stop being true. |
+| "The UI shipped; I'll update the wireframes/flows later." | Same death by 'later'. If the built UI diverges from the wireframes, re-sync now — or the design docs stop being true. |
+| "It's headless, but I'll add wireframes to be safe." | A wireframe for an API is noise. Produce UI docs only when there's a user-facing surface; state why you skipped them. |
+| "Reverse-engineering the repo — I'll just fill in a sensible retention rule." | Inventing a retention rule, metric, or rationale from code is fabrication. Emit a `⚠` marker; never guess intent. |
 | "I'll write the plan myself and route later." | Route as you decompose. The tier is a property of the task, decided when you understand its hardest aspect. |
 | "Requirements look done — ship the plan." | Run the traceability checklist first. An orphan requirement is an unbuilt promise. |
 

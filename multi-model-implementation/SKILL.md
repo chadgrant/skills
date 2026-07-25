@@ -36,7 +36,7 @@ Rate each task on its **hardest aspect** (not the average), then route:
 | **Medium** | Multi-file, some design judgement, integrates 2–3 components, moderate blast radius | mid |
 | **Hard** | Security / money / auth / data-integrity / tenancy; concurrency or ordering; novel algorithm; a decision many tasks depend on; high blast radius | top (Fable) |
 
-Concrete mapping today: **Easy → Sonnet, Medium → Opus, Hard → Fable.** Express it as tiers so it ages as models change. Anything on the security/money/auth/data-integrity spine is **Hard regardless of size**, and is additionally flagged **`observe`** — it gets an adversarial review pass (Phase 3, step 4) even if a mid-tier agent writes the first draft.
+Concrete mapping today: **Easy → Haiku, Medium → Opus, Hard → Fable.** Use **unversioned family names** — "Opus" always resolves to the current Opus, so the mapping doesn't rot when a new version ships; pin a version only to reproduce a specific run. (**Sonnet is parked**: its new tokenizer plus on-by-default thinking put its *effective* cost above Opus on many tasks right now — bring it back to the mid tier when that flips.) Express it as tiers so it ages as models change. Anything on the security/money/auth/data-integrity spine is **Hard regardless of size**, and is additionally flagged **`observe`** — it gets an adversarial review pass (Phase 3, step 4) even if a mid-tier agent writes the first draft.
 
 ## Phase 3 — Orchestrate the waves (this is where Fable observes)
 
