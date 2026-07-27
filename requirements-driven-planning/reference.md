@@ -98,7 +98,7 @@ Sits above the per-task `TEST-` unit checks: scenario-level cases, non-functiona
 
 ## Implementation plan — the execution DAG
 
-The most rigid doc: an agent must execute each task with **no interpretation**. This is the input `multi-model-implementation` consumes.
+The most rigid doc: an agent must execute each task with **no interpretation**. This is the input `model-routed-delivery` consumes.
 
 | Section | Intent |
 |---|---|
@@ -111,7 +111,7 @@ The most rigid doc: an agent must execute each task with **no interpretation**. 
 
 **Anti-patterns:** ambiguous tasks requiring interpretation; tasks without file-path specificity; missing per-task verification; undeclared (hidden) ordering dependencies; placeholder text; a task that overlaps another wave's files (breaks parallel disjointness).
 
-**Difficulty → model tier** (from `multi-model-implementation`): rate each task on its *hardest* aspect. Easy (mechanical, single-file, well-specified) → small tier. Medium (multi-file, some design judgement) → mid tier. Hard (security/money/auth/data-integrity, concurrency, novel algorithm, high blast radius, many tasks depend on it) → top tier; additionally flag **`observe`** (mandatory adversarial review) when the task sits on the security/money/auth/data-integrity spine. Security-small is still Hard. The concrete tier→model mapping lives in `multi-model-implementation`, not here — record tiers, not model names.
+**Difficulty → model tier** (from `model-routed-delivery`): rate each task on its *hardest* aspect. Easy (mechanical, single-file, well-specified) → small tier. Medium (multi-file, some design judgement) → mid tier. Hard (security/money/auth/data-integrity, concurrency, novel algorithm, high blast radius, many tasks depend on it) → top tier; additionally flag **`observe`** (mandatory adversarial review) when the task sits on the security/money/auth/data-integrity spine. Security-small is still Hard. The concrete tier→model mapping lives in `model-routed-delivery`, not here — record tiers, not model names.
 
 ## User flows — IA & journeys ("where things live, how you move")
 

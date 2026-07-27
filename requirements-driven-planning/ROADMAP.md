@@ -7,7 +7,7 @@ What exists in this skill today, and what's designed-for but not yet built.
 - **The spine** — shared ID namespace (`REQ- / NFR- / ADR- / ENT- / TASK- / TEST-`, extensions `API- / TC-`) with a hand-run traceability checklist.
 - **Diagrams** — Excalidraw, ≤6 boxes, C4 split-by-zoom, ELI5 captions, ID-labeled boxes.
 - **Two entry paths** — author, and re-sync (reconcile docs against current code).
-- **Model routing** — per-task tiers handed to `multi-model-implementation`.
+- **Model routing** — per-task tiers handed to `model-routed-delivery`.
 - **Connector-ready** — machine-readable front-matter on every doc + the mapping contract in `connectors.md`.
 
 ## Next (designed, not built)

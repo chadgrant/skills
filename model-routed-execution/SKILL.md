@@ -1,6 +1,6 @@
 ---
 name: model-routed-delivery
-description: Use when delivering a large multi-task build end to end — a whole project, milestone, or migration — mostly autonomously. A planner rates every task's difficulty and routes it to a model tier (easy→small, medium→mid, hard→top); a top-tier orchestrator/observer (Fable) then runs waves of subagents on disjoint file paths, verifying and committing each task, keeping a live ledger, and looping until everything is green. Requires a spec/PRD to exist first.
+description: Use when delivering a large multi-task build end to end — a whole project, milestone, or migration — mostly autonomously. This is the execution layer of the pipeline (plan → execute → implement): a planner rates every task's difficulty and routes it to a model tier (easy→small, medium→mid, hard→top); a top-tier orchestrator/observer (Fable) then runs waves of subagents on disjoint file paths, verifying and committing each task, keeping a live ledger, and looping until everything is green. Each worker builds its task by following the clean-implementation skill; this skill owns the fleet (routing, waves, verification, commits, ledger), not how a single task is written. Requires a spec/PRD to exist first.
 ---
 
 # Model-routed delivery
@@ -11,6 +11,8 @@ You are running a **fleet**, not typing code. There are two roles, and keeping t
 
 - **Planner** — decomposes the work into a task DAG and, for each task, assigns a **difficulty** (Easy / Medium / Hard) and the **model tier** that difficulty routes to. Its output is a written plan where every task names its files, the interface it produces, its verify step, and its model.
 - **Orchestrator / observer — run this role on the top tier (Fable).** It is the session itself. It does **not** grind low tasks by hand; it dispatches each task to its routed model, **observes** (adversarially reviews) the critical ones, verifies every result, commits, updates the ledger, and re-plans. Put the strongest model here on purpose — judgement, verification, and review are the load-bearing links, not the typing.
+
+**This skill owns the fleet, not the keystrokes.** *How* a single worker builds its one task — verify-first, clean code, UI via Impeccable, staying in its lane, reporting back — is the **`clean-implementation`** skill's job, and every dispatched worker follows it (Phase 3, step 2). This skill routes, dispatches, verifies, commits, and loops; it does not restate the worker's build doctrine. That seam is deliberate: it lets the worker be a Claude Code subagent today or a fully autonomous "dark factory" node later, without changing the floor manager.
 
 ## Phase 0 — Clarify before you plan
 
@@ -43,7 +45,7 @@ Concrete mapping today: **Easy → Haiku, Medium → Opus, Hard → Fable.** Use
 Loop until the ledger is all-green:
 
 1. **Pick a wave** — 3–4 *ready* tasks whose file paths are disjoint. Respect the DAG: never start a task whose interface dependency hasn't landed.
-2. **Dispatch** each task to its routed model as a subagent, **all in one message** so they run in parallel. Give each agent: its files, the interface it must produce, its exact verify command, and the iron rules below.
+2. **Dispatch** each task to its routed model as a subagent, **all in one message** so they run in parallel. Give each agent: its files, the interface it must produce, its exact verify command, the plan's global constraints, and the instruction to **build the task by following the `clean-implementation` skill** (that skill is the worker's operating manual — verify-first, clean code, Impeccable for UI, stay in its lane, never commit, report the interface back). Repeat the "never `git commit`" and disjoint-files rules explicitly in the brief; do not assume.
 3. **Verify on completion** — for each returned task, run its verify step **yourself**. Scope the build/test to the touched packages (the tree may be transiently red from other in-flight agents); run the full suite once the wave lands.
 4. **Observe the critical ones** — for every `observe`-flagged task, run an **adversarial review** before you trust it: a fresh agent (or several) told to *refute* the implementation, name the inputs that break it, prove the invariant holds. This is the observer half of the job and it is where the real bugs surface — in practice this is what caught the genuine security bugs.
 5. **Commit** each verified task (**orchestrator only** — see iron rules), one commit per task, then **update the ledger**.
@@ -79,5 +81,7 @@ Before declaring a milestone done, run the cleanup + review skills over the accu
 | "The diff is huge, skip the review." | Big refactors hide subtle regressions. Run the quality gate. |
 
 ---
+
+*The middle of a three-skill pipeline: **`requirements-driven-planning`** (produces the routed plan this skill consumes) → **`model-routed-delivery`** (this skill — routes, dispatches, verifies, commits, loops) → **`clean-implementation`** (each worker's build doctrine, which in turn composes **`uncle-bob-clean-code`**).*
 
 *Inspired by the structure and discipline of [obra/superpowers](https://github.com/obra/superpowers) (brainstorm-before-code, plans as small verifiable tasks, fresh-agent review). This skill adds the difficulty→model routing table and the top-tier orchestrator/observer running a wave loop over a fleet.*

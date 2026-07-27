@@ -10,7 +10,7 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 
 # <Feature name> — Implementation Plan
 
-> **For the build:** hand this plan to the `multi-model-implementation` (model-routed-delivery) skill to orchestrate the waves. Each task carries a **model tier**; the orchestrator dispatches, verifies, and commits per task.
+> **For the build:** hand this plan to the `model-routed-delivery` skill to orchestrate the waves. Each task carries a **model tier**; the orchestrator dispatches (each worker follows `clean-implementation`), verifies, and commits per task.
 >
 > **Sources:** [PRD](../requirements/prd.md) · [ERD](../requirements/erd.md) · [DRD](../requirements/drd.md) · [API](../requirements/api-contract.md) · [Test plan](../requirements/test-qa-plan.md)
 
