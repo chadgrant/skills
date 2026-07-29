@@ -76,6 +76,8 @@ Decompose into atomic `TASK-###`s (exact file paths, the interface each produces
 
 **UI build constraint.** For work with a user-facing surface, add a **global constraint** to the plan: *UI/site tasks are built with the [Impeccable](https://github.com/pbakaus/impeccable) skill* — it extends `frontend-design` with an anti-slop design vocabulary and builds against the [style guide](#a1-pick-the-doc-set-adaptive)'s tokens/components. `model-routed-delivery` copies global constraints verbatim into every worker's brief, and `clean-implementation` (the worker's manual) treats "build UI with Impeccable" as a rule — so each frontend agent inherits it without per-task repetition.
 
+**Quality-bar constraint.** Add a **global constraint** that *done* means green **and** clean: each task's acceptance is its `TEST-` passing **and** passing a code-quality review (`uncle-bob-clean-code` — one thing per unit, no bloat, SOLID, design patterns only where the problem warrants one). State it once; `model-routed-delivery` verifies it at **both** the worker and the orchestrator level, so every task inherits the bar without per-task repetition. A `TEST-` that a verbose or un-patterned solution can still pass is an incomplete acceptance criterion — the quality gate is part of *done*, not a later cleanup.
+
 ### A4. Traceability check (do this every time)
 
 Run the [checklist](#traceability-checklist) by hand. Fix gaps inline. Then hand off.
@@ -165,6 +167,7 @@ One shared ID namespace links every doc. This is what turns "keep them in sync" 
 - [ ] Every `REQ`/`NFR` maps to ≥1 `TASK`. (Unmapped → unbuilt promise.)
 - [ ] Every `TASK` cites ≥1 `REQ`/`NFR`. (Uncited → scope creep or dead work.)
 - [ ] Every `REQ` has a `TEST-` / acceptance criterion. (PRD success metrics ↔ plan `TEST-`s.)
+- [ ] *Done* is defined as green **and** clean: acceptance = the `TEST-` passing **plus** a code-quality gate (`uncle-bob-clean-code`, verified worker- and orchestrator-side), not tests alone.
 - [ ] Every `ENT` traces to a `REQ`; every persisted field has a classification and each entity a retention rule.
 - [ ] ERD design/interfaces ↔ DRD schema ↔ DRD data dictionary agree (names, types, cardinality).
 - [ ] Every `ADR` is referenced by the task(s) that implement it; no code contradicts an accepted `ADR`.
@@ -197,6 +200,7 @@ These docs are designed to leave the repo and live in a knowledge base without l
 | "Reverse-engineering the repo — I'll just fill in a sensible retention rule." | Inventing a retention rule, metric, or rationale from code is fabrication. Emit a `⚠` marker; never guess intent. |
 | "I'll write the plan myself and route later." | Route as you decompose. The tier is a property of the task, decided when you understand its hardest aspect. |
 | "Requirements look done — ship the plan." | Run the traceability checklist first. An orphan requirement is an unbuilt promise. |
+| "The `TEST-` passes, so the task's acceptance is met." | Acceptance is green *and* clean. A verbose or un-patterned solution that passes its `TEST-` is still debt — the quality gate is part of *done*. |
 
 ---
 
