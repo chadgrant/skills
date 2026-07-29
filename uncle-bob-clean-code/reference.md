@@ -1,4 +1,4 @@
-# Uncle Bob Reference — Clean Code and SOLID in Full
+# Uncle Bob Reference — Clean Code, SOLID, Clean Architecture, and Construction in Full
 
 Distilled from Robert C. Martin's *Clean Code*, *The Clean Coder*, *Clean Architecture*, and *Agile Software Development: Principles, Patterns, and Practices*. Load this when you need the detail behind a rule in SKILL.md.
 
@@ -127,6 +127,47 @@ High-level policy must not depend on low-level detail; both depend on abstractio
 # Fix: OrderService takes repository/notifier abstractions in the constructor;
 #      main() wires the concretions. Tests wire fakes.
 ```
+
+## Clean Architecture (Clean Architecture, Martin)
+
+SOLID scaled up from classes to components and boundaries.
+
+**The Dependency Rule — the whole game.** Source-code dependencies point **inward only**; nothing in an inner circle knows anything about an outer one. Concentric layers:
+
+```
+  Frameworks & Drivers (web, DB, UI, devices)   ← details, outermost
+    Interface Adapters (controllers, presenters, gateways)
+      Use Cases (application-specific business rules)
+        Entities (enterprise-wide business rules)  ← policy, innermost
+```
+
+- Business rules (Entities, Use Cases) know nothing of the DB, the web, or the framework. Those are **plugins** to the policy, not its foundation.
+- Cross a boundary inward-to-outward via an **interface the inner circle owns** (DIP) — e.g. a Use Case declares a `Repository` port; an outer adapter implements it. Data crossing a boundary is a simple struct (a DTO) — never pass an Entity object or a DB row across as-is, and never let an outer-layer type leak inward.
+- **Defer detail decisions.** Which DB, which framework, which UI are details you should be able to postpone; a good architecture lets you delay and swap them.
+
+**Component cohesion — what goes in a component:**
+- **REP** (Reuse/Release Equivalence) — the unit of reuse is the unit of release; a component is a coherent, versioned, releasable thing.
+- **CCP** (Common Closure) — classes that change together, for the same reasons, belong in the same component (SRP for components).
+- **CRP** (Common Reuse) — don't force a component's users to depend on things they don't use (ISP for components).
+- These three **pull against each other**; you can't max all three. Young projects lean CCP (developability), mature ones lean REP (reusability).
+
+**Component coupling — how components depend:**
+- **ADP** (Acyclic Dependencies) — the component dependency graph must have **no cycles**. Break a cycle with DIP or by extracting a new component.
+- **SDP** (Stable Dependencies) — depend in the direction of **stability**; a component should be more stable than those that depend on it. Volatile things depend on stable things, never the reverse.
+- **SAP** (Stable Abstractions) — a component should be **as abstract as it is stable**. Stable components should be abstract (so they can be extended without change); volatile components should be concrete. Stable-and-concrete is the "zone of pain."
+
+**Humble Object** — split hard-to-test behavior from easy-to-test logic at a boundary (e.g. a Presenter holds all logic; the View is a humble, logic-free shell). Keeps the untestable edge (UI, I/O) thin.
+
+## Construction (Code Complete, McConnell)
+
+The construction-level rigor beneath Clean Code. Cited where it adds beyond the chapters above.
+
+- **Managing complexity is the primary technical imperative.** Every rule below serves it. Software's hardest problem is comprehension, not typing.
+- **Defensive programming.** Distinguish **assertions** (for conditions that must *never* happen — programmer errors; can be compiled out) from **error handling** (for bad input that *can* happen at runtime). Erect **barricades**: validate at the boundary, and trust the data inside the barricade so interior code isn't littered with checks. Decide an error strategy per subsystem — return a neutral value, log, throw, or shut down — and apply it consistently (ties to fail-open vs fail-closed in `model-routed-delivery`).
+- **Variables.** One purpose per variable (no reusing `temp` for two things); shortest live time and smallest scope you can manage.
+- **Routines.** A valid reason to create or extract one: reduce complexity, avoid duplication, hide a sequence or pointer operation, or name intent — *not* merely "it got long." (The one-thing/cohesion rule lives in Functions above.)
+- **Pseudocode Programming Process.** Draft a routine's intent as pseudocode comments; refine each line into code; the comments that survive explain *why*, and the ones that were just restating *what* get deleted (aligns with the Comments rule above).
+- **Table-driven methods.** Replace a complex chain of conditionals with a lookup table when it's simpler to read and change (the `TIER_DISCOUNTS`/`TAX_RATES` tables in the worked example are exactly this).
 
 ## Code Smells (Clean Code ch. 17, selected)
 

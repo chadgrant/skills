@@ -45,7 +45,7 @@ Not for: vendored or generated code, or scripts the user explicitly calls throwa
 **Tests**
 - Test-first where the environment allows (Three Laws of TDD). Tests follow FIRST: Fast, Independent, Repeatable, Self-validating, Timely. One concept per test. Test code is held to production standards.
 
-**SOLID** — see [reference.md](reference.md) for examples and the full teachings.
+**SOLID** — see [reference.md](reference.md) for worked examples and the full teachings, plus **Clean Architecture** (the Dependency Rule; component cohesion REP/CCP/CRP and coupling ADP/SDP/SAP) and **Construction** (Code Complete: defensive programming, functional cohesion, table-driven methods). Read the whole file — the review passes below draw on all of it, not just the SOLID table.
 
 | Principle | Rule | Violation smell |
 |---|---|---|
@@ -57,12 +57,20 @@ Not for: vendored or generated code, or scripts the user explicitly calls throwa
 
 **Existing messy codebase?** Match its conventions — naming case, formatting, module layout — never its defects. "Match our style" means style, not smells: single-letter names, status-code returns, and blob functions are defects, not style. Apply the Boy Scout Rule to lines you touch; don't launch drive-by rewrites of code the task doesn't touch.
 
+## Composes with the design canon
+
+This skill covers how to write and review **any unit of code** well — names, functions, SOLID, Clean Architecture, construction. Three sibling skills carry the design knowledge above that altitude; reach for them when the problem calls for it, and don't reinvent what they catalog:
+
+- **`design-patterns`** — a recurring design problem (growing conditional, swappable behavior, how to structure domain logic / data access / the web layer) → the named GoF / Fowler-PoEAA solution. Most patterns are SOLID made concrete.
+- **`domain-driven-design`** — modeling a rich domain: ubiquitous language, bounded contexts, aggregates and their invariants, repositories, domain events.
+- **`refactoring`** — code that has become a burden: the smell → refactoring catalog and the two-hats, small-steps-under-green-tests discipline for moving toward the patterns and models above.
+
 ## Reviewing Code
 
 Run three REQUIRED passes and report findings in this order. A review that contains only one kind of finding means a pass was skipped.
 
 1. **Correctness & security** — bugs, injection, resource leaks, error paths, concurrency. Trace every boolean-flag combination end to end: a flag that only partially gates behavior (a "dry run" that still sends email) is a bug here, not just a design smell. Never let design commentary crowd these out.
-2. **Design (SOLID pass)** — walk the SOLID table above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type.
+2. **Design (SOLID + architecture pass)** — walk the SOLID table above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type. At component scale, check the **Dependency Rule** (does policy depend on a detail? any dependency cycles?) and whether a **known pattern is missing or misapplied** (`design-patterns`), or the **domain model is anemic / an aggregate leaks** (`domain-driven-design`). Where a smell is real, name the **refactoring** that fixes it (`refactoring`).
 3. **Readability** — names, magic numbers, commented-out code, comment quality, duplication (DRY).
 
 For each finding: name the principle or smell, say concretely why it will hurt, and sketch the fix. End with an explicit verdict: blockers, should-fix, nits.

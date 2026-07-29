@@ -78,6 +78,8 @@ Decompose into atomic `TASK-###`s (exact file paths, the interface each produces
 
 **Quality-bar constraint.** Add a **global constraint** that *done* means green **and** clean: each task's acceptance is its `TEST-` passing **and** passing a code-quality review (`uncle-bob-clean-code` — one thing per unit, no bloat, SOLID, design patterns only where the problem warrants one). State it once; `model-routed-delivery` verifies it at **both** the worker and the orchestrator level, so every task inherits the bar without per-task repetition. A `TEST-` that a verbose or un-patterned solution can still pass is an incomplete acceptance criterion — the quality gate is part of *done*, not a later cleanup.
 
+**Design-canon constraint.** Add a **global constraint** that design decisions draw on the established canon rather than invention: reach for a known **pattern** (`design-patterns` — GoF / Fowler PoEAA) instead of inventing one, model a rich domain with **`domain-driven-design`** (its ubiquitous-language glossary and bounded contexts belong in the PRD/ERD, and bounded contexts inform the service/module boundaries in the architecture doc), and treat **`refactoring`** as a first-class task type — a "reduce burden" task is plannable, with a *behavior-unchanged* verify. `model-routed-delivery` copies this into every worker's brief.
+
 ### A4. Traceability check (do this every time)
 
 Run the [checklist](#traceability-checklist) by hand. Fix gaps inline. Then hand off.
