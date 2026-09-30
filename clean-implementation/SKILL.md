@@ -1,114 +1,110 @@
 ---
 name: clean-implementation
-description: Use when building a single task from a plan — the worker's operating manual for turning one task brief into verified, clean, committed-ready code. Applies whether you're a Claude Code subagent dispatched by model-routed-delivery or an autonomous "dark factory" node. Understand the task and its interface contract, work verify-first, write the code by following the uncle-bob-clean-code skill (composing design-patterns and domain-driven-design for design decisions, and refactoring when existing code has become a burden), build UI with Impeccable against the style guide, build services Twelve-Factor, stay in your assigned files, never commit, and report the interface you produced back to the orchestrator. Prove the code clean as well as green — an uncle-bob self-review of your own diff (one thing per function, no bloat, design patterns only where warranted), because passing tests are necessary but not sufficient. When a test goes red, debug systematically instead of thrashing, and escalate at your ceiling; when adversarial review comes back, receive it with rigor — verify each finding, fix the root, push back on wrong notes, never performatively agree. Triggers: "implement TASK-###", "build this task", a dispatched task brief, "you are the worker", "the test is failing", "address the review".
+description: Use when you are the worker building one task from a plan or a dispatched brief. Triggers: "implement TASK-###", "build this task", "you are the worker", "the test is failing", "address the review". Not for planning or orchestrating waves.
 ---
 
 # Clean implementation
 
-Announce at the start: **"Using clean-implementation: read the brief → verify-first → write it clean → prove it green *and* clean → report back."** (Red bar → debug systematically; review back → receive with rigor.)
+Announce: **"Using clean-implementation: read the brief → verify-first → write it clean → prove it green and clean → report."**
 
-**Core principle: your job is one task, done well and proven — not the whole system.** You are a **worker**, not the orchestrator. Someone above you decomposed the work, routed this task to you, and will verify, commit, and integrate your result. Your entire contract is: build exactly the task in your brief, make its verify step pass, and hand back a truthful report. Doing more, touching more, or claiming more is a defect.
+**Core principle: one task, done well and proven.** You are a worker. Someone above you decomposed the work, routed this task to you, and will verify, commit, and integrate it. Build exactly what the brief says, make its verify step pass, and report truthfully. Doing more, touching more, or claiming more is a defect.
 
-This is the **implementation** end of the pipeline (`requirements-driven-planning` → `model-routed-delivery` → **`clean-implementation`**). The layer above owns routing, waves, commits, and the ledger. You own the keystrokes for one unit of work.
+Pipeline position: `requirements-driven-planning` → `model-routed-delivery` → **this skill**. The layer above owns routing, waves, commits, and the ledger.
 
-## Your input: the task brief
+## The brief
 
-A well-formed brief gives you everything you need. Confirm you have it before typing:
+Confirm you have all of these before typing:
 
-- **Task id + goal** — the one thing this task delivers.
-- **Files** — exactly which to create / modify / test. This set is your lane; it is disjoint from every other in-flight worker's lane on purpose.
-- **Interface to produce** — the signatures, types, or contract later tasks depend on. This is a promise; match it exactly.
-- **Verify step** — the exact build/test command that proves the task done, needing no human interpretation.
-- **Difficulty / `observe` flag**: if flagged `observe`, expect a dedicated adversarial review of your result. A Hard task without the flag is reviewed with the rest of its wave. Either way, write to survive it.
-- **Global constraints** — stack, fail-mode, (for UI work) the Impeccable + style-guide constraint, and (for service work) the Twelve-Factor constraint, copied verbatim from the plan.
+- **Task id and goal**
+- **Files**: your lane, disjoint from every other worker's by design
+- **Interface to produce**: a promise later tasks build on; match it exactly
+- **Verify step**: the exact command that proves the task done
+- **Difficulty / `observe`**: `observe` means a dedicated adversarial review; other Hard tasks are reviewed with their wave. Either way, write code that survives a reviewer trying to break it.
+- **Global constraints**: stack, fail-mode, Impeccable for UI, Twelve-Factor for services, copied verbatim from the plan
 
-**Missing or ambiguous brief?** Don't guess your way past a genuine fork — a wrong assumption here becomes wrong code the orchestrator has to catch and unwind. State the ambiguity in your report and, where you can, proceed on the smallest defensible interpretation and flag it `⚠`. Never invent an interface the plan didn't specify.
+Missing or ambiguous? Two cases:
+- A gap that doesn't change the interface or observable behavior: take the smallest defensible interpretation, mark it `⚠` in your report, and continue.
+- A gap that does (an unspecified interface, or two readings that produce different behavior): ask the orchestrator before building. Never invent an interface the plan didn't specify.
 
-## The build loop
+## Build loop
 
-1. **Read the task and its interface contract first.** Know what you must produce and what you may depend on before you write a line. Read the files in your lane and the interfaces of the tasks yours depends on — not the whole tree.
-2. **Verify-first.** Where the environment allows, write the failing test from the verify step before the implementation (uncle-bob's Three Laws of TDD). The verify step is the target; make it fail for the right reason, then make it pass.
-3. **Write the code by following the `uncle-bob-clean-code` skill.** That skill is this skill's code-quality doctrine — small single-purpose functions, intention-revealing names, exceptions over status codes, no flag arguments, SOLID at genuine seams, Clean Architecture's dependency rule, and its own "don't over-apply" guardrails. Do not restate or second-guess it; invoke it and follow it. The Boy Scout Rule applies to lines you touch — and only those. **When the task involves a design decision** — how objects collaborate, how the domain is modeled, how a layer is structured — also compose **`design-patterns`** (reach for a known GoF / Fowler-PoEAA solution, don't invent) and, for a rich domain, **`domain-driven-design`**. **If the code you must change has become a burden**, make the change easy first: refactor under green tests via **`refactoring`** (two hats — refactor, *then* add the feature; never smuggle a refactor into the feature diff).
-4. **UI/site work → build with Impeccable.** If the task has a user-facing surface, build it with the [Impeccable](https://github.com/pbakaus/impeccable) skill against the design system's `TOK-`/`CMP-` from the project's style guide (`design-system/style-guide.md`), per the plan's global constraint. Lo-fi wireframes define layout; the style guide defines visual language; Impeccable is how it gets built.
-5. **Service work → build it Twelve-Factor.** If the task builds or changes a deployable service (API, worker, consumer, scheduled job), it follows the [Twelve-Factor App](https://12factor.net). Hold your diff to the factors that apply to code:
-   - **II Dependencies:** declared explicitly in the manifest and lockfile. Nothing relies on a tool that happens to be installed on the host.
-   - **III Config:** anything that varies between deploys (URLs, credentials, feature flags, limits) is read from the environment at startup, validated there, and fails fast if missing. No config in code, no per-environment config files, no secrets in the repo.
-   - **IV Backing services:** databases, queues, caches and third-party APIs are attached resources located by config, so swapping local for managed is a config change, not a code change.
-   - **VI Processes:** stateless and share-nothing. Session, cache and upload state lives in a backing service, not in memory or on local disk across requests.
-   - **VII Port binding:** the service is self-contained and binds a port taken from config.
-   - **IX Disposability:** fast startup and graceful shutdown on `SIGTERM` (stop accepting work, drain in-flight work, close connections). Jobs are safe to retry after a crash.
-   - **X Dev/prod parity:** the same kinds of backing services in dev and test as in prod (a real Postgres in a container, not SQLite standing in for it).
-   - **XI Logs:** write an unbuffered event stream to stdout. Never manage log files or rotation in the app.
-   - **XII Admin processes:** migrations and one-off tasks run as separate commands against the same code and config, not as side effects of starting the app.
+1. **Read the contract.** Your lane's files and the interfaces of the tasks you depend on. Not the whole tree.
+2. **Verify-first.** Write the failing test from the verify step before the implementation; make it fail for the right reason, then pass.
+3. **Write it per `uncle-bob-clean-code`.** For a design decision (how objects collaborate, how the domain is modeled) also use `design-patterns` and, for a rich domain, `domain-driven-design`. If the code you must change fights you, refactor first under green tests via `refactoring`, then add the feature; never both in one diff.
+4. **UI → Impeccable.** Build user-facing surfaces with the [Impeccable](https://github.com/pbakaus/impeccable) skill against the style guide's `TOK-`/`CMP-` (`design-system/style-guide.md`). Wireframes give layout; the style guide gives visual language.
+5. **Service → Twelve-Factor.** A deployable service (API, worker, consumer, scheduled job) follows the [Twelve-Factor App](https://12factor.net):
+   - **II** dependencies declared in the manifest and lockfile; nothing relies on a host-installed tool
+   - **III** config (URLs, credentials, flags, limits) read from the environment at startup, validated, fail fast if missing; no config in code, no per-environment files, no secrets in the repo
+   - **IV** databases, queues, caches, third-party APIs are attached resources located by config
+   - **VI** stateless and share-nothing; session, cache and upload state lives in a backing service
+   - **VII** binds a port taken from config
+   - **IX** fast startup; on `SIGTERM` stop accepting work, drain, close connections; jobs are safe to retry after a crash
+   - **X** the same kinds of backing services in dev and test as in prod (a real Postgres in a container, not SQLite)
+   - **XI** an unbuffered log stream to stdout; no log files or rotation in the app
+   - **XII** migrations and one-off tasks are separate commands against the same code and config
+   - **I** one codebase, **V** build / release / run kept separate, **VIII** scaling by process type: these belong to the repo and deploy pipeline; don't break them (for example, no config baked into a build artifact)
 
-   Factors I (one codebase), V (build/release/run) and VIII (scale by process type) are properties of the repo and the deploy pipeline. Don't break them, for example by baking config into a build artifact. A factor the plan deliberately waives appears as an `ADR` in your brief; anything else you can't meet is a `⚠` in your report, not a quiet exception.
-6. **Prove it green.** Run your task's exact verify step **yourself**. The task is not done until its `TEST-` passes for the right reason. A worker who reports "done" on unrun tests has handed the orchestrator a live grenade. **Red instead of green? Don't guess — drop to the debug loop below.**
-7. **Prove it clean, not just green.** Green tests are necessary, not sufficient. Run `uncle-bob-clean-code`'s three passes over *your own* diff — correctness, design (SOLID), readability — and confirm the code is genuinely *good*: one thing per function, no needless abstraction or speculative hooks, no duplication, and **no bloat** — uncle-bob's "don't over-apply" guardrails name these smells directly (needless complexity, class explosion, speculative hooks, design-pattern showcase). Design patterns appear only where the problem demands one, never as decoration. A task that passes its test but reads like a mess is **not done**. Fix what the pass surfaces, then re-verify green.
-8. **Report back** (see format below). Your final message is a structured report to the orchestrator, not prose for a human.
+   A waived factor is an `ADR` in your brief; anything else you can't meet is a `⚠` in your report.
+6. **Prove it green.** Run the exact verify step yourself. Red → the debug loop below.
+7. **Prove it clean.** Run `uncle-bob-clean-code`'s three review passes (correctness and security, design, readability) over your own diff, checking in particular for one thing per function, no speculative abstraction, no duplication, and patterns only where the problem demands one. Code that passes its test but reads like a mess is not done. Fix, then re-verify.
+8. **Report** (format below).
 
-## When a test goes red — debug systematically, don't thrash
+## Debug loop (a test went red)
 
-A failing verify step is a clue, not a cue to start guessing. Random edits until the bar turns green produce code that passes for reasons you can't name — the worst thing to hand an orchestrator.
+1. **Reproduce on demand.** Can't reproduce → report it as flaky; never paper over it.
+2. **Read the actual error** before guessing.
+3. **One hypothesis at a time**, stated with its reason.
+4. **Root cause, not symptom.** A swallowed exception, a `+1`, a masking retry are symptom patches; review will find what you buried.
+5. **Minimal fix, then re-verify for the right reason**, not because you weakened the test.
+6. **Ceiling.** Three or four hypotheses tested and still red, or the fix needs a file outside your lane: stop and report what you tried and ruled out. Escalation is not failure; a silent wrong fix is.
 
-1. **Reproduce it reliably.** Run the failing step until you can trigger the failure on demand. A failure you can't reproduce, you can't fix — report it as flaky; never paper over it.
-2. **Read the actual error.** The stack trace / assertion diff names the symptom. Resist "I bet it's X" before you've read what it actually says.
-3. **One hypothesis at a time.** State what you think is wrong and *why*, then test that one thing. Change three things at once and a green bar tells you nothing.
-4. **Find the root cause, not the symptom.** Ask why the failing value is wrong, then why *that* is — until you reach the actual defect. A swallowed exception, a `+1` that hides an off-by-one, a retry that masks a race: those are symptom-patches, and the orchestrator's `observe` pass will find what you buried.
-5. **Minimal fix, then re-verify for the right reason.** Fix the root cause with the smallest change, rerun the verify step, and confirm it passes *because the defect is gone* — not because you weakened the test.
-6. **Ceiling: stop and escalate.** If you've formed and tested a few hypotheses and it's still red — or the real fix needs a file outside your lane — **stop and report the failure to the orchestrator** with what you tried and ruled out. Thrashing past your competence burns tokens and buries the real issue. Escalation is not failure; a silent wrong "fix" is.
+## Receiving review
 
-## When review comes back — receive it with rigor
+1. **Reproduce each finding before touching code.** Reproducible → real; fix it. Not reproducible → report it as refuted, with the exact case you ran and its result.
+2. **Fix real ones at the root** via the debug loop.
+3. **Push back with evidence** (the failing case, the violated requirement), not deference.
+4. **Never performatively agree.** Blind implementation is as much an abdication as ignoring the review.
+5. **Report per finding**: fixed (with re-verify evidence) or refuted (with the proving case).
 
-If your task was reviewed (a dedicated `observe` review, or the wave-level review of Hard tasks), an adversarial reviewer will try to refute it. Two failure modes are equally bad: caving to every note, and dismissing all of them. Neither is engineering.
+## Iron rules
 
-1. **Verify each finding before you touch code.** Reproduce the failure the reviewer claims. A finding you can reproduce is real — act on it. A finding you cannot is a claim to check, not an order to obey.
-2. **Fix what's real at the root** (via the debug loop above) — never a patch that silences the reviewer's specific example while leaving the defect.
-3. **Push back with evidence, not deference.** If a suggestion is wrong or would break an invariant, say so and show why — the failing case it would introduce, the requirement it violates. "Good catch, will do" on a note you haven't verified is how a wrong fix ships with two names on it.
-4. **Never performatively agree.** Blindly implementing feedback is as much an abdication as ignoring it. The reviewer is a second set of eyes, not an authority whose word skips verification.
-5. **Report your response.** For each finding: real → fixed (with the re-verify evidence), or refuted → why (with the case that proves it). The orchestrator adjudicates on evidence, not politeness.
-
-## Worker iron rules (the orchestrator is counting on these)
-
-- **Stay in your lane.** Touch only the files in your brief. Waves run in parallel on disjoint paths — a stray edit outside your set clobbers another worker and corrupts the whole wave. Need a file that isn't yours? Report it; don't reach for it.
-- **Never `git commit`.** Committing is the orchestrator's job, one commit per verified task, after it verifies independently. You produce the change; you do not record it. This holds even if you're certain it's correct.
-- **Verify your own work before reporting.** Never report "tests pass" on a test you didn't run. Run the verify step and paste what happened.
-- **Honest environment ceiling.** If the sandbox can't fully exercise the task (needs real cloud, signing certs, live services), "done" means **code-complete + tested-with-fakes + a runbook for the real-environment step** — say exactly that. Never imply production-verified work you couldn't run.
-- **Match the codebase's conventions, not its defects.** (uncle-bob's rule — naming case and layout yes, blob functions and status-code returns no.)
-- **Don't fabricate.** An unknown becomes a `⚠` in your report or a question back to the orchestrator, never an invented value, interface, or "sensible default" the plan didn't authorize.
+- **Stay in your lane.** Need a file that isn't yours? Report it; don't touch it.
+- **Never `git commit`.** Even when certain.
+- **Run the verify step before reporting.** Paste what happened.
+- **Honest environment ceiling.** Can't fully exercise it? "Done" means code-complete + tested with fakes + a runbook for the real step.
+- **Match conventions, not defects.** Naming and layout yes; blob functions and status-code returns no.
+- **Don't fabricate.** Unknowns become `⚠` or a question, never a "sensible default".
 
 ## Report format
 
-End with a compact, structured report the orchestrator can act on without reading your diff:
+- **Task:** `TASK-###`, one line
+- **Files changed:** a subset of your lane
+- **Interface produced:** verbatim signatures
+- **Verify:** the command and its output, not "tests pass"
+- **Quality:** the self-review outcome and what you refactored
+- **Deviations / ⚠:** assumptions, unverifiable items (with the runbook for any real-environment step), differences from the brief
+- **Review response** (only after a review): per finding, fixed with re-verify evidence, or refuted with the proving case
 
-- **Task:** `TASK-###` — one line on what you built.
-- **Files changed:** the paths you touched (must be a subset of your brief's lane).
-- **Interface produced:** the actual signatures/contract you delivered — verbatim, so dependent tasks can build against it.
-- **Verify:** the command you ran and its result (green / red + the relevant output). Not "tests pass" — the evidence.
-- **Quality:** the `uncle-bob-clean-code` self-review outcome — passes clean, or what you refactored (bloat removed, abstraction collapsed, pattern justified). Not "looks good" — the review result.
-- **Deviations / ⚠:** anything you assumed, couldn't verify, or that differs from the brief. Empty is a fine answer; a hidden surprise is not.
+## Red flags
 
-## Red flags — stop if you catch yourself thinking…
-
-| Rationalization | Reality |
+| Thought | Reality |
 |---|---|
-| "I'll just fix this neighboring file while I'm here." | That file is another worker's lane. Report it; don't touch it. You'll clobber a parallel wave. |
-| "I'm confident it's right — I'll commit it." | You never commit. The orchestrator verifies independently and commits. That's the whole safety model. |
-| "The code looks correct; I'll report done without running the verify step." | Unrun tests are not evidence. Run it, paste the result, then report. |
-| "The brief didn't specify this interface, but this shape seems reasonable." | Inventing an interface breaks the tasks that depend on the promised one. Flag `⚠` and ask; don't guess. |
-| "It's a small task, I don't need the clean-code discipline." | Small code is read most. Follow `uncle-bob-clean-code` — the quick version IS the clean version. |
-| "Tests are green — done." | Green ≠ good. Run uncle-bob's passes over your diff; verbose or over-abstracted code that passes is still a defect. |
-| "Can't reach the real service, but it basically works — I'll say done." | Say code-complete + tested-with-fakes + runbook. Never imply prod-verified. |
-| "I'll build the UI freehand, faster than wiring up Impeccable." | UI is built with Impeccable against the style guide, per the plan's global constraint. Freehand UI is drift. |
-| "I'll hardcode this URL / read a config file for now, env vars later." | Config comes from the environment on day one (Twelve-Factor III). "Later" ships to prod. |
-| "Keep it in memory, there's only one instance." | Processes are stateless (VI). The second replica, or the next restart, is when that breaks. |
-| "Run the migration on startup, it's simpler." | Admin processes run as their own command (XII). Racing replicas on boot corrupt schemas. |
-| "Test's red — let me try a few things and see what turns it green." | Guessing buys a green bar you can't explain. Reproduce → one hypothesis → root cause → minimal fix. |
-| "Still red after a dozen edits — one more should do it." | You hit your ceiling. Stop and escalate with what you ruled out. Thrashing buries the real bug. |
-| "The reviewer said fix it, so I'll fix it." | Verify the finding first — reproduce it. Unverified agreement is how a bad fix ships. |
-| "The reviewer's probably wrong, I'll ignore the notes." | Equally an abdication. Reproduce each finding; act on the real ones, refute the rest with evidence. |
+| "I'll fix this neighboring file while I'm here." | Another worker's lane. Report it. |
+| "It's right; I'll commit." | You never commit. |
+| "Looks correct; report done without running it." | Unrun tests are not evidence. |
+| "The brief didn't specify this interface, but this seems reasonable." | Flag `⚠` and ask. |
+| "Small task, skip the clean-code discipline." | The quick version is the clean version. |
+| "Green, done." | Green isn't clean. Three passes over your diff. |
+| "Can't reach the real service, but it basically works." | Code-complete + fakes + runbook. |
+| "Freehand UI is faster than Impeccable." | Freehand UI is drift. |
+| "Hardcode this URL for now, env vars later." | Config from the environment on day one. "Later" ships. |
+| "Keep it in memory; there's one instance." | The second replica or the next restart breaks it. |
+| "Run the migration on startup." | Separate command. Racing replicas corrupt schemas. |
+| "Try a few things and see what turns it green." | Reproduce → one hypothesis → root cause. |
+| "Fourth hypothesis in; one more should do it." | You hit your ceiling. Escalate. |
+| "The reviewer said fix it, so fix it." | Reproduce it first. |
+| "The reviewer's probably wrong; ignore it." | Reproduce it first. |
 
 ---
 
-*The implementation end of the pipeline: **`requirements-driven-planning`** (the plan) → **`model-routed-delivery`** (routes & dispatches this task to you, verifies and commits your result) → **`clean-implementation`** (this skill — how you build the one task), which **composes `uncle-bob-clean-code`** as its code-quality doctrine.*
-
-*The debug loop, receive-review discipline, and verify-first stance are condensed from [obra/superpowers](https://github.com/obra/superpowers) (`systematic-debugging`, `receiving-code-review`, `test-driven-development`, `verification-before-completion`), scoped to a single dispatched worker.*
+*Implementation end of the pipeline; composes `uncle-bob-clean-code`. Debug and review discipline condensed from [obra/superpowers](https://github.com/obra/superpowers).*

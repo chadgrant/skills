@@ -1,15 +1,13 @@
 ---
 name: domain-driven-design
-description: Use when modeling a non-trivial business domain — deciding what the objects are, where the consistency boundaries lie, how services are carved, and what language the code and the stakeholders share. Applies Eric Evans' Domain-Driven Design: strategic design (ubiquitous language, bounded contexts, context mapping, core vs supporting vs generic subdomains) and tactical design (entities, value objects, aggregates and their invariants, repositories, factories, domain services, domain events). Use it when a Domain Model (see design-patterns) is the right choice and you need to shape it well. Triggers: "domain model", "DDD", "bounded context", "aggregate", "entity vs value object", "ubiquitous language", "where's the consistency boundary", "how do I carve these services", "repository per aggregate".
+description: Use when modeling a non-trivial business domain: what the objects are, where the consistency boundaries lie, how services are carved, and what language the code and stakeholders share. Triggers: "domain model", "DDD", "bounded context", "aggregate", "entity vs value object", "ubiquitous language", "repository per aggregate".
 ---
 
 # Domain-driven design
 
 Announce at the start: **"Using domain-driven-design: speak the domain's language → draw the bounded contexts → model aggregates around invariants → keep the domain pure."**
 
-**Core principle: the model and the language are the same artifact.** The names in the code are the names the domain experts use — if the business says "policy" and the code says "record", the model has already failed. DDD is how you turn a tangled business into a model that protects its own rules and can be reasoned about a piece at a time. It pays off when the domain is **rich and changing**; for thin/CRUD domains it is overhead (use a Transaction Script per `design-patterns` and move on).
-
-This composes with the canon: a DDD **Domain Model** is built from Fowler enterprise patterns (`design-patterns`: Repository, Value Object, Service Layer, Data Mapper), its objects obey **SOLID** and clean-code rules (`uncle-bob-clean-code`), and you **`refactoring`** your way toward richer aggregates as understanding deepens. Full detail in [reference.md](reference.md).
+**Core principle: the model and the language are the same artifact.** The names in the code are the names the domain experts use — if the business says "policy" and the code says "record", the model has already failed. DDD is how you turn a tangled business into a model that protects its own rules and can be reasoned about a piece at a time. It pays off when the domain is **rich and changing**; for thin/CRUD domains it is overhead (use a Transaction Script per `design-patterns` and move on). Full detail in [reference.md](reference.md).
 
 ## Strategic design — carve the space before modeling
 
@@ -42,25 +40,19 @@ Do this first; tactical modeling inside the wrong boundary is wasted.
 
 The domain model depends on **nothing** — no framework, no ORM, no HTTP, no clock. Persistence, transport, and I/O sit *outside* and depend inward (this is Clean Architecture's dependency rule, `uncle-bob-clean-code`, and DIP). Application/Service Layer orchestrates; the domain holds the rules.
 
-## Don't over-apply
+## Red flags: don't over-apply
 
-| Temptation | Reality |
+| Thought | Reality |
 |---|---|
-| Full DDD on a CRUD app | If the domain is thin, DDD is ceremony. Transaction Script + Active Record is honest. Reserve DDD for rich, changing core domains. |
-| One giant "God" aggregate | Aggregates are consistency boundaries, not object dumps. Small, invariant-scoped, referenced by id. |
-| One canonical enterprise-wide model for everything | That's the road to a big ball of mud. Multiple bounded contexts with explicit mappings beat one model serving every master. |
-| Anemic domain model (data bags + service does everything) | If entities have no behavior and services hold all logic, you have a Transaction Script wearing a Domain Model costume. Put behavior on the model — or admit it's a Transaction Script. |
-| Rich Domain Model on a *generic* subdomain | Buy/adopt generic subdomains (auth, billing). Model only the core. |
-
-## Red flags — stop if you catch yourself thinking…
-
-| Rationalization | Reality |
-|---|---|
-| "This transaction updates five aggregates atomically." | One transaction, one aggregate. Use domain events + eventual consistency across them. |
-| "The entities are just data; the service has the logic." | Anemic model. Behavior belongs on the aggregate that owns the invariant. |
-| "The domain object can call the ORM/HTTP directly, it's simpler." | The domain depends on nothing. Invert it — I/O lives outside and points in. |
-| "Let me name it what the framework calls it." | Name it what the domain experts call it. The ubiquitous language is the model. |
+| "Full DDD on this CRUD app." | A thin domain makes DDD ceremony. Transaction Script + Active Record is honest. Reserve DDD for rich, changing core domains. |
+| "A rich Domain Model for auth / billing." | Generic subdomains are bought or adopted. Model only the core. |
+| "One canonical enterprise-wide model for everything." | The road to a big ball of mud. Multiple bounded contexts with explicit mappings. |
+| "One aggregate holds the whole order graph." | Aggregates are consistency boundaries, not object dumps. Small, invariant-scoped, referenced by id. |
+| "This transaction updates five aggregates atomically." | One transaction, one aggregate. Domain events + eventual consistency across them. |
+| "The entities are just data; the service has the logic." | Anemic model: a Transaction Script in a Domain Model costume. Put behavior on the aggregate that owns the invariant, or admit it's a Transaction Script. |
+| "The domain object can call the ORM/HTTP directly." | The domain depends on nothing. I/O lives outside and points in. |
+| "Name it what the framework calls it." | Name it what the domain experts call it. The ubiquitous language is the model. |
 
 ---
 
-*A recognition-and-decision layer distilled from **Eric Evans**' *Domain-Driven Design* (and Vernon's *Implementing DDD*). It builds on `design-patterns` (Domain Model, Repository, Value Object, Service Layer are its substrate), obeys `uncle-bob-clean-code` (SOLID + the dependency rule keep the domain pure), and is shaped over time via `refactoring`. Its ubiquitous language and context map belong in the PRD/ERD produced by `requirements-driven-planning`. Full detail in [reference.md](reference.md).*
+*Distilled from **Eric Evans**' *Domain-Driven Design* and Vernon's *Implementing DDD*. Related: `design-patterns` (Domain Model, Repository, Value Object, Service Layer are its substrate), `uncle-bob-clean-code` (the dependency rule keeps the domain pure), `refactoring` (how aggregates get richer over time), `requirements-driven-planning` (the glossary and context map live in the PRD/ERD). Full detail in [reference.md](reference.md).*

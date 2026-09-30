@@ -45,7 +45,7 @@ Not for: vendored or generated code, or scripts the user explicitly calls throwa
 **Tests**
 - Test-first where the environment allows (Three Laws of TDD). Tests follow FIRST: Fast, Independent, Repeatable, Self-validating, Timely. One concept per test. Test code is held to production standards.
 
-**SOLID** — see [reference.md](reference.md) for worked examples and the full teachings, plus **Clean Architecture** (the Dependency Rule; component cohesion REP/CCP/CRP and coupling ADP/SDP/SAP) and **Construction** (Code Complete: defensive programming, functional cohesion, table-driven methods). Read the whole file — the review passes below draw on all of it, not just the SOLID table.
+**SOLID** — the table below is the working rule. [reference.md](reference.md) holds worked examples, **Clean Architecture** (the Dependency Rule; component cohesion REP/CCP/CRP and coupling ADP/SDP/SAP) and **Construction** (Code Complete: defensive programming, functional cohesion, table-driven methods); open the section a review pass or design decision calls for.
 
 | Principle | Rule | Violation smell |
 |---|---|---|
