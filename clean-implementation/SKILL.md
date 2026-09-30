@@ -19,7 +19,7 @@ A well-formed brief gives you everything you need. Confirm you have it before ty
 - **Files** — exactly which to create / modify / test. This set is your lane; it is disjoint from every other in-flight worker's lane on purpose.
 - **Interface to produce** — the signatures, types, or contract later tasks depend on. This is a promise; match it exactly.
 - **Verify step** — the exact build/test command that proves the task done, needing no human interpretation.
-- **Difficulty / `observe` flag** — if flagged `observe`, expect an adversarial review of your result; write to survive it.
+- **Difficulty / `observe` flag**: if flagged `observe`, expect a dedicated adversarial review of your result. A Hard task without the flag is reviewed with the rest of its wave. Either way, write to survive it.
 - **Global constraints** — stack, fail-mode, and (for UI work) the Impeccable + style-guide constraint, copied verbatim from the plan.
 
 **Missing or ambiguous brief?** Don't guess your way past a genuine fork — a wrong assumption here becomes wrong code the orchestrator has to catch and unwind. State the ambiguity in your report and, where you can, proceed on the smallest defensible interpretation and flag it `⚠`. Never invent an interface the plan didn't specify.
@@ -47,7 +47,7 @@ A failing verify step is a clue, not a cue to start guessing. Random edits until
 
 ## When review comes back — receive it with rigor
 
-If your task was `observe`-flagged, an adversarial reviewer will try to refute it. Two failure modes are equally bad: caving to every note, and dismissing all of them. Neither is engineering.
+If your task was reviewed (a dedicated `observe` review, or the wave-level review of Hard tasks), an adversarial reviewer will try to refute it. Two failure modes are equally bad: caving to every note, and dismissing all of them. Neither is engineering.
 
 1. **Verify each finding before you touch code.** Reproduce the failure the reviewer claims. A finding you can reproduce is real — act on it. A finding you cannot is a claim to check, not an order to obey.
 2. **Fix what's real at the root** (via the debug loop above) — never a patch that silences the reviewer's specific example while leaving the defect.
