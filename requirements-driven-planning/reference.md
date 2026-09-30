@@ -109,6 +109,8 @@ The most rigid doc: an agent must execute each task with **no interpretation**. 
 | Per task | Exact file paths, the interface it produces, `TEST-###` (automatic pass criteria), the `REQ` it cites, difficulty, and **model tier**. |
 | Alternatives / dependencies / risks | Rejected approaches, external deps + ordering, risks & assumptions. |
 
+**Service tasks (Twelve-Factor):** when the plan builds a deployable service, the plan carries a *services follow Twelve-Factor* global constraint. Each service task names its config keys and env var names, its backing services, and its port/health endpoints. Migrations and one-off admin jobs are their own tasks. A deviation is an `ADR`.
+
 **Anti-patterns:** ambiguous tasks requiring interpretation; tasks without file-path specificity; missing per-task verification; undeclared (hidden) ordering dependencies; placeholder text; a task that overlaps another wave's files (breaks parallel disjointness).
 
 **Difficulty → model tier** (from `model-routed-delivery`): rate each task on its *hardest* aspect. Easy (mechanical, single-file, well-specified) → small tier. Medium (multi-file, some design judgement) → mid tier. Hard (security/money/auth/data-integrity, concurrency, novel algorithm, high blast radius, many tasks depend on it) → top tier; additionally flag **`observe`** (dedicated per-task adversarial review) only when a bug in the task *is* the breach: key storage, credential/token minting, authn/authz decisions, money movement, tenancy isolation. Other Hard tasks get a wave-level review; Medium/Easy get none. `observe` should cover a small minority of tasks. Security-small is still Hard. The concrete tier→model mapping lives in `model-routed-delivery`, not here — record tiers, not model names.
