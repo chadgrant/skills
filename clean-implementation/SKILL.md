@@ -22,6 +22,8 @@ Confirm you have all of these before typing:
 - **Difficulty / `observe`**: `observe` means a dedicated adversarial review; other Hard tasks are reviewed with their wave. Either way, write code that survives a reviewer trying to break it.
 - **Global constraints**: stack, fail-mode, Impeccable for UI, Twelve-Factor for services, copied verbatim from the plan
 
+A brief may bundle several Easy tasks in one lane. Build and verify each in turn and report per task.
+
 Missing or ambiguous? Two cases:
 - A gap that doesn't change the interface or observable behavior: take the smallest defensible interpretation, mark it `⚠` in your report, and continue.
 - A gap that does (an unspecified interface, or two readings that produce different behavior): ask the orchestrator before building. Never invent an interface the plan didn't specify.
@@ -29,7 +31,10 @@ Missing or ambiguous? Two cases:
 ## Build loop
 
 1. **Read the contract.** Your lane's files and the interfaces of the tasks you depend on. Not the whole tree.
-2. **Verify-first.** Write the failing test from the verify step before the implementation; make it fail for the right reason, then pass.
+2. **Verify-first.** Write the failing test from the verify step before the implementation; make it fail for the right reason, then pass. When the verify step is only a build, lint, or type-check (scaffolding, config, wiring), there is no test to write first: build it and run the verify step.
+   - **Coverage**: your tests cover at least 90% of the lines in your lane's files, through assertions on behavior. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
+   - **Real backing services**: code that talks to a database, queue, or cache is tested against the real one from the plan's Compose file. Don't mock it or swap in an in-memory substitute.
+   - **End-to-end**, when your task is an e2e scenario: drive the public surface with the plan's driver (Playwright for browser UI, HTTP for an API, the built binary for a CLI) against the Compose stack. Never Playwright for something without a browser UI.
 3. **Write it per `uncle-bob-clean-code`.** For a design decision (how objects collaborate, how the domain is modeled) also use `design-patterns` and, for a rich domain, `domain-driven-design`. If the code you must change fights you, refactor first under green tests via `refactoring`, then add the feature; never both in one diff.
 4. **UI → Impeccable.** Build user-facing surfaces with the [Impeccable](https://github.com/pbakaus/impeccable) skill against the style guide's `TOK-`/`CMP-` (`design-system/style-guide.md`). Wireframes give layout; the style guide gives visual language.
 5. **Service → Twelve-Factor.** A deployable service (API, worker, consumer, scheduled job) follows the [Twelve-Factor App](https://12factor.net):
@@ -46,7 +51,7 @@ Missing or ambiguous? Two cases:
 
    A waived factor is an `ADR` in your brief; anything else you can't meet is a `⚠` in your report.
 6. **Prove it green.** Run the exact verify step yourself. Red → the debug loop below.
-7. **Prove it clean.** Run `uncle-bob-clean-code`'s three review passes (correctness and security, design, readability) over your own diff, checking in particular for one thing per function, no speculative abstraction, no duplication, and patterns only where the problem demands one. Code that passes its test but reads like a mess is not done. Fix, then re-verify.
+7. **Prove it clean.** The static gate in your verify step covers format, lint, types, and complexity; spend this step on what tools can't see. Run `uncle-bob-clean-code`'s three review passes (correctness and security, design, readability) over your own diff, checking in particular for one thing per function, no speculative abstraction, no duplication, and patterns only where the problem demands one. Code that passes its test but reads like a mess is not done. Fix, then re-verify.
 8. **Report** (format below).
 
 ## Debug loop (a test went red)
@@ -70,18 +75,20 @@ Missing or ambiguous? Two cases:
 
 - **Stay in your lane.** Need a file that isn't yours? Report it; don't touch it.
 - **Never `git commit`.** Even when certain.
-- **Run the verify step before reporting.** Paste what happened.
+- **Run the verify step before reporting.** Report its actual result, not a claim.
 - **Honest environment ceiling.** Can't fully exercise it? "Done" means code-complete + tested with fakes + a runbook for the real step.
 - **Match conventions, not defects.** Naming and layout yes; blob functions and status-code returns no.
 - **Don't fabricate.** Unknowns become `⚠` or a question, never a "sensible default".
 
 ## Report format
 
+Keep it to about 25 lines per task. The orchestrator pays for every line on every later turn, and the diff is on disk; don't paste code or full logs.
+
 - **Task:** `TASK-###`, one line
 - **Files changed:** a subset of your lane
 - **Interface produced:** verbatim signatures
-- **Verify:** the command and its output, not "tests pass"
-- **Quality:** the self-review outcome and what you refactored
+- **Verify:** the command, its exit status, and the summary lines of its output (pass/fail counts, line coverage for your lane's files), not "tests pass". Include failure output only for a failure you couldn't fix.
+- **Quality:** the self-review outcome and what you refactored, one or two lines
 - **Deviations / ⚠:** assumptions, unverifiable items (with the runbook for any real-environment step), differences from the brief
 - **Review response** (only after a review): per finding, fixed with re-verify evidence, or refuted with the proving case
 
@@ -95,6 +102,8 @@ Missing or ambiguous? Two cases:
 | "The brief didn't specify this interface, but this seems reasonable." | Flag `⚠` and ask. |
 | "Small task, skip the clean-code discipline." | The quick version is the clean version. |
 | "Green, done." | Green isn't clean. Three passes over your diff. |
+| "Mock the database; it's faster." | Real database from the Compose file. Mocks pass on queries that fail in production. |
+| "Add a few assertion-free tests to reach 90%." | Coverage counts only when the test would fail on wrong behavior. |
 | "Can't reach the real service, but it basically works." | Code-complete + fakes + runbook. |
 | "Freehand UI is faster than Impeccable." | Freehand UI is drift. |
 | "Hardcode this URL for now, env vars later." | Config from the environment on day one. "Later" ships. |

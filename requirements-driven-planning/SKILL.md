@@ -51,7 +51,7 @@ Produce only what the project warrants; confirm with the requester. State which 
 | **Release plan** (`templates/release-plan.md`) | Prod-facing deploy, migration, cutover, or rollback | Internal library / no-deploy change |
 | **Observability** (`templates/observability.md`) | Runs as a live service with health to watch | Pure library, build-time, or one-shot |
 | **User docs** (`templates/user-docs.md`) | End-user-visible behavior changes | Internal-only refactor |
-| **Test & QA plan** (`templates/test-qa-plan.md`) | Non-trivial behavior or integration to verify beyond unit tests | Trivial change covered by per-task `TEST-` |
+| **Test & QA plan** (`templates/test-qa-plan.md`) | Non-trivial behavior or integration to verify beyond unit tests; anything with e2e tests | Trivial change covered by per-task `TEST-` |
 | **Implementation plan** (`templates/implementation-plan.md`) | More than one obvious task | A single self-evident task |
 
 Add by hand when warranted: a threat model for security / money / auth work; an RFC before the ERD on a contentious decision.
@@ -69,7 +69,12 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 - Add these **global constraints** once; `model-routed-delivery` copies them into every brief:
   - **UI**: built with [Impeccable](https://github.com/pbakaus/impeccable) against the style guide's tokens and components.
   - **Services** (API, worker, consumer, scheduled job): follow the [Twelve-Factor App](https://12factor.net); `clean-implementation` carries the checklist. Each service task names its config keys and env var names, backing services, port and health endpoints, and shutdown behavior; migrations and admin jobs are their own tasks. A deviation is an `ADR` the task cites.
-  - **Quality bar**: done means the `TEST-` is green **and** the code is clean per `uncle-bob-clean-code`. A `TEST-` that a bloated or over-engineered solution can still pass is not a complete acceptance criterion.
+  - **Quality bar**: done means the `TEST-` is green **and** the code is clean per `uncle-bob-clean-code`. Name the project's static gate command (format check, lint, type-check, complexity limit); every `TEST-` runs it alongside the task's tests. A `TEST-` that a bloated or over-engineered solution can still pass is not a complete acceptance criterion.
+  - **Testing**: the plan names each command and tool; workers don't choose them.
+    - *Coverage*: at least 90% line coverage, enforced by the coverage tool's fail-under threshold so it fails the run without anyone reading a report. Exclusions (generated or vendored code) are listed in the plan.
+    - *Real backing services*: code that talks to a database, queue, or cache is tested against the real thing started by Docker Compose (a `compose.test.yaml` with health checks), never a mock or an in-memory substitute.
+    - *End-to-end*: anything deployable or runnable gets e2e tests that drive it through its public surface, with the whole stack brought up by Docker Compose when it has backing services. Pick the driver by surface: browser UI → Playwright; HTTP API → requests against the running service; CLI → invoke the built binary and assert on output and exit code; library → none beyond tests of its public API. No Playwright without a browser UI.
+    - The compose file and e2e harness are an M0 task; each e2e scenario is a `TC-` built by its own task.
   - **Design canon**: known patterns (`design-patterns`) over invention; rich domains via `domain-driven-design`, whose glossary and bounded contexts go in the PRD/ERD and inform module boundaries; `refactoring` is a plannable task type with a behavior-unchanged verify.
 - Hand the plan to `model-routed-delivery`. A single self-evident task needs neither a plan nor a handoff.
 
@@ -145,6 +150,7 @@ Extension IDs, only when their doc exists: `API-###` in the API contract (each c
 - [ ] Every `TASK` cites ≥1 `REQ`/`NFR` (uncited = scope creep or dead work).
 - [ ] Every `REQ` has a `TEST-` / acceptance criterion.
 - [ ] Done is defined as green **and** clean (a code-quality gate, not tests alone).
+- [ ] The plan names the coverage command with its 90% threshold, the Compose file for backing services, and an e2e driver that fits each surface (Playwright only for browser UI); every user-facing `REQ` has an e2e `TC-`.
 - [ ] Every `ENT` traces to a `REQ`; every persisted field has a classification and each entity a retention rule.
 - [ ] ERD interfaces ↔ DRD schema ↔ DRD data dictionary agree (names, types, cardinality).
 - [ ] Every `ADR` is referenced by the tasks that implement it; no code contradicts an accepted `ADR`.
@@ -177,6 +183,7 @@ The docs are connector-ready, not connected; nothing ships an integration yet.
 | "Write the plan now, route later." | The tier is a property of the task, decided when you know its hardest aspect. |
 | "Requirements look done; ship the plan." | Run the traceability checklist first. |
 | "The `TEST-` passes, so acceptance is met." | Acceptance is green *and* clean. |
+| "It has tests; add Playwright to be thorough." | Playwright is for browser UI. A CLI's e2e runs the binary; an API's calls the service. |
 
 ---
 

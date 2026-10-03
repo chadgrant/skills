@@ -18,6 +18,10 @@ jira_project_key: null   # set by the Jira connector
 ## 2. Test strategy
 <Levels and where each runs: unit · integration · end-to-end · manual/exploratory. Tooling, test environments, and CI stage for each.>
 
+- **Coverage:** `<command>` fails under 90% line coverage. Exclusions: <generated / vendored paths, or none>.
+- **Backing services:** `<compose.test.yaml>` starts <real Postgres / queue / cache> for integration and e2e tests. No mocks or in-memory substitutes.
+- **End-to-end:** `<command>` brings the stack up with Docker Compose and drives <browser UI → Playwright · HTTP API → requests to the running service · CLI → the built binary>. Use the driver that fits the surface; no Playwright without a browser UI.
+
 ## 3. Test matrix
 > Each `TC-###` verifies one or more `REQ-`/`NFR-` and rolls up to a release gate. Per-task `TEST-` (in the plan) are the unit-level checks; these are the scenario-level cases above them.
 
@@ -35,7 +39,7 @@ jira_project_key: null   # set by the Jira connector
 
 ## 6. Entry & exit criteria
 - **Entry:** <what must be true before testing starts.>
-- **Exit / release gate:** <the pass bar — e.g. all Must `TC-` green, no open Sev-1, NFR budgets met.>
+- **Exit / release gate:** <the pass bar — e.g. all Must `TC-` green, coverage ≥ 90%, e2e suite green, no open Sev-1, NFR budgets met.>
 
 ## 7. Risks & gaps
 <Known untested areas and why; residual risk accepted.>

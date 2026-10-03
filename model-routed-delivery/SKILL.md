@@ -22,8 +22,10 @@ Ask the questions whose answers change the plan: fail modes, tenancy, scope boun
 
 Write `IMPLEMENTATION.md` (or `docs/plans/<date>-<name>.md`):
 
-- **Header**: one-sentence goal; 2–3 sentence architecture; stack and global constraints copied verbatim from the spec; milestones M0…Mn, each with an exit criterion.
-- **Per task**: stable id; exact file paths (create / modify / test); the interface it produces, signatures written down; its verify command; difficulty; tier; `observe` and `isolate` flags.
+- **Header**: one-sentence goal; 2–3 sentence architecture; stack and global constraints copied verbatim from the spec; the static gate command; milestones M0…Mn, each with an exit criterion.
+- **Static gate**: one command that runs the format check, linter, type-check, and a complexity limit. Tools catch mechanical quality problems for free; review tokens go to what tools can't see. If the repo has no such command, creating it is an M0 task.
+- **Test gates**: the coverage command with its 90% fail-under threshold, the Compose file that starts real backing services for tests, and the e2e command with a driver that fits the surface (Playwright for browser UI, HTTP for an API, the built binary for a CLI; no Playwright without a browser UI). The Compose file and e2e harness are an M0 task; each e2e scenario is its own task.
+- **Per task**: stable id; exact file paths (create / modify / test); the interface it produces, signatures written down; its verify command (the task's tests plus the static gate); difficulty; tier; `observe` and `isolate` flags.
 - A task is the smallest unit with its own verify cycle that a reviewer could accept or reject alone. Fold setup into the deliverable task.
 - Tasks in one wave touch non-overlapping files. Design the seams so parallel workers never share a file.
 - No "TBD", no "similar to task N". A worker can't recover from an undefined detail; it guesses wrong.
@@ -49,24 +51,30 @@ Rate on the **hardest aspect**, not the average.
 Repeat until the ledger is all green.
 
 1. **Pick the whole wave.** Every ready task whose files are disjoint, usually 6–10. Disjointness was settled in the plan, so don't throttle to 3–5. Hold a task back only if a dependency's interface isn't verified yet or its files overlap.
-2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, and touch only your files. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
-3. **Verify each result yourself.** Run its verify command scoped to the touched packages (the tree may be transiently red from other workers); run the full suite once the wave lands. Then run `uncle-bob-clean-code`'s three review passes over the diff, independent of the worker's self-review; service tasks are also checked against the Twelve-Factor list in `clean-implementation`. Green but bloated, over-abstracted, or hardcoding config is a defect: send it back to the worker to refactor, once. If it comes back still not clean, go to step 7.
-4. **Review by risk.**
+2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, touch only your files, and keep the report short (the diff is on disk). Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
+   - **Bundle Easy tasks.** Ready Easy tasks in the same package or following the same pattern go to one small-tier worker in one brief (up to about five), built and reported per task. Each is still verified and committed as its own task; if one fails, only that one escalates.
+3. **Verify the wave once.** When the wave's workers have reported, run the full suite with its coverage threshold and the static gate once over the tree, against the Compose-started backing services. Green verifies every task in the wave; don't rerun each task's command. Red: run the verify commands of the tasks touching the failing packages to find the culprit, and send that task back to its worker. Coverage under 90% is red: the workers' per-lane figures name the task to send back. The e2e suite is slower, so it runs at the milestone gate, plus the single scenario an e2e task adds.
+4. **Review by risk.** Every task gets a `git diff --stat` check from you: changes stay in the task's lane and the size fits the task. Beyond that:
 
-   | Task | Adversarial review |
+   | Task | Review |
    |---|---|
-   | `observe` | Per task: a fresh agent told to refute it, name the breaking inputs, prove the invariant holds. |
-   | Other Hard | Per wave: one review over the wave's combined Hard diff. |
-   | Medium / Easy | None. Step 3 catches what matters. |
+   | Easy | None. The wave gate and the worker's self-review cover it. |
+   | Medium | You skim the diff for what tools miss: hardcoded config, speculative abstraction, duplication, and for service tasks the Twelve-Factor list in `clean-implementation`. |
+   | Other Hard | Per wave: one mid-tier reviewer agent over the wave's combined Hard diff. |
+   | `observe` | Per task: a fresh top-tier reviewer agent. |
 
-   Confirmed findings go back to the worker under `clean-implementation`'s receive-review rules. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
-5. **Pipeline the reviews.** Once a wave is verified (step 3), dispatch the next wave; reviews run alongside it. Reviews gate commits, not dispatch. A dependent task may build on a verified-but-uncommitted interface. If a review changes that interface, re-dispatch the uncommitted dependents with the new interface; a dependent already committed gets a follow-up task.
+   - A reviewer agent gets the task briefs and file paths. It runs `uncle-bob-clean-code`'s three review passes, independent of the worker's self-review, and tries to refute the work: name the breaking inputs, prove the invariants hold.
+   - It returns a verdict per task: clean, or findings with `file:line` and the breaking case. No diff excerpts, no narration. Don't read Hard diffs yourself; every diff in your context is paid for again on each later turn.
+   - Dispatch reviewers in parallel, in one message.
+   - Green but bloated, over-abstracted, or hardcoding config is a defect: send it back to the worker to refactor, once. If it comes back still not clean, go to step 7.
+   - Confirmed findings go back to the worker under `clean-implementation`'s receive-review rules. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
+5. **Pipeline the reviews.** Once a wave is verified (step 3), dispatch the next wave together with this wave's reviewers; reviews run alongside it. Reviews gate commits, not dispatch. A dependent task may build on a verified-but-uncommitted interface. If a review changes that interface, re-dispatch the uncommitted dependents with the new interface; a dependent already committed gets a follow-up task.
 6. **Commit** (orchestrator only): one commit per finished task, staging only that task's paths (never `-A`; other workers share the tree). Update the ledger.
 7. **Escalate, then re-plan.** A task that ends red, or green but unable to reach the quality bar after one refactor pass: never re-dispatch the same brief at the same tier. Bump the tier when the brief was sound and the worker couldn't do it; split the task when it was too big to verify in one piece; fix the plan when the interface itself was wrong. Re-plan when a task reveals new work.
 
 ## Phase 4: milestone gate
 
-Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then `/code-review`. Fix what's real, note what's deferred and why, then push.
+Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then `/code-review`. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
 
 ## Iron rules
 
@@ -74,11 +82,11 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 - **`isolate` tasks run in their own worktree.** Disjoint paths are a promise a stray worker can break; a worktree makes collision impossible. A worktree costs setup and disk, which is why isolation is a flag rather than the default.
 - **Only the orchestrator commits.** Say it in every brief.
 - **`general-purpose` + model override, never a fork.** A fork inherits your commit authorization.
-- **Verify before committing.** A worker's "tests pass" is not evidence.
+- **Verify before committing.** A worker's "tests pass" is not evidence; the green wave run is.
 - **`STATUS.md` is the ledger**: active wave, done tasks, follow-ups, incidents, decisions. Update it every wave; it's how the next context window resumes.
 - **Zombie check.** A worker can die silently with no output. When nothing has changed on disk for a while, check each in-flight task's files. A task that wrote nothing never ran, so re-dispatching the same brief is safe (the escalation rule is for tasks that ran and failed). A task that wrote partial output is treated as failed: escalate per step 7.
 - **Push once per milestone**, not per task. Each push burns CI.
-- **Global constraints exist before dispatch.** If the plan builds a deployable service and lacks the Twelve-Factor constraint, add it. Fail-mode per component class must be in the plan before dispatch: fail-closed for spend, auth, governance, budgets, safety; fail-open for soft quotas and rate limits.
+- **Global constraints exist before dispatch.** If the plan builds a deployable service and lacks the Twelve-Factor constraint, add it. If it lacks the test gates (90% coverage, Compose-backed services, surface-appropriate e2e), add them. Fail-mode per component class must be in the plan before dispatch: fail-closed for spend, auth, governance, budgets, safety; fail-open for soft quotas and rate limits.
 - **Honest environment ceiling.** Without real cloud, certs, or live services, "done" means code-complete + tested with fakes + a runbook. Never imply production-verified.
 
 ## Red flags
@@ -86,18 +94,23 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | Thought | Reality |
 |---|---|
 | "I'll write this one myself, it's quick." | Route it. Your job is judgment and verification. |
-| "The worker said tests pass; commit." | Run them yourself. |
+| "The worker said tests pass; commit." | Run the wave gate yourself. |
+| "Rerun every task's verify command to be sure." | One full run per wave. Per-task commands are for bisecting a red run. |
+| "Read every diff to be safe." | Stat all, skim Medium, delegate Hard. Diffs in your context cost on every later turn. |
+| "One worker per Easy task." | Bundle Easy tasks that share a package or pattern. Cold starts cost more than the change. |
 | "Adjacent files, probably fine." | Disjoint or serialize. |
 | "Hard but small; send it to the mid tier." | Route on the hardest aspect. |
 | "Fork myself for speed." | Forks commit. |
 | "Push after each task to be safe." | Git holds it locally. Push per milestone. |
 | "Dispatch 3–5 to be safe." | The plan made the wave disjoint. Dispatch all of it. |
 | "Flag it `observe`, better safe than sorry." | Each flag is an hour on the critical path. True spine only. |
-| "Review each task separately." | Only `observe` tasks. Other Hard tasks share one wave review; Medium/Easy get none. |
+| "Review each task separately." | Only `observe` tasks. Other Hard tasks share one wave review; Medium gets your skim; Easy gets the gate. |
 | "Wait for the reviews before the next wave." | Reviews gate commits, not dispatch. |
+| "Coverage is 87%, close enough." | Under 90% is red. Send the short lane back. |
+| "Run the e2e suite after every wave." | Milestone gate. Per wave is the full suite with coverage. |
 | "It builds, ship it." | `observe` tasks are reviewed first. |
 | "Huge diff, skip the gate." | Big diffs hide regressions. Run it. |
-| "Tests pass; commit." | Green isn't clean. Quality-pass the diff first. |
+| "Tests pass; commit." | Green isn't clean. Review at the task's tier first. |
 | "Re-dispatch the same brief." | Same brief, same tier, same result. Escalate. |
 | "Apply the reviewer's patch." | Adjudicate the claim; route it through the worker. |
 | "Disjoint paths are enough for this risky wave." | High blast radius → `isolate`. |

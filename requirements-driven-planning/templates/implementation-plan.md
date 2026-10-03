@@ -23,6 +23,11 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 ## Global constraints
 <Version floors, dependency limits, naming/copy rules, platform requirements — one line each, copied verbatim from the PRD/ERD. Every task implicitly includes these.>
 
+- **Static gate:** `<command>` (format check, lint, type-check, complexity limit)
+- **Coverage:** `<command>` fails under 90% line coverage. Exclusions: <paths, or none>
+- **Backing services for tests:** `<compose.test.yaml>` (real database / queue / cache; no mocks)
+- **End-to-end:** `<command>`, driver: <Playwright for browser UI · HTTP for an API · the built binary for a CLI · n/a for a library>
+
 ## Requirements covered
 <REQ-/NFR- IDs this plan satisfies. Every one must map to ≥1 task below.>
 
