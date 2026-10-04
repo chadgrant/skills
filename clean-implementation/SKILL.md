@@ -35,11 +35,11 @@ Missing or ambiguous? Two cases:
    - **Coverage**: your tests cover at least 90% of the lines in your lane's files, through assertions on behavior. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
    - **Real backing services**: code that talks to a database, queue, or cache is tested against the real one from the plan's Compose file. Don't mock it or swap in an in-memory substitute.
    - **End-to-end**, when your task is an e2e scenario: drive the public surface with the plan's driver (Playwright for browser UI, HTTP for an API, the built binary for a CLI) against the Compose stack. Never Playwright for something without a browser UI.
-3. **Write it per `uncle-bob-clean-code`.** For a design decision (how objects collaborate, how the domain is modeled) also use `design-patterns` and, for a rich domain, `domain-driven-design`. If the code you must change fights you, refactor first under green tests via `refactoring`, then add the feature; never both in one diff.
+3. **Write it per `uncle-bob-clean-code`**, including its four simplicity rules: KISS (the simplest thing that passes the verify step), YAGNI (nothing the brief doesn't ask for), DRY (one home for each rule and constant), convention over configuration (the framework's and repo's standard layout, naming, and defaults before anything custom). For a design decision (how objects collaborate, how the domain is modeled) also use `design-patterns` and, for a rich domain, `domain-driven-design`. If the code you must change fights you, refactor first under green tests via `refactoring`, then add the feature; never both in one diff.
 4. **UI → Impeccable.** Build user-facing surfaces with the [Impeccable](https://github.com/pbakaus/impeccable) skill against the style guide's `TOK-`/`CMP-` (`design-system/style-guide.md`). Wireframes give layout; the style guide gives visual language.
 5. **Service → Twelve-Factor.** A deployable service (API, worker, consumer, scheduled job) follows the [Twelve-Factor App](https://12factor.net):
    - **II** dependencies declared in the manifest and lockfile; nothing relies on a host-installed tool
-   - **III** config (URLs, credentials, flags, limits) read from the environment at startup, validated, fail fast if missing; no config in code, no per-environment files, no secrets in the repo
+   - **III** config (URLs, credentials, flags, limits) read from the environment at startup, validated, fail fast if missing; no config in code, no per-environment files, no secrets in the repo. Convention over configuration keeps the list short: a setting exists only when deployments truly differ on it.
    - **IV** databases, queues, caches, third-party APIs are attached resources located by config
    - **VI** stateless and share-nothing; session, cache and upload state lives in a backing service
    - **VII** binds a port taken from config
@@ -51,7 +51,7 @@ Missing or ambiguous? Two cases:
 
    A waived factor is an `ADR` in your brief; anything else you can't meet is a `⚠` in your report.
 6. **Prove it green.** Run the exact verify step yourself. Red → the debug loop below.
-7. **Prove it clean.** The static gate in your verify step covers format, lint, types, and complexity; spend this step on what tools can't see. Run `uncle-bob-clean-code`'s three review passes (correctness and security, design, readability) over your own diff, checking in particular for one thing per function, no speculative abstraction, no duplication, and patterns only where the problem demands one. Code that passes its test but reads like a mess is not done. Fix, then re-verify.
+7. **Prove it clean.** The static gate in your verify step covers format, lint, types, and complexity; spend this step on what tools can't see. Run `uncle-bob-clean-code`'s three review passes (correctness and security, design, readability) over your own diff, checking in particular for one thing per function, the four simplicity rules (KISS, YAGNI, DRY, convention over configuration), and patterns where the problem demands one and nowhere else. Code that passes its test but reads like a mess is not done. Fix, then re-verify.
 8. **Report** (format below).
 
 ## Debug loop (a test went red)
@@ -106,6 +106,8 @@ Keep it to about 25 lines per task. The orchestrator pays for every line on ever
 | "Add a few assertion-free tests to reach 90%." | Coverage counts only when the test would fail on wrong behavior. |
 | "Can't reach the real service, but it basically works." | Code-complete + fakes + runbook. |
 | "Freehand UI is faster than Impeccable." | Freehand UI is drift. |
+| "Make it configurable in case someone needs it." | YAGNI. A setting nobody varies is code to maintain and a way to misconfigure. |
+| "The framework's way is awkward; I'll wire my own." | Convention over configuration. Custom wiring is a `⚠` in your report, with the reason. |
 | "Hardcode this URL for now, env vars later." | Config from the environment on day one. "Later" ships. |
 | "Keep it in memory; there's one instance." | The second replica or the next restart breaks it. |
 | "Run the migration on startup." | Separate command. Racing replicas corrupt schemas. |

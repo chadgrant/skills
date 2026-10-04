@@ -40,6 +40,14 @@ Do this first; tactical modeling inside the wrong boundary is wasted.
 
 The domain model depends on **nothing** — no framework, no ORM, no HTTP, no clock. Persistence, transport, and I/O sit *outside* and depend inward (this is Clean Architecture's dependency rule, `uncle-bob-clean-code`, and DIP). Application/Service Layer orchestrates; the domain holds the rules.
 
+## Simplicity in the model
+
+The four simplicity rules in `uncle-bob-clean-code` apply here with one twist each:
+
+- **KISS / YAGNI**: use a tactical building block only where an invariant or the language calls for it. No aggregate, domain service, or event for a need the domain experts haven't stated.
+- **DRY stops at the context boundary.** A rule has one home inside its bounded context. The same word modeled separately in two contexts is two models, not duplication; merging them "for DRY" couples the contexts.
+- **Convention over configuration**: the ubiquitous language is the naming convention, and each building block sits where the codebase's layout puts that kind of object.
+
 ## Red flags: don't over-apply
 
 | Thought | Reality |

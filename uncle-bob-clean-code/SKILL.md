@@ -55,6 +55,17 @@ Not for: vendored or generated code, or scripts the user explicitly calls throwa
 | ISP | Small, client-specific interfaces | Implementers with empty or stub methods |
 | DIP | Depend on abstractions at seams | Business logic constructing its own DB/network/clock |
 
+**Simplicity**: four rules that outrank cleverness. Sibling skills cite them by name.
+
+| Principle | Rule | Violation smell |
+|---|---|---|
+| KISS | The simplest design that passes the tests and reads clearly wins | A layer, indirection, or generic mechanism that a plain function would replace |
+| YAGNI | Build what today's requirement needs; extend when the second real case arrives | A hook, option, parameter, or abstraction with no current caller |
+| DRY | Every piece of knowledge has one authoritative home | The same rule, constant, or schema edited in several places |
+| Convention over configuration | Follow the language's, framework's, and repo's standard layout, naming, and defaults; configure only where you truly differ | A setting nobody varies; a home-made mechanism where the framework has a standard one; wiring a naming convention would make unnecessary |
+
+Where they pull apart: code that looks alike but changes for different reasons is not duplication, so KISS and YAGNI outrank DRY until the third occurrence (the rule of three, `refactoring`). Convention decides how few settings exist; the ones that remain still come from the environment (Twelve-Factor).
+
 **Existing messy codebase?** Match its conventions — naming case, formatting, module layout — never its defects. "Match our style" means style, not smells: single-letter names, status-code returns, and blob functions are defects, not style. Apply the Boy Scout Rule to lines you touch; don't launch drive-by rewrites of code the task doesn't touch.
 
 ## Composes with the design canon
@@ -70,8 +81,10 @@ This skill covers how to write and review **any unit of code** well — names, f
 Run three REQUIRED passes and report findings in this order. A review that contains only one kind of finding means a pass was skipped.
 
 1. **Correctness & security** — bugs, injection, resource leaks, error paths, concurrency. Trace every boolean-flag combination end to end: a flag that only partially gates behavior (a "dry run" that still sends email) is a bug here, not just a design smell. Never let design commentary crowd these out.
-2. **Design (SOLID + architecture pass)** — walk the SOLID table above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type. At component scale, check the **Dependency Rule** (does policy depend on a detail? any dependency cycles?) and whether a **known pattern is missing or misapplied** (`design-patterns`), or the **domain model is anemic / an aggregate leaks** (`domain-driven-design`). Where a smell is real, name the **refactoring** that fixes it (`refactoring`).
+2. **Design (SOLID + simplicity + architecture pass)** — walk the SOLID table and the simplicity table (KISS, YAGNI, DRY, convention over configuration) above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type. At component scale, check the **Dependency Rule** (does policy depend on a detail? any dependency cycles?) and whether a **known pattern is missing or misapplied** (`design-patterns`), or the **domain model is anemic / an aggregate leaks** (`domain-driven-design`). Where a smell is real, name the **refactoring** that fixes it (`refactoring`).
 3. **Readability** — names, magic numbers, commented-out code, comment quality, duplication (DRY).
+
+Reviewing someone else's work or auditing a codebase? `clean-code-review` wraps these passes in a full procedure: scope, security and Twelve-Factor checklists, a test lens, and the report format.
 
 For each finding: name the principle or smell, say concretely why it will hurt, and sketch the fix. End with an explicit verdict: blockers, should-fix, nits.
 
@@ -85,6 +98,8 @@ Needless complexity is itself a smell.
 | Class explosion: twelve one-method classes for a 40-line feature | SRP means one reason to change, not one function per class. Plain functions are fine. |
 | Design-pattern showcase | Patterns are vocabulary for problems you HAVE, not decoration. |
 | Speculative hooks and config "for later" | YAGNI. Extend when the second case arrives — that is OCP's moment, not before. |
+| Extracting a shared helper from two look-alike snippets "for DRY" | DRY is about knowledge, not text. Wait for the third occurrence, and check they change for the same reason. |
+| A custom project layout, config format, or wiring scheme | Convention over configuration. The framework's standard way is the one the next reader already knows. |
 
 ## Rationalization Table
 

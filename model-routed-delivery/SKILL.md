@@ -18,6 +18,8 @@ How a worker builds one task is `clean-implementation`'s job; every dispatched w
 
 Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Record the answers. If `requirements-driven-planning` has run, its spec and routed plan are the input.
 
+**Check the review stamp** before planning on a repo that already has code: run `clean-code-review`'s `review-stamp.sh status`. `stale` means its full review of the whole codebase runs first; the blockers and should-fix findings become tasks in the plan, so new work isn't built on unreviewed code. `fresh`, or a repo with no code yet: carry on.
+
 ## Phase 1: plan
 
 Write `IMPLEMENTATION.md` (or `docs/plans/<date>-<name>.md`):
@@ -28,6 +30,7 @@ Write `IMPLEMENTATION.md` (or `docs/plans/<date>-<name>.md`):
 - **Per task**: stable id; exact file paths (create / modify / test); the interface it produces, signatures written down; its verify command (the task's tests plus the static gate); difficulty; tier; `observe` and `isolate` flags.
 - A task is the smallest unit with its own verify cycle that a reviewer could accept or reject alone. Fold setup into the deliverable task.
 - Tasks in one wave touch non-overlapping files. Design the seams so parallel workers never share a file.
+- **Simplicity** (the four rules in `uncle-bob-clean-code`). YAGNI: every task traces to a stated requirement; no task builds for a future one. KISS: the plan takes the simplest architecture that meets the requirements. DRY: a shared rule or type is one task's interface that others consume, not something several tasks each write. Convention over configuration: the stack's standard layout, naming, and tooling; a deviation is an `ADR`.
 - No "TBD", no "similar to task N". A worker can't recover from an undefined detail; it guesses wrong.
 - A "reduce burden" refactor is a valid task (verify: tests green and the target smell gone), scheduled as its own task and commit per `refactoring`.
 
@@ -59,12 +62,12 @@ Repeat until the ledger is all green.
    | Task | Review |
    |---|---|
    | Easy | None. The wave gate and the worker's self-review cover it. |
-   | Medium | You skim the diff for what tools miss: hardcoded config, speculative abstraction, duplication, and for service tasks the Twelve-Factor list in `clean-implementation`. |
+   | Medium | You skim the diff for what tools miss: hardcoded config, the four simplicity rules (a needless layer, a speculative abstraction or setting, duplicated knowledge, a custom mechanism where the framework has a convention), and for service tasks the Twelve-Factor list in `clean-implementation`. |
    | Other Hard | Per wave: one mid-tier reviewer agent over the wave's combined Hard diff. |
    | `observe` | Per task: a fresh top-tier reviewer agent. |
 
-   - A reviewer agent gets the task briefs and file paths. It runs `uncle-bob-clean-code`'s three review passes, independent of the worker's self-review, and tries to refute the work: name the breaking inputs, prove the invariants hold.
-   - It returns a verdict per task: clean, or findings with `file:line` and the breaking case. No diff excerpts, no narration. Don't read Hard diffs yourself; every diff in your context is paid for again on each later turn.
+   - A reviewer agent gets the task briefs and file paths and follows `clean-code-review` in scoped mode: those files only, independent of the worker's self-review, trying to refute the work.
+   - It returns that skill's report per task: clean, or findings with `file:line` and the breaking case. No diff excerpts, no narration. Don't read Hard diffs yourself; every diff in your context is paid for again on each later turn.
    - Dispatch reviewers in parallel, in one message.
    - Green but bloated, over-abstracted, or hardcoding config is a defect: send it back to the worker to refactor, once. If it comes back still not clean, go to step 7.
    - Confirmed findings go back to the worker under `clean-implementation`'s receive-review rules. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
@@ -74,7 +77,7 @@ Repeat until the ledger is all green.
 
 ## Phase 4: milestone gate
 
-Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then `/code-review`. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
+Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review with `clean-code-review`. Run its `review-stamp.sh status` first: `fresh` means a scoped review of the milestone's accumulated diff; `stale` (14 days or 50 commits since the last full review, or none recorded in `AGENTS.md`) means its full review of the whole codebase, which rewrites the stamp. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
 
 ## Iron rules
 
@@ -108,6 +111,7 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | "Wait for the reviews before the next wave." | Reviews gate commits, not dispatch. |
 | "Coverage is 87%, close enough." | Under 90% is red. Send the short lane back. |
 | "Run the e2e suite after every wave." | Milestone gate. Per wave is the full suite with coverage. |
+| "The stamp is stale, but the milestone diff is small; review just the diff." | Stale means the whole codebase. That's what the stamp is for. |
 | "It builds, ship it." | `observe` tasks are reviewed first. |
 | "Huge diff, skip the gate." | Big diffs hide regressions. Run it. |
 | "Tests pass; commit." | Green isn't clean. Review at the task's tier first. |

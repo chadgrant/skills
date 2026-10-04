@@ -15,7 +15,10 @@ Announce at the start: **"Using design-patterns: name the problem → match a kn
 2. **Match it to a known solution.** Scan [reference.md](reference.md) for the pattern whose *intent* matches your problem and whose *smell it cures* is the smell you actually have.
 3. **Apply the minimal form.** Implement the smallest version that solves today's problem. A Strategy is an interface and two implementers — not a factory-of-factories. Patterns are extensible by design; add the machinery when the second real case arrives (that is OCP's moment, per `uncle-bob-clean-code`).
 4. **Name it in the code and the docs.** Call the class `RetryStrategy`, cite the pattern in the `ADR` when it's an architectural choice. The name is half the value.
-5. **Or reject it.** If the recurring problem isn't actually recurring, the pattern is speculative generality — a smell, not a solution. Stop.
+5. **Check the convention first.** If the framework already supplies the pattern (its ORM's repository, its middleware chain, its event bus), use the framework's version; a parallel home-made one breaks convention over configuration.
+6. **Or reject it.** If the recurring problem isn't actually recurring, the pattern is speculative generality — a smell, not a solution. Stop.
+
+The four simplicity rules in `uncle-bob-clean-code` gate every pattern. KISS and YAGNI say when not to reach for one; DRY is often why you do (a Decorator or Template Method gives repeated wrapping logic one home); convention over configuration says whose version to use.
 
 ## Choosing among the common forks
 

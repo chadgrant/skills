@@ -31,6 +31,8 @@ Announce at the start: **"Using refactoring: confirm green tests → one small n
 - **It should be a rewrite, not a refactor.** When the design is beyond incremental repair, that's a planned rewrite decision (record it as an `ADR`/task via `requirements-driven-planning`), not an endless refactor.
 - **There are no tests and you can't add them.** Get a characterization harness first; otherwise you're changing behavior blind.
 
+**The four simplicity rules (`uncle-bob-clean-code`) set the direction.** A refactoring should leave the code simpler (KISS), with knowledge in fewer places (DRY, at the third occurrence), with less speculative machinery (YAGNI: deleting an unused abstraction is a refactoring), and closer to the framework's and repo's conventions. A step that adds indirection without removing a burden is going the wrong way.
+
 ## In the pipeline
 
 Refactoring is a first-class activity, not an afterthought:
