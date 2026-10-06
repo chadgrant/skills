@@ -27,7 +27,7 @@ The stamp is one line in the repo's `AGENTS.md`: `Last full review: <date> at co
 2. **Read every file in the lane in full**, not only the changed hunks. Open a neighboring file only to read an interface the lane calls or implements; neighbors are context, never review targets.
 3. **Check the brief.** The interface produced matches the brief's signatures exactly, and the verify step would fail if the behavior were wrong.
 4. **Run the six lenses** below over the lane.
-5. **Return a verdict per task** in the report shape below.
+5. **Write the report** in the shape below to the path in your brief (`.delivery/review-<id>.md`) and return only part 1, the verdict, per task, with the path. No path in the brief: return the report itself.
 
 A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane while reading an interface (an exploitable hole, data loss) gets one line under `Outside scope` and no further investigation.
 
@@ -38,11 +38,17 @@ A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane whi
 3. **Fan out in one message.**
    - One reviewer per unit, running a scoped review of that unit's files. Units holding spine code (authn/authz, money, tenancy, key or token handling) go to the top tier; the rest to the mid tier.
    - Three cross-cutting reviewers on the top tier, each reading across units: **architecture**, **security**, **operations**. Their briefs are in [reference.md](reference.md).
+   - Each writes its report to `.delivery/review-<unit>.md` and returns its verdict line.
    - No subagent tool: review the units yourself, one at a time, then the three cross-cutting reads.
-4. **Adjudicate.** Verify each blocker yourself or with a fresh verifier: reproduce it with a failing test or command, or trace the path with `file:line` at each hop. A blocker that can't be verified is downgraded or dropped. Merge duplicates. Report a systemic smell once, with its count and three exemplars.
-5. **Report** in the shape below.
-6. **Stamp**, only when every unit was read: `bash <this skill's directory>/scripts/review-stamp.sh stamp`. A review that skipped units lists them under `Unreviewed` and writes no stamp.
-7. **Hand off.** Blockers and should-fix findings become work for someone else: `TASK-`s in the pipeline (structural ones as their own refactoring tasks per `refactoring`), or the list handed to the user when run standalone.
+4. **Consolidate.** A mid-tier agent merges the unit and cross-cutting reports into one report file: duplicates merged, a systemic smell reported once with its count and three exemplars. Read that file, not the individual reports.
+5. **Adjudicate.** Verify each blocker yourself or with a fresh verifier: reproduce it with a failing test or command, or trace the path with `file:line` at each hop. A blocker that can't be verified is downgraded or dropped.
+6. **Report** in the shape below.
+7. **Stamp**, only when every unit was read: `bash <this skill's directory>/scripts/review-stamp.sh stamp`. A review that skipped units lists them under `Unreviewed` and writes no stamp.
+8. **Hand off.** Blockers and should-fix findings become work for someone else: `TASK-`s in the pipeline (structural ones as their own refactoring tasks per `refactoring`), or the list handed to the user when run standalone.
+
+## Re-review (after a fix)
+
+One round, on the small or mid tier. The scope is the original findings and the lines the fix changed (`git diff` of the fix), nothing else. For each finding: fixed, with the evidence, or still open. Then the six lenses over the changed lines only. A finding still open goes back as an escalation, not a third round.
 
 ## The six lenses
 
@@ -91,6 +97,7 @@ A scoped report for several tasks repeats parts 1–3 per task.
 | "The duplication is small; no need to mention a pattern." | Three occurrences of the same wrapping logic is the evidence a Decorator needs. Prescribe it. |
 | "I'd have written it differently." | Taste isn't a finding. Name the principle and the cost. |
 | "Nothing serious; I'll list some nits so the review has content." | `clean` is a complete verdict. |
+| "While re-reviewing, I'll take another full pass." | A re-review is the findings and the fix's lines. A fresh full pass restarts the round count. |
 | "The fix is two lines; I'll just make it." | Reviewers don't edit. The finding goes to the worker. |
 | "It's an internal tool; skip the security lens." | Internal tools hold credentials too. All six lenses, every time. |
 

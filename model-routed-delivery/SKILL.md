@@ -14,6 +14,16 @@ Announce: **"Using model-routed-delivery: rate & route → dispatch full waves �
 
 How a worker builds one task is `clean-implementation`'s job; every dispatched worker follows it. This skill owns routing, waves, verification, commits, and the ledger.
 
+## Your context is the budget
+
+Every turn re-sends your whole context. Your context size times your turn count is the largest cost of a delivery run: in a measured 200-agent run the orchestrator was about half the total, at a typical context of 400k tokens across 3,700 turns. A turn at 40k costs a tenth of one at 400k. So:
+
+- **One session per milestone.** At the end of the milestone gate, write into `STATUS.md` everything the next milestone needs (the plan path, the next wave, open follow-ups, decisions, incidents) and end the session. The next milestone starts in a fresh session from `STATUS.md` and the plan. Past about 200k tokens mid-milestone, do the same at the next wave boundary.
+- **Delegate looking.** You don't grep, `cat`, or read source, logs, diffs, or findings to work something out. Ask a small-tier `Explore` agent the question; it answers in a few lines.
+- **Reports on disk, verdicts in context.** Workers and reviewers write their full report to `.delivery/<id>.md` (add `.delivery/` to `.git/info/exclude` once) and return one line: id, status, verify result, report path. Open a report only when its line says red, findings, or `⚠`.
+- **Filter command output.** Run gates so only failures and the summary come back (`2>&1 | tail -n 40`, or the runner's quiet or failures-only flag). Full logs and screenshots stay with the agent that needs them.
+- **Batch.** One shell call per check, not one per step.
+
 ## Phase 0: clarify
 
 Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Record the answers. If `requirements-driven-planning` has run, its spec and routed plan are the input.
@@ -54,7 +64,7 @@ Rate on the **hardest aspect**, not the average.
 Repeat until the ledger is all green.
 
 1. **Pick the whole wave.** Every ready task whose files are disjoint, usually 6–10. Disjointness was settled in the plan, so don't throttle to 3–5. Hold a task back only if a dependency's interface isn't verified yet or its files overlap.
-2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, touch only your files, and keep the report short (the diff is on disk). Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
+2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, touch only your files, and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
    - **Bundle Easy tasks.** Ready Easy tasks in the same package or following the same pattern go to one small-tier worker in one brief (up to about five), built and reported per task. Each is still verified and committed as its own task; if one fails, only that one escalates.
 3. **Verify the wave once.** When the wave's workers have reported, run the full suite with its coverage threshold and the static gate once over the tree, against the Compose-started backing services. Green verifies every task in the wave; don't rerun each task's command. Red: run the verify commands of the tasks touching the failing packages to find the culprit, and send that task back to its worker. Coverage under 90% is red: the workers' per-lane figures name the task to send back. The e2e suite is slower, so it runs at the milestone gate, plus the single scenario an e2e task adds.
 4. **Review by risk.** Every task gets a `git diff --stat` check from you: changes stay in the task's lane and the size fits the task. Beyond that:
@@ -67,17 +77,19 @@ Repeat until the ledger is all green.
    | `observe` | Per task: a fresh top-tier reviewer agent. |
 
    - A reviewer agent gets the task briefs and file paths and follows `clean-code-review` in scoped mode: those files only, independent of the worker's self-review, trying to refute the work.
-   - It returns that skill's report per task: clean, or findings with `file:line` and the breaking case. No diff excerpts, no narration. Don't read Hard diffs yourself; every diff in your context is paid for again on each later turn.
+   - It writes that skill's report to `.delivery/review-<wave or task id>.md` and returns one line per task: clean, or its finding counts. Don't read Hard diffs yourself; every diff in your context is paid for again on each later turn.
    - Dispatch reviewers in parallel, in one message.
    - Green but bloated, over-abstracted, or hardcoding config is a defect: send it back to the worker to refactor, once. If it comes back still not clean, go to step 7.
-   - Confirmed findings go back to the worker under `clean-implementation`'s receive-review rules. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
+   - Confirmed findings go back to the worker under `clean-implementation`'s receive-review rules, pointing at the review file. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
+   - **Fixes stay at the task's tier.** Send findings to the worker that built the task (continue it with `SendMessage` while it's alive; it already holds the context). A fresh fix worker gets the task's original tier. The top tier fixes only `observe` tasks, or a task escalated under step 7.
+   - **One review round.** Review, one fix pass, then a re-review on the small or mid tier limited to the findings and the lines the fix changed (`clean-code-review`'s re-review). Still failing after that: step 7. Never a third round.
 5. **Pipeline the reviews.** Once a wave is verified (step 3), dispatch the next wave together with this wave's reviewers; reviews run alongside it. Reviews gate commits, not dispatch. A dependent task may build on a verified-but-uncommitted interface. If a review changes that interface, re-dispatch the uncommitted dependents with the new interface; a dependent already committed gets a follow-up task.
 6. **Commit** (orchestrator only): one commit per finished task, staging only that task's paths (never `-A`; other workers share the tree). Update the ledger.
 7. **Escalate, then re-plan.** A task that ends red, or green but unable to reach the quality bar after one refactor pass: never re-dispatch the same brief at the same tier. Bump the tier when the brief was sound and the worker couldn't do it; split the task when it was too big to verify in one piece; fix the plan when the interface itself was wrong. Re-plan when a task reveals new work.
 
 ## Phase 4: milestone gate
 
-Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review with `clean-code-review`. Run its `review-stamp.sh status` first: `fresh` means a scoped review of the milestone's accumulated diff; `stale` (14 days or 50 commits since the last full review, or none recorded in `AGENTS.md`) means its full review of the whole codebase, which rewrites the stamp. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
+Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review with `clean-code-review`. Run its `review-stamp.sh status` first: `fresh` means a scoped review of the milestone's accumulated diff; `stale` (14 days or 50 commits since the last full review, or none recorded in `AGENTS.md`) means its full review of the whole codebase, which rewrites the stamp. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push. Then update `STATUS.md` for the next milestone and end the session.
 
 ## Iron rules
 
@@ -97,7 +109,6 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | Thought | Reality |
 |---|---|
 | "I'll write this one myself, it's quick." | Route it. Your job is judgment and verification. |
-| "The worker said tests pass; commit." | Run the wave gate yourself. |
 | "Rerun every task's verify command to be sure." | One full run per wave. Per-task commands are for bisecting a red run. |
 | "Read every diff to be safe." | Stat all, skim Medium, delegate Hard. Diffs in your context cost on every later turn. |
 | "One worker per Easy task." | Bundle Easy tasks that share a package or pattern. Cold starts cost more than the change. |
@@ -112,12 +123,16 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | "Coverage is 87%, close enough." | Under 90% is red. Send the short lane back. |
 | "Run the e2e suite after every wave." | Milestone gate. Per wave is the full suite with coverage. |
 | "The stamp is stale, but the milestone diff is small; review just the diff." | Stale means the whole codebase. That's what the stamp is for. |
-| "It builds, ship it." | `observe` tasks are reviewed first. |
 | "Huge diff, skip the gate." | Big diffs hide regressions. Run it. |
-| "Tests pass; commit." | Green isn't clean. Review at the task's tier first. |
+| "Tests pass; commit." | Run the wave gate yourself, then review at the task's tier. Green isn't clean. |
 | "Re-dispatch the same brief." | Same brief, same tier, same result. Escalate. |
 | "Apply the reviewer's patch." | Adjudicate the claim; route it through the worker. |
 | "Disjoint paths are enough for this risky wave." | High blast radius → `isolate`. |
+| "Quick grep to check." / "Let me read that file." | Everything you read is re-sent on every later turn. Ask an `Explore` agent. |
+| "Paste the full report back; I'll want the detail." | One line back, the report on disk. Open it only when the line says so. |
+| "Stay in this session; it already has the context." | `STATUS.md` has what the next milestone needs. Fresh session per milestone. |
+| "One more review round to be sure." | One review, one fix, one narrow re-check. Then escalate. |
+| "Send the fix to the top tier so it's done right." | Fix at the task's tier. The top tier is for `observe` tasks and escalations. |
 
 ---
 

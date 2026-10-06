@@ -82,7 +82,7 @@ Missing or ambiguous? Two cases:
 
 ## Report format
 
-Keep it to about 25 lines per task. The orchestrator pays for every line on every later turn, and the diff is on disk; don't paste code or full logs.
+Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 lines per task with no pasted code or full logs, and return only one line per task: `TASK-### · green|red · <verify summary> · ⚠ <count> · <report path>`. The orchestrator pays for everything you return on every later turn, and opens the file only when the line says red or `⚠`. No path in the brief: return the report itself.
 
 - **Task:** `TASK-###`, one line
 - **Files changed:** a subset of your lane
