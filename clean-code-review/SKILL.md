@@ -7,7 +7,7 @@ description: Use when reviewing code someone else wrote, or auditing a codebase:
 
 Announce: **"Using clean-code-review: fix the scope → run the gates → six lenses, adversarially → verify findings → verdict."**
 
-**Core principle: a review tries to break the code, not to approve it.** Every finding carries a `file:line` and either the input that breaks the code or the concrete cost of leaving it. A finding without evidence is an opinion; drop it. The reviewer reads and reports and never edits the code under review.
+**Core principle: a review tries to break the code, not to approve it.** Every finding carries a `file:line` and either the input that breaks the code or the concrete cost of leaving it. A finding without evidence is an opinion; drop it. The reviewer reads and reports. It never edits the code under review, and never edits `CLAUDE.md`, `AGENTS.md`, or any other shared file; the one exception is the stamp line, written by whoever runs a full review.
 
 Pipeline position: `model-routed-delivery` dispatches reviewers that follow this skill; `clean-implementation` workers receive the findings. The standards are the canon's: `uncle-bob-clean-code`, `design-patterns`, `domain-driven-design`, `refactoring`.
 

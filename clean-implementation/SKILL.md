@@ -74,6 +74,7 @@ Missing or ambiguous? Two cases:
 ## Iron rules
 
 - **Stay in your lane.** Need a file that isn't yours? Report it; don't touch it.
+- **Shared files belong to the orchestrator.** Never create or edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, the root `README`, or any other file outside your lane, including to record a learning, a convention, or progress. Several workers run at once and overwrite each other there. Put what you'd have written under **Notes for shared docs** in your report; the orchestrator applies it. A documentation file you may edit is one your brief lists in your lane.
 - **Never `git commit`.** Even when certain.
 - **Run the verify step before reporting.** Report its actual result, not a claim.
 - **Honest environment ceiling.** Can't fully exercise it? "Done" means code-complete + tested with fakes + a runbook for the real step.
@@ -82,7 +83,7 @@ Missing or ambiguous? Two cases:
 
 ## Report format
 
-Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 lines per task with no pasted code or full logs, and return only one line per task: `TASK-### · green|red · <verify summary> · ⚠ <count> · <report path>`. The orchestrator pays for everything you return on every later turn, and opens the file only when the line says red or `⚠`. No path in the brief: return the report itself.
+Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 lines per task with no pasted code or full logs, and return only one line per task: `TASK-### · green|red · <verify summary> · ⚠ <count> · notes <count> · <report path>`. The orchestrator pays for everything you return on every later turn, and opens the file only when the line says red, `⚠`, or notes. No path in the brief: return the report itself.
 
 - **Task:** `TASK-###`, one line
 - **Files changed:** a subset of your lane
@@ -90,6 +91,7 @@ Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 
 - **Verify:** the command, its exit status, and the summary lines of its output (pass/fail counts, line coverage for your lane's files), not "tests pass". Include failure output only for a failure you couldn't fix.
 - **Quality:** the self-review outcome and what you refactored, one or two lines
 - **Deviations / ⚠:** assumptions, unverifiable items (with the runbook for any real-environment step), differences from the brief
+- **Notes for shared docs:** anything that belongs in `CLAUDE.md`, `AGENTS.md`, or docs outside your lane (a convention you established, a command, a gotcha, a doc that is now out of date), each as the target file and the exact text to add or change. Omit when there is nothing.
 - **Review response** (only after a review): per finding, fixed with re-verify evidence, or refuted with the proving case
 
 ## Red flags
@@ -97,6 +99,7 @@ Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 
 | Thought | Reality |
 |---|---|
 | "I'll fix this neighboring file while I'm here." | Another worker's lane. Report it. |
+| "I'll note this convention in `CLAUDE.md` so others know." | Not your file. Put it under Notes for shared docs; the orchestrator writes it. |
 | "It's right; I'll commit." | You never commit. |
 | "Looks correct; report done without running it." | Unrun tests are not evidence. |
 | "The brief didn't specify this interface, but this seems reasonable." | Flag `⚠` and ask. |

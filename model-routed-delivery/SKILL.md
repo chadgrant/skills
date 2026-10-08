@@ -20,7 +20,7 @@ Every turn re-sends your whole context. Your context size times your turn count 
 
 - **One session per milestone.** At the end of the milestone gate, write into `STATUS.md` everything the next milestone needs (the plan path, the next wave, open follow-ups, decisions, incidents) and end the session. The next milestone starts in a fresh session from `STATUS.md` and the plan. Past about 200k tokens mid-milestone, do the same at the next wave boundary.
 - **Delegate looking.** You don't grep, `cat`, or read source, logs, diffs, or findings to work something out. Ask a small-tier `Explore` agent the question; it answers in a few lines.
-- **Reports on disk, verdicts in context.** Workers and reviewers write their full report to `.delivery/<id>.md` (add `.delivery/` to `.git/info/exclude` once) and return one line: id, status, verify result, report path. Open a report only when its line says red, findings, or `⚠`.
+- **Reports on disk, verdicts in context.** Workers and reviewers write their full report to `.delivery/<id>.md` (add `.delivery/` to `.git/info/exclude` once) and return one line: id, status, verify result, report path. Open a report only when its line says red, findings, `⚠`, or notes.
 - **Filter command output.** Run gates so only failures and the summary come back (`2>&1 | tail -n 40`, or the runner's quiet or failures-only flag). Full logs and screenshots stay with the agent that needs them.
 - **Batch.** One shell call per check, not one per step.
 
@@ -64,7 +64,7 @@ Rate on the **hardest aspect**, not the average.
 Repeat until the ledger is all green.
 
 1. **Pick the whole wave.** Every ready task whose files are disjoint, usually 6–10. Disjointness was settled in the plan, so don't throttle to 3–5. Hold a task back only if a dependency's interface isn't verified yet or its files overlap.
-2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, touch only your files, and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
+2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
    - **Bundle Easy tasks.** Ready Easy tasks in the same package or following the same pattern go to one small-tier worker in one brief (up to about five), built and reported per task. Each is still verified and committed as its own task; if one fails, only that one escalates.
 3. **Verify the wave once.** When the wave's workers have reported, run the full suite with its coverage threshold and the static gate once over the tree, against the Compose-started backing services. Green verifies every task in the wave; don't rerun each task's command. Red: run the verify commands of the tasks touching the failing packages to find the culprit, and send that task back to its worker. Coverage under 90% is red: the workers' per-lane figures name the task to send back. The e2e suite is slower, so it runs at the milestone gate, plus the single scenario an e2e task adds.
 4. **Review by risk.** Every task gets a `git diff --stat` check from you: changes stay in the task's lane and the size fits the task. Beyond that:
@@ -96,6 +96,7 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 - **Disjoint paths, one worker per file.** Symlinked or aliased directories are the same file. Serialize or re-seam.
 - **`isolate` tasks run in their own worktree.** Disjoint paths are a promise a stray worker can break; a worktree makes collision impossible. A worktree costs setup and disk, which is why isolation is a flag rather than the default.
 - **Only the orchestrator commits.** Say it in every brief.
+- **Only the orchestrator writes shared files**: `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, the root `README`, and any doc no task owns. Workers and reviewers run in parallel and overwrite each other there, so they report notes instead. After each wave, apply the wave's **Notes for shared docs** yourself, one file at a time, merging duplicates and dropping what the file already says. A doc that a task must update (requirements docs, user docs, a package `README`) is listed in exactly one task's lane, like any other file.
 - **`general-purpose` + model override, never a fork.** A fork inherits your commit authorization.
 - **Verify before committing.** A worker's "tests pass" is not evidence; the green wave run is.
 - **`STATUS.md` is the ledger**: active wave, done tasks, follow-ups, incidents, decisions. Update it every wave; it's how the next context window resumes.
@@ -115,6 +116,8 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | "Adjacent files, probably fine." | Disjoint or serialize. |
 | "Hard but small; send it to the mid tier." | Route on the hardest aspect. |
 | "Fork myself for speed." | Forks commit. |
+| "Have each worker record its learnings in `CLAUDE.md`." | Parallel writers clobber each other. Workers report notes; you write the file. |
+| "This task changes behavior, the docs will get updated somewhere." | Put the doc file in that task's lane, or it's nobody's. |
 | "Push after each task to be safe." | Git holds it locally. Push per milestone. |
 | "Dispatch 3–5 to be safe." | The plan made the wave disjoint. Dispatch all of it. |
 | "Flag it `observe`, better safe than sorry." | Each flag is an hour on the critical path. True spine only. |
