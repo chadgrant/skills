@@ -65,7 +65,7 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 ### A3. Build the routed plan
 
 - Decompose into atomic `TASK-###`s: exact file paths, the interface each produces, a `TEST-###` verify step needing no human interpretation.
-- Rate each task on its hardest aspect and assign a tier per `model-routed-delivery`'s table; record tiers, not model names. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
+- Rate each task on its hardest aspect and assign a tier per `model-routed-delivery`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `model-routed-delivery` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
 - Add these **global constraints** once; `model-routed-delivery` copies them into every brief:
   - **UI**: built with [Impeccable](https://github.com/pbakaus/impeccable) against the style guide's tokens and components.
   - **Services** (API, worker, consumer, scheduled job): follow the [Twelve-Factor App](https://12factor.net); `clean-implementation` carries the checklist. Each service task names its config keys and env var names, backing services, port and health endpoints, and shutdown behavior; migrations and admin jobs are their own tasks. A deviation is an `ADR` the task cites.

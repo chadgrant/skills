@@ -10,7 +10,7 @@ Announce: **"Using model-routed-delivery: rate & route → dispatch full waves �
 **Core principle: you run a fleet; you don't type code.** Two roles, kept separate:
 
 - **Planner**: decomposes the work into a task DAG; each task gets a difficulty and a model tier.
-- **Orchestrator** (this session, on the top tier): dispatches, verifies, reviews the risky tasks, commits, keeps the ledger, re-plans. Judgment and verification are the load-bearing work, so the strongest model sits here.
+- **Orchestrator** (this session, on whatever model the user started it with): dispatches, verifies, reviews the risky tasks, commits, keeps the ledger, re-plans. Judgment and verification are the load-bearing work, so the strongest model sits here.
 
 How a worker builds one task is `clean-implementation`'s job; every dispatched worker follows it. This skill owns routing, waves, verification, commits, and the ledger.
 
@@ -27,6 +27,16 @@ Every turn re-sends your whole context. Your context size times your turn count 
 ## Phase 0: clarify
 
 Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Record the answers. If `requirements-driven-planning` has run, its spec and routed plan are the input.
+
+**Ask before using Fable.** Fable costs about three times Opus per token, so the user decides, once, before the plan is written. Ask with the choices below and record the answer in the plan header and `STATUS.md`; it holds for the whole run, including later sessions.
+
+| Answer | Top tier means |
+|---|---|
+| No Fable (the default when the user doesn't answer or can't be asked) | Opus for everything rated Hard, including `observe` tasks and their reviewers |
+| Fable for `observe` only | Fable for `observe` tasks and their per-task reviewers; Opus for other Hard work |
+| Fable for all Hard | Fable wherever the routing table says top tier |
+
+Never dispatch a Fable agent without a recorded yes. An escalation under step 7 that would reach Fable without one stops and asks.
 
 **Check the review stamp** before planning on a repo that already has code: run `clean-code-review`'s `review-stamp.sh status`. `stale` means its full review of the whole codebase runs first; the blockers and should-fix findings become tasks in the plan, so new work isn't built on unreviewed code. `fresh`, or a repo with no code yet: carry on.
 
@@ -52,7 +62,7 @@ Rate on the **hardest aspect**, not the average.
 |---|---|---|---|
 | Easy | mechanical, single-file, pattern-following, reversible | small | Haiku |
 | Medium | multi-file, some design judgment, integrates 2–3 components | mid | Opus |
-| Hard | security / money / auth / data-integrity / tenancy; concurrency; novel algorithm; many tasks depend on it; high blast radius | top | Fable |
+| Hard | security / money / auth / data-integrity / tenancy; concurrency; novel algorithm; many tasks depend on it; high blast radius | top | Opus, or Fable where the user approved it in Phase 0 |
 
 - Use unversioned family names so the mapping doesn't rot; pin a version only to reproduce a run. Sonnet is parked until its effective cost drops below Opus.
 - Security / money / auth / data-integrity is **Hard regardless of size**.
@@ -135,6 +145,7 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | "Paste the full report back; I'll want the detail." | One line back, the report on disk. Open it only when the line says so. |
 | "Stay in this session; it already has the context." | `STATUS.md` has what the next milestone needs. Fresh session per milestone. |
 | "One more review round to be sure." | One review, one fix, one narrow re-check. Then escalate. |
+| "This one is really hard; Fable just this once." | Fable needs the user's recorded yes from Phase 0. No record: Opus, or stop and ask. |
 | "Send the fix to the top tier so it's done right." | Fix at the task's tier. The top tier is for `observe` tasks and escalations. |
 
 ---
