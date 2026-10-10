@@ -9,7 +9,7 @@ Announce: **"Using clean-code-review: fix the scope → run the gates → six le
 
 **Core principle: a review tries to break the code, not to approve it.** Every finding carries a `file:line` and either the input that breaks the code or the concrete cost of leaving it. A finding without evidence is an opinion; drop it. The reviewer reads and reports. It never edits the code under review, and never edits `CLAUDE.md`, `AGENTS.md`, or any other shared file; the one exception is the stamp line, written by whoever runs a full review.
 
-Pipeline position: `model-routed-delivery` dispatches reviewers that follow this skill; `clean-implementation` workers receive the findings. The standards are the canon's: `uncle-bob-clean-code`, `design-patterns`, `domain-driven-design`, `refactoring`.
+Pipeline position: `model-routed-delivery` dispatches reviewers that follow this skill; `clean-implementation` workers receive the findings. The standards are `uncle-bob-clean-code`'s, including its pattern, domain-modeling, and refactoring files.
 
 ## Scope: decided by what you were handed
 
@@ -44,7 +44,7 @@ A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane whi
 5. **Adjudicate.** Verify each blocker yourself or with a fresh verifier: reproduce it with a failing test or command, or trace the path with `file:line` at each hop. A blocker that can't be verified is downgraded or dropped.
 6. **Report** in the shape below.
 7. **Stamp**, only when every unit was read: `bash <this skill's directory>/scripts/review-stamp.sh stamp`. A review that skipped units lists them under `Unreviewed` and writes no stamp.
-8. **Hand off.** Blockers and should-fix findings become work for someone else: `TASK-`s in the pipeline (structural ones as their own refactoring tasks per `refactoring`), or the list handed to the user when run standalone.
+8. **Hand off.** Blockers and should-fix findings become work for someone else: `TASK-`s in the pipeline (structural ones as their own refactoring tasks per `uncle-bob-clean-code`'s `refactoring.md`), or the list handed to the user when run standalone.
 
 ## Re-review (after a fix)
 
@@ -58,7 +58,7 @@ Run them in this order. Checklists for lenses 2 to 5 are in [reference.md](refer
 2. **Security.** Walk each trust boundary: who can reach this entry point, what they control, what it reaches. Injection, authn and authz on every entry point, tenancy isolation, secrets, unsafe deserialization, path traversal, SSRF, sensitive data in logs, fail-closed on spend, auth, and safety decisions.
 3. **Tests.** The tests are evidence of TDD or they aren't: each behavior has a test that would fail if the behavior were wrong; no assertion-free tests; 90% line coverage through behavior, with no unexplained exclusions; real backing services rather than mocks of them; one concept per test; FIRST.
 4. **Design.** Three checks, each ending in a named prescription:
-   - **Prescribe the pattern.** Where the code has the problem a known pattern solves, say so in those words: "use a Decorator here", "this needs a Repository", "replace this switch with a Strategy". Cite the evidence (the occurrences, the growing conditional, the leaking type) and the `file:line` where the pattern goes. The evidence → pattern table is in [reference.md](reference.md); the catalogs are `design-patterns` and `domain-driven-design`.
+   - **Prescribe the pattern.** Where the code has the problem a known pattern solves, say so in those words: "use a Decorator here", "this needs a Repository", "replace this switch with a Strategy". Cite the evidence (the occurrences, the growing conditional, the leaking type) and the `file:line` where the pattern goes. The evidence → pattern table is in [reference.md](reference.md); the catalogs are `uncle-bob-clean-code`'s `patterns.md` and `domain-driven-design.md`.
    - **Simplicity**, per the four rules in `uncle-bob-clean-code`. KISS: a layer or indirection a plain function would replace. YAGNI: an interface with one implementer, a pattern without its problem, a setting or hook with no caller. DRY: one rule or constant with several homes. Convention over configuration: a custom layout, wiring scheme, or home-made mechanism where the framework or repo has a standard one. A pattern to remove is prescribed the same way as a pattern to add.
    - **Structure.** The SOLID table and the Dependency Rule; an anemic model or a leaking aggregate.
 5. **Twelve-Factor** (deployable services only). Config from the environment, validated at startup; stateless processes; backing services attached by config; port from config; graceful `SIGTERM`; logs to stdout; migrations as separate commands; dev/test parity.
@@ -103,4 +103,4 @@ A scoped report for several tasks repeats parts 1–3 per task.
 
 ---
 
-*Review end of the pipeline; applies the design canon (`uncle-bob-clean-code`, `design-patterns`, `domain-driven-design`, `refactoring`) and the service and test gates from `clean-implementation`. Checklists and cross-cutting briefs in [reference.md](reference.md).*
+*Review end of the pipeline; applies `uncle-bob-clean-code` and the service and test gates from `clean-implementation`. Checklists and cross-cutting briefs in [reference.md](reference.md).*

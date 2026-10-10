@@ -36,7 +36,7 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 
 ## Design lens: evidence → pattern to prescribe
 
-A prescription needs evidence in the code today. State it as the finding: the evidence with its count, the pattern, and where it goes. Catalogs and the "don't use when" column are in `design-patterns`; domain building blocks in `domain-driven-design`; the steps to get there in `refactoring`.
+A prescription needs evidence in the code today. State it as the finding: the evidence with its count, the pattern, and where it goes. All three are files in `uncle-bob-clean-code`: catalogs and the "don't use when" column in `patterns.md`, domain building blocks in `domain-driven-design.md`, the steps to get there in `refactoring.md`.
 
 | Evidence in the code | Prescribe |
 |---|---|
@@ -54,7 +54,7 @@ A prescription needs evidence in the code today. State it as the finding: the ev
 | Several classes repeating the same algorithm skeleton with one or two steps different | **Template Method**, or **Strategy** for the varying step |
 | The same `if (x == null)` guard before every use of a collaborator | **Null Object**, or an option type |
 | Money, date ranges, emails, ids, or quantities passed as bare strings and numbers, validated again at each use | **Value Object** |
-| The same three or four parameters travelling together through many signatures | **Parameter Object** (introduce it via `refactoring`) |
+| The same three or four parameters travelling together through many signatures | **Parameter Object** (a refactoring; see `refactoring.md`) |
 | Controllers holding business rules; the same use case implemented in an HTTP handler and a job | **Service Layer** |
 | Several repositories saved in one use case with hand-managed transactions | **Unit of Work** |
 | Entities that are bags of getters and setters while services hold all the rules | Move behavior onto the **aggregate** that owns the invariant |

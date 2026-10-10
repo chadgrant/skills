@@ -1,6 +1,6 @@
 ---
 name: uncle-bob-clean-code
-description: Use when writing, modifying, or refactoring code in any language, or when reviewing code, a diff, or a pull request — before the first line is written and before review feedback is sent.
+description: Use when writing, modifying, or refactoring code in any language, or when reviewing code, a diff, or a pull request — before the first line is written and before review feedback is sent. Also when a design problem appears: a growing conditional, swappable behavior, where domain logic or data access lives, modeling a business domain, or code that has become hard to change. Triggers: "which pattern", "GoF", "strategy vs state", "repository vs active record", "domain model", "DDD", "bounded context", "aggregate", "refactor this", "clean this up", "this smells".
 ---
 
 # Uncle Bob Clean Code
@@ -64,24 +64,26 @@ Not for: vendored or generated code, or scripts the user explicitly calls throwa
 | DRY | Every piece of knowledge has one authoritative home | The same rule, constant, or schema edited in several places |
 | Convention over configuration | Follow the language's, framework's, and repo's standard layout, naming, and defaults; configure only where you truly differ | A setting nobody varies; a home-made mechanism where the framework has a standard one; wiring a naming convention would make unnecessary |
 
-Where they pull apart: code that looks alike but changes for different reasons is not duplication, so KISS and YAGNI outrank DRY until the third occurrence (the rule of three, `refactoring`). Convention decides how few settings exist; the ones that remain still come from the environment (Twelve-Factor).
+Where they pull apart: code that looks alike but changes for different reasons is not duplication, so KISS and YAGNI outrank DRY until the third occurrence (the rule of three, [refactoring.md](refactoring.md)). Convention decides how few settings exist; the ones that remain still come from the environment (Twelve-Factor).
 
 **Existing messy codebase?** Match its conventions — naming case, formatting, module layout — never its defects. "Match our style" means style, not smells: single-letter names, status-code returns, and blob functions are defects, not style. Apply the Boy Scout Rule to lines you touch; don't launch drive-by rewrites of code the task doesn't touch.
 
-## Composes with the design canon
+## Design problems: open the file the problem calls for
 
-This skill covers how to write and review **any unit of code** well — names, functions, SOLID, Clean Architecture, construction. Three sibling skills carry the design knowledge above that altitude; reach for them when the problem calls for it, and don't reinvent what they catalog:
+The rules above cover any unit of code. Three files in this skill carry the design knowledge above that altitude. Each holds its discipline, its over-apply table, and its catalog; read the one the problem names and don't reinvent what it catalogs.
 
-- **`design-patterns`** — a recurring design problem (growing conditional, swappable behavior, how to structure domain logic / data access / the web layer) → the named GoF / Fowler-PoEAA solution. Most patterns are SOLID made concrete.
-- **`domain-driven-design`** — modeling a rich domain: ubiquitous language, bounded contexts, aggregates and their invariants, repositories, domain events.
-- **`refactoring`** — code that has become a burden: the smell → refactoring catalog and the two-hats, small-steps-under-green-tests discipline for moving toward the patterns and models above.
+| The problem | Open | The rule that matters most |
+|---|---|---|
+| A recurring design problem: a growing conditional, swappable behavior, complex construction, adapting an interface, where domain logic, data access, or the web layer lives | [patterns.md](patterns.md) (Gang of Four, Fowler's PoEAA) | Name the problem before the pattern; apply the minimal form; use the framework's version when it ships one; reject the pattern when the problem isn't there |
+| Modeling a rich, changing business domain: the language, the boundaries, what must stay consistent | [domain-driven-design.md](domain-driven-design.md) (Evans) | The code uses the domain experts' words; aggregates are small and drawn around invariants; one transaction, one aggregate; the domain depends on nothing |
+| Code that has become a burden: hard to change, duplicated, tangled | [refactoring.md](refactoring.md) (Fowler's smell → refactoring catalog) | Green tests first; two hats, never both in one edit; one small named refactoring, then run the tests; rule of three |
 
 ## Reviewing Code
 
 Run three REQUIRED passes and report findings in this order. A review that contains only one kind of finding means a pass was skipped.
 
 1. **Correctness & security** — bugs, injection, resource leaks, error paths, concurrency. Trace every boolean-flag combination end to end: a flag that only partially gates behavior (a "dry run" that still sends email) is a bug here, not just a design smell. Never let design commentary crowd these out.
-2. **Design (SOLID + simplicity + architecture pass)** — walk the SOLID table and the simplicity table (KISS, YAGNI, DRY, convention over configuration) above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type. At component scale, check the **Dependency Rule** (does policy depend on a detail? any dependency cycles?) and whether a **known pattern is missing or misapplied** (`design-patterns`), or the **domain model is anemic / an aggregate leaks** (`domain-driven-design`). Where a smell is real, name the **refactoring** that fixes it (`refactoring`).
+2. **Design (SOLID + simplicity + architecture pass)** — walk the SOLID table and the simplicity table (KISS, YAGNI, DRY, convention over configuration) above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type. At component scale, check the **Dependency Rule** (does policy depend on a detail? any dependency cycles?) and whether a **known pattern is missing or misapplied** ([patterns.md](patterns.md)), or the **domain model is anemic / an aggregate leaks** ([domain-driven-design.md](domain-driven-design.md)). Where a smell is real, name the **refactoring** that fixes it ([refactoring.md](refactoring.md)).
 3. **Readability** — names, magic numbers, commented-out code, comment quality, duplication (DRY).
 
 Reviewing someone else's work or auditing a codebase? `clean-code-review` wraps these passes in a full procedure: scope, security and Twelve-Factor checklists, a test lens, and the report format.

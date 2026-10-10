@@ -52,7 +52,7 @@ Write `IMPLEMENTATION.md` (or `docs/plans/<date>-<name>.md`):
 - Tasks in one wave touch non-overlapping files. Design the seams so parallel workers never share a file.
 - **Simplicity** (the four rules in `uncle-bob-clean-code`). YAGNI: every task traces to a stated requirement; no task builds for a future one. KISS: the plan takes the simplest architecture that meets the requirements. DRY: a shared rule or type is one task's interface that others consume, not something several tasks each write. Convention over configuration: the stack's standard layout, naming, and tooling; a deviation is an `ADR`.
 - No "TBD", no "similar to task N". A worker can't recover from an undefined detail; it guesses wrong.
-- A "reduce burden" refactor is a valid task (verify: tests green and the target smell gone), scheduled as its own task and commit per `refactoring`.
+- A "reduce burden" refactor is a valid task (verify: tests green and the target smell gone), scheduled as its own task and commit per `uncle-bob-clean-code`'s `refactoring.md`.
 
 ## Phase 2: rate and route
 
