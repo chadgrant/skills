@@ -2,7 +2,7 @@
 
 Announce: **"Using implementation as orchestrator: rate & route → dispatch full waves → verify → review by risk → commit → loop."**
 
-**Core principle: you run a fleet; you don't type code.** Two roles, kept separate:
+**Core principle: you run a fleet; you don't type code.** Every task is routed, including the quick ones; your work is judgment and verification. Two roles, kept separate:
 
 - **Planner**: decomposes the work into a task DAG; each task gets a difficulty and a model tier.
 - **Orchestrator** (this session, on whatever model the user started it with): dispatches, verifies, reviews the risky tasks, commits, keeps the ledger, re-plans. Judgment and verification are the load-bearing work, so the strongest model sits here.
@@ -69,7 +69,7 @@ Rate on the **hardest aspect**, not the average.
 Repeat until the ledger is all green.
 
 1. **Pick the whole wave.** Every ready task whose files are disjoint, usually 6–10. Disjointness was settled in the plan, so don't throttle to 3–5. Hold a task back only if a dependency's interface isn't verified yet or its files overlap.
-2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "use the `chadgrant:implementation` skill as the worker (its `worker.md`)", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), the path to `GLOSSARY.md` when the repo has one, and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
+2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, a pointer to the plan's global constraints (the file and heading; the worker reads them there, you don't restate them), "use the `chadgrant:implementation` skill as the worker (its `worker.md`)", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), the path to `GLOSSARY.md` when the repo has one, and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
    - **Bundle Easy tasks.** Ready Easy tasks in the same package or following the same pattern go to one small-tier worker in one brief (up to about five), built and reported per task. Each is still verified and committed as its own task; if one fails, only that one escalates.
 3. **Verify the wave once.** When the wave's workers have reported, run the full suite with its coverage threshold and the static gate once over the tree, against the Compose-started backing services. Green verifies every task in the wave; don't rerun each task's command. Red: run the verify commands of the tasks touching the failing packages to find the culprit, and send that task back to its worker. Coverage under 90% is red: the workers' per-lane figures name the task to send back. The e2e suite is slower, so it runs at the milestone gate, plus the single scenario an e2e task adds.
 4. **Review by risk.** Every task gets a `git diff --stat` check from you: changes stay in the task's lane and the size fits the task. Beyond that:
@@ -116,42 +116,8 @@ Then update `STATUS.md` for the next milestone and end the session.
 - **Only the orchestrator commits.** Say it in every brief.
 - **Only the orchestrator writes shared files**: `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, the root `README`, and any doc no task owns. Workers and reviewers run in parallel and overwrite each other there, so they report notes instead. After each wave, apply the wave's **Notes for shared docs** yourself, one file at a time, merging duplicates and dropping what the file already says. A doc that a task must update (requirements docs, user docs, a package `README`) is listed in exactly one task's lane, like any other file.
 - **`general-purpose` + model override, never a fork.** A fork inherits your commit authorization.
-- **Verify before committing.** A worker's "tests pass" is not evidence; the green wave run is.
+- **Verify before committing.** A worker's "tests pass" is not evidence; the green wave run is, and the bigger the diff the more it matters.
 - **`STATUS.md` is the ledger**: active wave, done tasks, follow-ups, incidents, decisions. Update it every wave; it's how the next context window resumes.
 - **Zombie check.** A worker can die silently with no output. When nothing has changed on disk for a while, check each in-flight task's files. A task that wrote nothing never ran, so re-dispatching the same brief is safe (the escalation rule is for tasks that ran and failed). A task that wrote partial output is treated as failed: escalate per step 7.
 - **Push once per milestone**, not per task. Each push burns CI.
 - **Global constraints exist before dispatch.** If the plan builds a deployable service and lacks the Twelve-Factor constraint, add it. If it lacks the test gates (90% coverage, Compose-backed services, surface-appropriate e2e), add them. Fail-mode per component class must be in the plan before dispatch: fail-closed for spend, auth, governance, budgets, safety; fail-open for soft quotas and rate limits.
-
-## Red flags
-
-| Thought | Reality |
-|---|---|
-| "I'll write this one myself, it's quick." | Route it. Your job is judgment and verification. |
-| "Rerun every task's verify command to be sure." | One full run per wave. Per-task commands are for bisecting a red run. |
-| "Read every diff to be safe." | Stat all, skim Medium, delegate Hard. Diffs in your context cost on every later turn. |
-| "One worker per Easy task." | Bundle Easy tasks that share a package or pattern. Cold starts cost more than the change. |
-| "Adjacent files, probably fine." | Disjoint or serialize. |
-| "Hard but small; send it to the mid tier." | Route on the hardest aspect. |
-| "Fork myself for speed." | Forks commit. |
-| "Have each worker record its learnings in `CLAUDE.md`." | Parallel writers clobber each other. Workers report notes; you write the file. |
-| "This task changes behavior, the docs will get updated somewhere." | Put the doc file in that task's lane, or it's nobody's. |
-| "Push after each task to be safe." | Git holds it locally. Push per milestone. |
-| "Dispatch 3–5 to be safe." | The plan made the wave disjoint. Dispatch all of it. |
-| "Flag it `observe`, better safe than sorry." | Each flag is an hour on the critical path. True spine only. |
-| "Review each task separately." | Only `observe` tasks. Other Hard tasks share one wave review; Medium gets your skim; Easy gets the gate. |
-| "Wait for the reviews before the next wave." | Reviews gate commits, not dispatch. |
-| "Coverage is 87%, close enough." | Under 90% is red. Send the short lane back. |
-| "Run the e2e suite after every wave." | Milestone gate. Per wave is the full suite with coverage. |
-| "The stamp is stale, but the milestone diff is small; review just the diff." | Stale means the whole codebase. That's what the stamp is for. |
-| "Huge diff, skip the gate." | Big diffs hide regressions. Run it. |
-| "Tests pass; commit." | Run the wave gate yourself, then review at the task's tier. Green isn't clean. |
-| "Re-dispatch the same brief." | Same brief, same tier, same result. Escalate. |
-| "Apply the reviewer's patch." | Adjudicate the claim; route it through the worker. |
-| "Disjoint paths are enough for this risky wave." | High blast radius → `isolate`. |
-| "Quick grep to check." / "Let me read that file." | Everything you read is re-sent on every later turn. Ask an `Explore` agent. |
-| "Paste the full report back; I'll want the detail." | One line back, the report on disk. Open it only when the line says so. |
-| "Stay in this session; it already has the context." | `STATUS.md` has what the next milestone needs. Fresh session per milestone. |
-| "One more review round to be sure." | One review, one fix, one narrow re-check. Then escalate. |
-| "This one is really hard; Fable just this once." | Fable needs the user's recorded yes from Phase 0. No record: Opus, or stop and ask. |
-| "Send the fix to the top tier so it's done right." | Fix at the task's tier. The top tier is for `observe` tasks and escalations. |
-

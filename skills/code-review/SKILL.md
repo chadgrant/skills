@@ -7,7 +7,7 @@ description: Use when reviewing code someone else wrote, or auditing a codebase:
 
 Announce: **"Using code-review: fix the scope → run the gates → seven lenses, adversarially → verify findings → verdict."**
 
-**Core principle: a review tries to break the code, not to approve it.** Every finding carries a `file:line` and either the input that breaks the code or the concrete cost of leaving it. A finding without evidence is an opinion; drop it. The reviewer reads and reports. It never edits the code under review, and never edits `CLAUDE.md`, `AGENTS.md`, or any other shared file; the one exception is the stamp line, written by whoever runs a full review.
+**Core principle: a review tries to break the code, not to approve it.** Every finding carries a `file:line` and either the input that breaks the code or the concrete cost of leaving it. A finding names a principle or smell and what it costs; taste and unevidenced suspicion are left out, and `clean` is a complete verdict. Every lens runs on every review, internal tools included. The reviewer reads and reports. It never edits the code under review, and never edits `CLAUDE.md`, `AGENTS.md`, or any other shared file; the one exception is the stamp line, written by whoever runs a full review.
 
 Pipeline position: `chadgrant:implementation`'s orchestrator dispatches reviewers that follow this skill; its workers receive the findings. The standards are `chadgrant:clean-code`'s, including its pattern, domain-modeling, and refactoring files.
 
@@ -83,25 +83,6 @@ The report is these parts, in this order, and nothing else:
 | Nit | Readability |
 
 A scoped report for several tasks repeats parts 1–3 per task.
-
-## Red flags
-
-| Thought | Reality |
-|---|---|
-| "While I'm here, this neighboring module also looks off." | Scoped means the lane. One `Outside scope` line for a blocker; otherwise leave it. |
-| "The stamp is stale, so I'll widen this task review." | A dispatched reviewer stays in its lane. The orchestrator runs the full review at the start of a run or at the milestone gate. |
-| "I'll sample a few files per package." | A full review reads every unit. Skipped units go under `Unreviewed` and there is no stamp. |
-| "Mostly reviewed; stamp it." | The stamp says every unit was read. Otherwise it lies to the next fifty commits. |
-| "This looks exploitable; report it as a blocker." | Reproduce it or trace it hop by hop first. |
-| "Tests pass and coverage is 92%; the test lens is clean." | Read the assertions. Coverage counts executed lines, not checked behavior. |
-| "It would be more flexible with a Strategy here." | Flexibility isn't evidence. Prescribe a pattern when the code shows its problem today; otherwise it's speculative generality. |
-| "There's a smell here; I'll flag it and let the worker pick the fix." | Name the pattern or refactoring and where it goes. "Tangled" is not actionable; "extract a Repository for the six queries in `OrderService`" is. |
-| "The duplication is small; no need to mention a pattern." | Three occurrences of the same wrapping logic is the evidence a Decorator needs. Prescribe it. |
-| "I'd have written it differently." | Taste isn't a finding. Name the principle and the cost. |
-| "Nothing serious; I'll list some nits so the review has content." | `clean` is a complete verdict. |
-| "While re-reviewing, I'll take another full pass." | A re-review is the findings and the fix's lines. A fresh full pass restarts the round count. |
-| "The fix is two lines; I'll just make it." | Reviewers don't edit. The finding goes to the worker. |
-| "It's an internal tool; skip the security lens." | Internal tools hold credentials too. All seven lenses, every time. |
 
 ---
 

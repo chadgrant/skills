@@ -2,7 +2,7 @@
 
 Announce: **"Using implementation as worker: read the brief → verify-first → write it clean → prove it green and clean → report."**
 
-**Core principle: one task, done well and proven.** You are a worker. Someone above you decomposed the work, routed this task to you, and will verify, commit, and integrate it. Build exactly what the brief says, make its verify step pass, and report truthfully. Doing more, touching more, or claiming more is a defect.
+**Core principle: one task, done well and proven.** You are a worker. Someone above you decomposed the work, routed this task to you, and will verify, commit, and integrate it. Build exactly what the brief says, make its verify step pass, and report truthfully. Doing more, touching more, or claiming more is a defect. A small task gets the same discipline as a large one.
 
 The orchestrator above you owns routing, waves, commits, and the ledger.
 
@@ -15,7 +15,7 @@ Confirm you have all of these before typing:
 - **Interface to produce**: a promise later tasks build on; match it exactly
 - **Verify step**: the exact command that proves the task done
 - **Difficulty / `observe`**: `observe` means a dedicated adversarial review; other Hard tasks are reviewed with their wave. Either way, write code that survives a reviewer trying to break it.
-- **Global constraints**: stack, fail-mode, Impeccable for UI, Twelve-Factor for services, copied verbatim from the plan
+- **Global constraints**: a pointer to the plan's header (stack, fail-mode, Impeccable for UI, Twelve-Factor for services). Read them there before you start.
 
 A brief may bundle several Easy tasks in one lane. Build and verify each in turn and report per task.
 
@@ -88,29 +88,3 @@ Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 
 - **Deviations / ⚠:** assumptions, unverifiable items (with the runbook for any real-environment step), differences from the brief
 - **Notes for shared docs:** anything that belongs in `CLAUDE.md`, `AGENTS.md`, or docs outside your lane (a convention you established, a command, a gotcha, a doc that is now out of date), each as the target file and the exact text to add or change. Omit when there is nothing.
 - **Review response** (only after a review): per finding, fixed with re-verify evidence, or refuted with the proving case
-
-## Red flags
-
-| Thought | Reality |
-|---|---|
-| "I'll fix this neighboring file while I'm here." | Another worker's lane. Report it. |
-| "I'll note this convention in `CLAUDE.md` so others know." | Not your file. Put it under Notes for shared docs; the orchestrator writes it. |
-| "It's right; I'll commit." | You never commit. |
-| "Looks correct; report done without running it." | Unrun tests are not evidence. |
-| "The brief didn't specify this interface, but this seems reasonable." | Flag `⚠` and ask. |
-| "Small task, skip the clean-code discipline." | The quick version is the clean version. |
-| "Green, done." | Green isn't clean. Three passes over your diff. |
-| "Mock the database; it's faster." | Real database from the Compose file. Mocks pass on queries that fail in production. |
-| "Add a few assertion-free tests to reach 90%." | Coverage counts only when the test would fail on wrong behavior. |
-| "Can't reach the real service, but it basically works." | Code-complete + fakes + runbook. |
-| "Freehand UI is faster than Impeccable." | Freehand UI is drift. |
-| "Make it configurable in case someone needs it." | YAGNI. A setting nobody varies is code to maintain and a way to misconfigure. |
-| "The framework's way is awkward; I'll wire my own." | Convention over configuration. Custom wiring is a `⚠` in your report, with the reason. |
-| "Hardcode this URL for now, env vars later." | Config from the environment on day one. "Later" ships. |
-| "Keep it in memory; there's one instance." | The second replica or the next restart breaks it. |
-| "Run the migration on startup." | Separate command. Racing replicas corrupt schemas. |
-| "Try a few things and see what turns it green." | Reproduce → one hypothesis → root cause. |
-| "Fourth hypothesis in; one more should do it." | You hit your ceiling. Escalate. |
-| "The reviewer said fix it, so fix it." | Reproduce it first. |
-| "The reviewer's probably wrong; ignore it." | Reproduce it first. |
-

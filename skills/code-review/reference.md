@@ -99,4 +99,4 @@ Each cross-cutting reviewer gets the unit map from the inventory and reads acros
 
 ## Unit reviewer brief (full review)
 
-Give each unit reviewer: the unit's file list, the stack and global constraints from the plan or `AGENTS.md`, the instruction to follow `chadgrant:code-review` in scoped mode over exactly those files, and the report shape. Tell it to read every file in full and to return findings only.
+Give each unit reviewer: the unit's file list, a pointer to the stack and global constraints in the plan or `AGENTS.md`, the instruction to follow `chadgrant:code-review` in scoped mode over exactly those files, and the report shape. Tell it to read every file in full and to return findings only.
