@@ -9,7 +9,7 @@ Announce: **"Using clean-code-review: fix the scope → run the gates → six le
 
 **Core principle: a review tries to break the code, not to approve it.** Every finding carries a `file:line` and either the input that breaks the code or the concrete cost of leaving it. A finding without evidence is an opinion; drop it. The reviewer reads and reports. It never edits the code under review, and never edits `CLAUDE.md`, `AGENTS.md`, or any other shared file; the one exception is the stamp line, written by whoever runs a full review.
 
-Pipeline position: `model-routed-delivery` dispatches reviewers that follow this skill; `clean-implementation` workers receive the findings. The standards are `uncle-bob-clean-code`'s, including its pattern, domain-modeling, and refactoring files.
+Pipeline position: `implementation`'s orchestrator dispatches reviewers that follow this skill; its workers receive the findings. The standards are `uncle-bob-clean-code`'s, including its pattern, domain-modeling, and refactoring files.
 
 ## Scope: decided by what you were handed
 
@@ -103,4 +103,4 @@ A scoped report for several tasks repeats parts 1–3 per task.
 
 ---
 
-*Review end of the pipeline; applies `uncle-bob-clean-code` and the service and test gates from `clean-implementation`. Checklists and cross-cutting briefs in [reference.md](reference.md).*
+*Review end of the pipeline; applies `uncle-bob-clean-code` and the service and test gates from `implementation`. Checklists and cross-cutting briefs in [reference.md](reference.md).*

@@ -1,15 +1,10 @@
----
-name: clean-implementation
-description: Use when you are the worker building one task from a plan or a dispatched brief. Triggers: "implement TASK-###", "build this task", "you are the worker", "the test is failing", "address the review". Not for planning or orchestrating waves.
----
+# Worker: build one task
 
-# Clean implementation
-
-Announce: **"Using clean-implementation: read the brief → verify-first → write it clean → prove it green and clean → report."**
+Announce: **"Using implementation as worker: read the brief → verify-first → write it clean → prove it green and clean → report."**
 
 **Core principle: one task, done well and proven.** You are a worker. Someone above you decomposed the work, routed this task to you, and will verify, commit, and integrate it. Build exactly what the brief says, make its verify step pass, and report truthfully. Doing more, touching more, or claiming more is a defect.
 
-Pipeline position: `requirements-driven-planning` → `model-routed-delivery` → **this skill**. The layer above owns routing, waves, commits, and the ledger.
+The orchestrator above you owns routing, waves, commits, and the ledger.
 
 ## The brief
 
@@ -77,7 +72,6 @@ Missing or ambiguous? Two cases:
 - **Shared files belong to the orchestrator.** Never create or edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, the root `README`, or any other file outside your lane, including to record a learning, a convention, or progress. Several workers run at once and overwrite each other there. Put what you'd have written under **Notes for shared docs** in your report; the orchestrator applies it. A documentation file you may edit is one your brief lists in your lane.
 - **Never `git commit`.** Even when certain.
 - **Run the verify step before reporting.** Report its actual result, not a claim.
-- **Honest environment ceiling.** Can't fully exercise it? "Done" means code-complete + tested with fakes + a runbook for the real step.
 - **Match conventions, not defects.** Naming and layout yes; blob functions and status-code returns no.
 - **Don't fabricate.** Unknowns become `⚠` or a question, never a "sensible default".
 
@@ -119,6 +113,3 @@ Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 
 | "The reviewer said fix it, so fix it." | Reproduce it first. |
 | "The reviewer's probably wrong; ignore it." | Reproduce it first. |
 
----
-
-*Implementation end of the pipeline; composes `uncle-bob-clean-code`. Debug and review discipline condensed from [obra/superpowers](https://github.com/obra/superpowers).*

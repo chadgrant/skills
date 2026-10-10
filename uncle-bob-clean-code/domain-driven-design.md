@@ -6,7 +6,7 @@
 
 Do this first; tactical modeling inside the wrong boundary is wasted.
 
-1. **Forge the ubiquitous language.** Capture the exact nouns and verbs the domain experts use. Use them verbatim in class, method, and event names. One term, one meaning — *within a context* (see below). A glossary in the PRD/ERD is where this lives (`requirements-driven-planning`).
+1. **Forge the ubiquitous language.** Capture the exact nouns and verbs the domain experts use. Use them verbatim in class, method, and event names. One term, one meaning — *within a context* (see below). A glossary in the PRD/ERD is where this lives (`planning`).
 2. **Draw bounded contexts.** A bounded context is where a term has one precise meaning and the model is internally consistent. "Customer" in Sales ≠ "Customer" in Support — those are two models in two contexts, not one shared class forced to serve both. **A bounded context is the unit that maps cleanly to a service/module boundary** — this is where microservice seams actually come from.
 3. **Map the contexts.** Name the relationship between each pair of contexts so integration is deliberate, not accidental — see the context-mapping table in the detail below (Shared Kernel, Customer/Supplier, Conformist, **Anticorruption Layer**, Open Host Service, Published Language, Separate Ways). An **Anticorruption Layer** is the default when integrating a legacy or third-party model you don't want leaking into yours.
 4. **Rank subdomains.** **Core** (your competitive advantage — invest your best effort and modeling here), **Supporting** (needed but not differentiating), **Generic** (buy/adopt off the shelf — auth, billing). Don't lavish a rich Domain Model on a generic subdomain.
@@ -61,7 +61,7 @@ The four simplicity rules in [SKILL.md](SKILL.md) apply here with one twist each
 ## Strategic design
 
 ### Ubiquitous language
-The shared vocabulary of domain experts and developers, used **verbatim** in code, tests, docs, and conversation. Every class, method, and event name is a term from it. When the language is fuzzy, the model is fuzzy. Capture it as a glossary in the PRD/ERD (`requirements-driven-planning`). A term's meaning is only guaranteed *within one bounded context*.
+The shared vocabulary of domain experts and developers, used **verbatim** in code, tests, docs, and conversation. Every class, method, and event name is a term from it. When the language is fuzzy, the model is fuzzy. Capture it as a glossary in the PRD/ERD (`planning`). A term's meaning is only guaranteed *within one bounded context*.
 
 ### Bounded context
 A boundary within which a model is internally consistent and each term has one precise meaning. It is the honest unit of modularity — **the seam a service or module boundary should follow**. Trying to build one canonical model for the whole enterprise produces a "big ball of mud"; multiple bounded contexts with explicit mappings is the alternative.

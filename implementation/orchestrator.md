@@ -1,18 +1,13 @@
----
-name: model-routed-delivery
-description: Use when delivering a multi-task build (a project, milestone, or migration) mostly autonomously from an existing spec or routed plan, or when running waves of subagents whose results must be verified and committed. Triggers: "build the plan", "run the waves", "orchestrate this", "execute IMPLEMENTATION.md".
----
+# Orchestrator: deliver a multi-task plan
 
-# Model-routed delivery
-
-Announce: **"Using model-routed-delivery: rate & route → dispatch full waves → verify → review by risk → commit → loop."**
+Announce: **"Using implementation as orchestrator: rate & route → dispatch full waves → verify → review by risk → commit → loop."**
 
 **Core principle: you run a fleet; you don't type code.** Two roles, kept separate:
 
 - **Planner**: decomposes the work into a task DAG; each task gets a difficulty and a model tier.
 - **Orchestrator** (this session, on whatever model the user started it with): dispatches, verifies, reviews the risky tasks, commits, keeps the ledger, re-plans. Judgment and verification are the load-bearing work, so the strongest model sits here.
 
-How a worker builds one task is `clean-implementation`'s job; every dispatched worker follows it. This skill owns routing, waves, verification, commits, and the ledger.
+How a worker builds one task is [worker.md](worker.md); every dispatched worker follows it. This file owns routing, waves, verification, commits, and the ledger.
 
 ## Your context is the budget
 
@@ -26,7 +21,7 @@ Every turn re-sends your whole context. Your context size times your turn count 
 
 ## Phase 0: clarify
 
-Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Record the answers. If `requirements-driven-planning` has run, its spec and routed plan are the input.
+Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Record the answers. If `planning` has run, its spec and routed plan are the input.
 
 **Ask before using Fable.** Fable costs about three times Opus per token, so the user decides, once, before the plan is written. Ask with the choices below and record the answer in the plan header and `STATUS.md`; it holds for the whole run, including later sessions.
 
@@ -74,7 +69,7 @@ Rate on the **hardest aspect**, not the average.
 Repeat until the ledger is all green.
 
 1. **Pick the whole wave.** Every ready task whose files are disjoint, usually 6–10. Disjointness was settled in the plan, so don't throttle to 3–5. Hold a task back only if a dependency's interface isn't verified yet or its files overlap.
-2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "build it by following `clean-implementation`", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
+2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "use the `implementation` skill as the worker (its `worker.md`)", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
    - **Bundle Easy tasks.** Ready Easy tasks in the same package or following the same pattern go to one small-tier worker in one brief (up to about five), built and reported per task. Each is still verified and committed as its own task; if one fails, only that one escalates.
 3. **Verify the wave once.** When the wave's workers have reported, run the full suite with its coverage threshold and the static gate once over the tree, against the Compose-started backing services. Green verifies every task in the wave; don't rerun each task's command. Red: run the verify commands of the tasks touching the failing packages to find the culprit, and send that task back to its worker. Coverage under 90% is red: the workers' per-lane figures name the task to send back. The e2e suite is slower, so it runs at the milestone gate, plus the single scenario an e2e task adds.
 4. **Review by risk.** Every task gets a `git diff --stat` check from you: changes stay in the task's lane and the size fits the task. Beyond that:
@@ -82,7 +77,7 @@ Repeat until the ledger is all green.
    | Task | Review |
    |---|---|
    | Easy | None. The wave gate and the worker's self-review cover it. |
-   | Medium | You skim the diff for what tools miss: hardcoded config, the four simplicity rules (a needless layer, a speculative abstraction or setting, duplicated knowledge, a custom mechanism where the framework has a convention), and for service tasks the Twelve-Factor list in `clean-implementation`. |
+   | Medium | You skim the diff for what tools miss: hardcoded config, the four simplicity rules (a needless layer, a speculative abstraction or setting, duplicated knowledge, a custom mechanism where the framework has a convention), and for service tasks the Twelve-Factor list in [worker.md](worker.md). |
    | Other Hard | Per wave: one mid-tier reviewer agent over the wave's combined Hard diff. |
    | `observe` | Per task: a fresh top-tier reviewer agent. |
 
@@ -90,7 +85,7 @@ Repeat until the ledger is all green.
    - It writes that skill's report to `.delivery/review-<wave or task id>.md` and returns one line per task: clean, or its finding counts. Don't read Hard diffs yourself; every diff in your context is paid for again on each later turn.
    - Dispatch reviewers in parallel, in one message.
    - Green but bloated, over-abstracted, or hardcoding config is a defect: send it back to the worker to refactor, once. If it comes back still not clean, go to step 7.
-   - Confirmed findings go back to the worker under `clean-implementation`'s receive-review rules, pointing at the review file. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
+   - Confirmed findings go back to the worker under [worker.md](worker.md)'s receive-review rules, pointing at the review file. A reviewer's suggested patch is a claim to adjudicate, not a diff to apply.
    - **Fixes stay at the task's tier.** Send findings to the worker that built the task (continue it with `SendMessage` while it's alive; it already holds the context). A fresh fix worker gets the task's original tier. The top tier fixes only `observe` tasks, or a task escalated under step 7.
    - **One review round.** Review, one fix pass, then a re-review on the small or mid tier limited to the findings and the lines the fix changed (`clean-code-review`'s re-review). Still failing after that: step 7. Never a third round.
 5. **Pipeline the reviews.** Once a wave is verified (step 3), dispatch the next wave together with this wave's reviewers; reviews run alongside it. Reviews gate commits, not dispatch. A dependent task may build on a verified-but-uncommitted interface. If a review changes that interface, re-dispatch the uncommitted dependents with the new interface; a dependent already committed gets a follow-up task.
@@ -113,7 +108,6 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 - **Zombie check.** A worker can die silently with no output. When nothing has changed on disk for a while, check each in-flight task's files. A task that wrote nothing never ran, so re-dispatching the same brief is safe (the escalation rule is for tasks that ran and failed). A task that wrote partial output is treated as failed: escalate per step 7.
 - **Push once per milestone**, not per task. Each push burns CI.
 - **Global constraints exist before dispatch.** If the plan builds a deployable service and lacks the Twelve-Factor constraint, add it. If it lacks the test gates (90% coverage, Compose-backed services, surface-appropriate e2e), add them. Fail-mode per component class must be in the plan before dispatch: fail-closed for spend, auth, governance, budgets, safety; fail-open for soft quotas and rate limits.
-- **Honest environment ceiling.** Without real cloud, certs, or live services, "done" means code-complete + tested with fakes + a runbook. Never imply production-verified.
 
 ## Red flags
 
@@ -148,6 +142,3 @@ Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe
 | "This one is really hard; Fable just this once." | Fable needs the user's recorded yes from Phase 0. No record: Opus, or stop and ask. |
 | "Send the fix to the top tier so it's done right." | Fix at the task's tier. The top tier is for `observe` tasks and escalations. |
 
----
-
-*Middle of the pipeline: `requirements-driven-planning` → **`model-routed-delivery`** → `clean-implementation`. Structure inspired by [obra/superpowers](https://github.com/obra/superpowers).*

@@ -1,13 +1,13 @@
 ---
-name: requirements-driven-planning
+name: planning
 description: Use when planning a feature, project, or migration that needs durable requirements docs (PRD, ERD, DRD, API contract, UX and ops docs) and a routed implementation plan; when iterating one doc ("let's do the wireframes"); or when reconciling docs with code, including reverse-engineering a brownfield repo. Triggers: "write a PRD", "spec this out", "requirements doc", "reconstruct docs", "keep the docs in sync".
 ---
 
 # Requirements-driven planning
 
-Announce: **"Using requirements-driven-planning: pick the mode → clarify → write living docs → route the plan → hand off."**
+Announce: **"Using planning: pick the mode → clarify → write living docs → route the plan → hand off."**
 
-**Core principle: the requirements are the source of truth; the code is downstream.** The implementation plan is disposable. The PRD/ERD/DRD are what a human reads in six months to learn what was promised, how it was built, and what the data means, so they must outlive the plan and stay true to the code. One shared ID spine keeps them checkable. The routed plan goes to `model-routed-delivery` (execute), which dispatches each task to a worker running `clean-implementation`.
+**Core principle: the requirements are the source of truth; the code is downstream.** The implementation plan is disposable. The PRD/ERD/DRD are what a human reads in six months to learn what was promised, how it was built, and what the data means, so they must outlive the plan and stay true to the code. One shared ID spine keeps them checkable. The routed plan goes to `implementation` (execute), which dispatches each task to a worker running `implementation`.
 
 This is a self-contained loop (clarify → design → document); it doesn't depend on a separate brainstorming skill.
 
@@ -65,10 +65,10 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 ### A3. Build the routed plan
 
 - Decompose into atomic `TASK-###`s: exact file paths, the interface each produces, a `TEST-###` verify step needing no human interpretation.
-- Rate each task on its hardest aspect and assign a tier per `model-routed-delivery`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `model-routed-delivery` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
-- Add these **global constraints** once; `model-routed-delivery` copies them into every brief:
+- Rate each task on its hardest aspect and assign a tier per `implementation`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `implementation` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
+- Add these **global constraints** once; `implementation` copies them into every brief:
   - **UI**: built with [Impeccable](https://github.com/pbakaus/impeccable) against the style guide's tokens and components.
-  - **Services** (API, worker, consumer, scheduled job): follow the [Twelve-Factor App](https://12factor.net); `clean-implementation` carries the checklist. Each service task names its config keys and env var names, backing services, port and health endpoints, and shutdown behavior; migrations and admin jobs are their own tasks. A deviation is an `ADR` the task cites.
+  - **Services** (API, worker, consumer, scheduled job): follow the [Twelve-Factor App](https://12factor.net); `implementation`'s `worker.md` carries the checklist. Each service task names its config keys and env var names, backing services, port and health endpoints, and shutdown behavior; migrations and admin jobs are their own tasks. A deviation is an `ADR` the task cites.
   - **Quality bar**: done means the `TEST-` is green **and** the code is clean per `uncle-bob-clean-code`. Name the project's static gate command (format check, lint, type-check, complexity limit); every `TEST-` runs it alongside the task's tests. A `TEST-` that a bloated or over-engineered solution can still pass is not a complete acceptance criterion.
   - **Testing**: the plan names each command and tool; workers don't choose them.
     - *Coverage*: at least 90% line coverage, enforced by the coverage tool's fail-under threshold so it fails the run without anyone reading a report. Exclusions (generated or vendored code) are listed in the plan.
@@ -77,7 +77,7 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
     - The compose file and e2e harness are an M0 task; each e2e scenario is a `TC-` built by its own task.
   - **Design**: per `uncle-bob-clean-code`: known patterns (its `patterns.md`) over invention; rich domains via its `domain-driven-design.md`, whose glossary and bounded contexts go in the PRD/ERD and inform module boundaries; a refactoring (its `refactoring.md`) is a plannable task type with a behavior-unchanged verify.
   - **Simplicity**: the four rules in `uncle-bob-clean-code` bind the docs and the plan as well as the code. YAGNI: no requirement, entity, endpoint, or task without a stated need behind it; "future-proofing" is out of scope until someone asks for it. KISS: the ERD picks the simplest architecture that meets the PRD and records what it declined to add. DRY: each fact lives in one doc and the others cite its spine ID. Convention over configuration: the chosen stack's standard layout, naming, and tooling are the default; a deviation is an `ADR`.
-- Hand the plan to `model-routed-delivery`. A single self-evident task needs neither a plan nor a handoff.
+- Hand the plan to `implementation`. A single self-evident task needs neither a plan nor a handoff.
 
 ### A4. Traceability check
 
@@ -188,4 +188,4 @@ The docs are connector-ready, not connected; nothing ships an integration yet.
 
 ---
 
-*Plan stage of the pipeline: **this skill** → `model-routed-delivery` → `clean-implementation`. Inspired by [obra/superpowers](https://github.com/obra/superpowers), Google design docs, Amazon's working-backwards PR/FAQ, and Nygard-style ADRs.*
+*Plan stage of the pipeline: **this skill** → `implementation` → `clean-code-review`. Inspired by [obra/superpowers](https://github.com/obra/superpowers), Google design docs, Amazon's working-backwards PR/FAQ, and Nygard-style ADRs.*
