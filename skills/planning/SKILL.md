@@ -33,7 +33,9 @@ digraph modes {
 
 ### A0. Clarify
 
-Ask only questions whose answers change the docs, one at a time, multiple-choice when possible: the problem and for whom, success metrics, scope in/out, fail modes, tenancy, data sensitivity, environment ceilings, decisions that fork the architecture. Get the forking decisions on the record first.
+Ask only questions whose answers change the docs: the problem and for whom, success metrics, scope in/out, fail modes, tenancy, data sensitivity, environment ceilings, decisions that fork the architecture.
+
+Work the open decisions as a tree, in **rounds**. A round is every question you can ask now without guessing at an answer you haven't heard. Number each question, give your recommended answer, and word it so "yes" accepts the recommendation; then wait. Each answer unblocks the next round. Facts are yours to find (send an `Explore` agent to the code, the docs, the environment); only decisions go to the user. Done when no decision is left assumed.
 
 ### A1. Pick the doc set
 
@@ -61,6 +63,7 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 - Fill `templates/`. `reference.md` has per-section intent and the anti-patterns that kill each doc type.
 - Requirements go in `docs/requirements/`, the plan in `docs/plans/`; project conventions override. The style guide lives in `design-system/`, cross-project and long-lived, referenced not regenerated per feature.
 - Every requirement, entity, decision, and task gets a spine ID as you write it. Each doc gets its diagrams (below).
+- **`docs/requirements/GLOSSARY.md`** is written first and kept current: each domain term, a one-line definition, and the synonyms to avoid. The docs, the plan, the code, and the tests use these words and no others. It is one short file because every worker and reviewer reads it; the PRD and ERD cite it and don't repeat it.
 
 ### A3. Build the routed plan
 

@@ -25,8 +25,9 @@ Missing or ambiguous? Two cases:
 
 ## Build loop
 
-1. **Read the contract.** Your lane's files and the interfaces of the tasks you depend on. Not the whole tree.
+1. **Read the contract.** Your lane's files, the interfaces of the tasks you depend on, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
 2. **Verify-first.** Write the failing test from the verify step before the implementation; make it fail for the right reason, then pass. When the verify step is only a build, lint, or type-check (scaffolding, config, wiring), there is no test to write first: build it and run the verify step.
+   - **One slice at a time**: one test, then the code that passes it, then the next test. Each test goes through the public interface your brief names and asserts on behavior a caller can see. Expected values come from the brief, the spec, or a worked example, never from recomputing them the way the code does.
    - **Coverage**: your tests cover at least 90% of the lines in your lane's files, through assertions on behavior. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
    - **Real backing services**: code that talks to a database, queue, or cache is tested against the real one from the plan's Compose file. Don't mock it or swap in an in-memory substitute.
    - **End-to-end**, when your task is an e2e scenario: drive the public surface with the plan's driver (Playwright for browser UI, HTTP for an API, the built binary for a CLI) against the Compose stack. Never Playwright for something without a browser UI.

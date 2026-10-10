@@ -21,7 +21,7 @@ Every turn re-sends your whole context. Your context size times your turn count 
 
 ## Phase 0: clarify
 
-Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Record the answers. If `chadgrant:planning` has run, its spec and routed plan are the input.
+Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Work the open decisions as a tree, in **rounds**. A round is every question you can ask now without guessing at an answer you haven't heard. Number each question, give your recommended answer, and word it so "yes" accepts the recommendation; then wait. Each answer unblocks the next round. Facts are yours to find (send an `Explore` agent to the code, the docs, the environment); only decisions go to the user. Done when no decision is left assumed. Record the answers. If `chadgrant:planning` has run, its spec and routed plan are the input.
 
 **Ask before using Fable.** Fable costs about three times Opus per token, so the user decides, once, before the plan is written. Ask with the choices below and record the answer in the plan header and `STATUS.md`; it holds for the whole run, including later sessions.
 
@@ -69,7 +69,7 @@ Rate on the **hardest aspect**, not the average.
 Repeat until the ledger is all green.
 
 1. **Pick the whole wave.** Every ready task whose files are disjoint, usually 6–10. Disjointness was settled in the plan, so don't throttle to 3–5. Hold a task back only if a dependency's interface isn't verified yet or its files overlap.
-2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "use the `chadgrant:implementation` skill as the worker (its `worker.md`)", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
+2. **Dispatch all in one message.** Each brief carries: its files, the interface to produce, the exact verify command, the global constraints verbatim, "use the `chadgrant:implementation` skill as the worker (its `worker.md`)", **never `git commit`**, touch only your files (never `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan; notes for those go in the report), the path to `GLOSSARY.md` when the repo has one, and the report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override; `isolate` tasks get `isolation: "worktree"`.
    - **Bundle Easy tasks.** Ready Easy tasks in the same package or following the same pattern go to one small-tier worker in one brief (up to about five), built and reported per task. Each is still verified and committed as its own task; if one fails, only that one escalates.
 3. **Verify the wave once.** When the wave's workers have reported, run the full suite with its coverage threshold and the static gate once over the tree, against the Compose-started backing services. Green verifies every task in the wave; don't rerun each task's command. Red: run the verify commands of the tasks touching the failing packages to find the culprit, and send that task back to its worker. Coverage under 90% is red: the workers' per-lane figures name the task to send back. The e2e suite is slower, so it runs at the milestone gate, plus the single scenario an e2e task adds.
 4. **Review by risk.** Every task gets a `git diff --stat` check from you: changes stay in the task's lane and the size fits the task. Beyond that:
@@ -94,7 +94,20 @@ Repeat until the ledger is all green.
 
 ## Phase 4: milestone gate
 
-Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review with `chadgrant:code-review`. Run its `review-stamp.sh status` first: `fresh` means a scoped review of the milestone's accumulated diff; `stale` (14 days or 50 commits since the last full review, or none recorded in `AGENTS.md`) means its full review of the whole codebase, which rewrites the stamp. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push. Then update `STATUS.md` for the next milestone and end the session.
+Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review with `chadgrant:code-review`. Run its `review-stamp.sh status` first: `fresh` means a scoped review of the milestone's accumulated diff; `stale` (14 days or 50 commits since the last full review, or none recorded in `AGENTS.md`) means its full review of the whole codebase, which rewrites the stamp. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
+
+**Retro.** Before ending the session, have a mid-tier agent read this milestone's `.delivery/` reports and review files and return at most ten improvements to the environment, most costly problem first. You apply them or schedule them as tasks:
+
+| What kept happening | The fix |
+|---|---|
+| The same mechanical finding in several reviews (a banned call, an import shape, a naming or file-location rule) | A lint rule or a check in the static gate. Tools enforce it from then on and reviewers stop spending on it. |
+| The same judgement finding in several reviews | One line under conventions in `AGENTS.md`, or in the plan's global constraints |
+| Workers asking, guessing, or flagging `⚠` about the same gap | Fix the plan or the brief wording |
+| Workers hunting for the same file, command, or fact | A pointer in `AGENTS.md` |
+| A tool call that returned far more than was needed | A filtered command or script, named in `AGENTS.md` |
+| A line in `AGENTS.md` or `CLAUDE.md` no run needed | Delete it |
+
+Then update `STATUS.md` for the next milestone and end the session.
 
 ## Iron rules
 

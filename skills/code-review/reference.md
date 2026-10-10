@@ -31,7 +31,9 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 | Tests that depend on order, wall-clock time, sleeps, or shared state | Flaky tests train people to ignore red |
 | Several concepts in one test; setup that hides what's being tested | A failure doesn't say what broke |
 | An e2e driver that doesn't fit the surface (Playwright without a browser UI) | Slow and proves the wrong thing |
-| Tests mirroring the implementation line for line | They pin structure, so every refactoring breaks them |
+| Implementation-coupled tests: mocking internal collaborators, testing private methods, or checking through a side channel (querying the database instead of the interface) | They break on a refactoring that changed no behavior |
+| Tautological tests: the assertion recomputes the expected value the way the code does, or asserts a constant against itself | They pass by construction and can never disagree with the code |
+| All the tests written in one batch before any implementation | They test imagined behavior and the shape of things; tests should arrive one slice at a time |
 | Error paths and boundaries untested while the happy path has five tests | The bugs live at the edges |
 
 ## Design lens: evidence → pattern to prescribe
@@ -90,6 +92,8 @@ Each cross-cutting reviewer gets the unit map from the inventory and reads acros
 **Architecture.** Draw the dependency graph between components from the imports. Report: policy depending on detail (domain code importing the framework, the ORM, or the transport); dependency cycles; a component with several unrelated reasons to change; the same concept implemented twice in different units; bounded contexts sharing a model or a table; a layer bypassed (a controller reaching the database around the service or repository); the same cross-cutting concern or structural problem solved differently in different units (convention over configuration: one way per codebase); machinery nothing uses (YAGNI). Prescribe the pattern or refactoring that resolves each, from the design-lens table above.
 
 **Security.** List every entry point in the codebase, then walk the security lens table for each one end to end, across unit boundaries, following input from the boundary to every sink it reaches. Unit reviewers see one unit; this role finds the hole between two units that each look fine alone. Also read CI config, Dockerfiles, and Compose files for secrets, privileged containers, and unpinned base images.
+
+**Spec.** Read the requirements docs (`docs/requirements/`, or wherever the repo keeps them) and `GLOSSARY.md`. For every requirement id, find the code and tests that implement it and report: implemented, partial, missing, or implemented wrongly, quoting the requirement line. Then the reverse: behavior, endpoints, entities, or settings in the code that no requirement asks for. Also report docs that the code has outgrown, and names in the code that contradict the glossary.
 
 **Operations.** For each deployable service, walk the Twelve-Factor lens table. Then check what the table doesn't: health and readiness endpoints, timeouts and retry limits on every outbound call, bounded queues and pools, and migrations that can run while the previous version is still serving.
 
