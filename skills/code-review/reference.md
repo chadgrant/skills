@@ -36,7 +36,7 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 
 ## Design lens: evidence → pattern to prescribe
 
-A prescription needs evidence in the code today. State it as the finding: the evidence with its count, the pattern, and where it goes. All three are files in `uncle-bob-clean-code`: catalogs and the "don't use when" column in `patterns.md`, domain building blocks in `domain-driven-design.md`, the steps to get there in `refactoring.md`.
+A prescription needs evidence in the code today. State it as the finding: the evidence with its count, the pattern, and where it goes. All three are files in `chadgrant:clean-code`: catalogs and the "don't use when" column in `patterns.md`, domain building blocks in `domain-driven-design.md`, the steps to get there in `refactoring.md`.
 
 | Evidence in the code | Prescribe |
 |---|---|
@@ -95,4 +95,4 @@ Each cross-cutting reviewer gets the unit map from the inventory and reads acros
 
 ## Unit reviewer brief (full review)
 
-Give each unit reviewer: the unit's file list, the stack and global constraints from the plan or `AGENTS.md`, the instruction to follow `clean-code-review` in scoped mode over exactly those files, and the report shape. Tell it to read every file in full and to return findings only.
+Give each unit reviewer: the unit's file list, the stack and global constraints from the plan or `AGENTS.md`, the instruction to follow `chadgrant:code-review` in scoped mode over exactly those files, and the report shape. Tell it to read every file in full and to return findings only.

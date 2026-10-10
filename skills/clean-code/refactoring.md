@@ -8,7 +8,7 @@
 2. **Two hats — never wear both at once.** You are *either* adding behavior *or* refactoring, never in the same edit. Feature work changes what tests assert; refactoring keeps every test asserting exactly what it did. Switch hats deliberately and know which one you have on.
 3. **Small, reversible steps.** Apply one named refactoring (extract function, rename, introduce parameter object…), then run the tests. Then the next. If a step goes red, you moved too far in one go — revert the last step, not the whole session.
 4. **Test after every step.** Green → green → green. The safety of refactoring is entirely in the frequency of the check.
-5. **Commit at green milestones.** A completed refactoring at green is a natural commit boundary (in the pipeline, the orchestrator commits — `implementation`).
+5. **Commit at green milestones.** A completed refactoring at green is a natural commit boundary (in the pipeline, the orchestrator commits — `chadgrant:implementation`).
 
 ## When to refactor — and when not
 
@@ -21,7 +21,7 @@
 **Don't refactor when:**
 - **You're mid-feature with the feature hat on.** Finish or stash the feature; switch hats cleanly.
 - **The code doesn't need to change and isn't in your way.** Ugly-but-stable code that nobody touches is not a priority. Refactor code you're working *in*, not code you happened to notice (Boy Scout Rule applies to your path, not the whole repo).
-- **It should be a rewrite, not a refactor.** When the design is beyond incremental repair, that's a planned rewrite decision (record it as an `ADR`/task via `planning`), not an endless refactor.
+- **It should be a rewrite, not a refactor.** When the design is beyond incremental repair, that's a planned rewrite decision (record it as an `ADR`/task via `chadgrant:planning`), not an endless refactor.
 - **There are no tests and you can't add them.** Get a characterization harness first; otherwise you're changing behavior blind.
 
 **The four simplicity rules ([SKILL.md](SKILL.md)) set the direction.** A refactoring should leave the code simpler (KISS), with knowledge in fewer places (DRY, at the third occurrence), with less speculative machinery (YAGNI: deleting an unused abstraction is a refactoring), and closer to the framework's and repo's conventions. A step that adds indirection without removing a burden is going the wrong way.
@@ -30,8 +30,8 @@
 
 Refactoring is a first-class activity, not an afterthought:
 
-- **Planned** — a "reduce burden" refactor is a legitimate `TASK-` in `planning`, with a verify step of *behavior unchanged (tests green) and the target smell gone*. Debt gets scheduled, not just lamented.
-- **Triggered in the build** — when an `implementation` worker meets change-friction ("make the change easy" first), or the quality gate or a `clean-code-review` reviewer flags a smell, that spawns a refactoring under the two-hats discipline — kept as its own step/commit, never smuggled into a feature diff.
+- **Planned** — a "reduce burden" refactor is a legitimate `TASK-` in `chadgrant:planning`, with a verify step of *behavior unchanged (tests green) and the target smell gone*. Debt gets scheduled, not just lamented.
+- **Triggered in the build** — when an `chadgrant:implementation` worker meets change-friction ("make the change easy" first), or the quality gate or a `chadgrant:code-review` reviewer flags a smell, that spawns a refactoring under the two-hats discipline — kept as its own step/commit, never smuggled into a feature diff.
 
 ## Red flags: don't over-apply
 

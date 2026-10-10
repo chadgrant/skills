@@ -6,7 +6,7 @@ An [Agent Skill](https://agentskills.io) that turns a planning loop into a **liv
 
 - **Adaptive doc set:** always produces a **PRD** (product: problem, users, `REQ-` requirements, success metrics). Adds an **ERD** (engineering: architecture, infra, patterns, *alternatives considered*, `ADR-` decisions) when there's real design, a **DRD** (data: entity model, schemas, data dictionary, PII classification, retention) when the work touches persistent data, an **API contract** when a service/public interface changes, and a **Test & QA plan** when there's non-trivial behavior to prove. For user-facing work it adds **user flows** + IA, lo-fi **wireframes** (with an interaction spec), and a referenced **style guide** (UI built with the [Impeccable](https://github.com/pbakaus/impeccable) design skill); for prod-facing work, a **release plan** (deploy/migration/rollback), an **observability** doc (SLOs/dashboards/alerts), and **user docs**. Each skipped doc must be justified — a headless API needs no wireframes; a UI that stores data needs a DRD. A CLI tweak gets a short PRD; a platform gets the whole family.
 - **Digestible diagrams:** every structural doc carries **Excalidraw** diagrams held to **≤5–6 boxes each** — bigger systems are split by **C4 zoom level** (Context → Container → Component) instead of crammed — and every diagram gets a plain-language **ELI5 caption**. Boxes are labeled with spine IDs so the diagram stays checkable against the docs.
-- **Routed implementation plan:** decomposes the work into atomic `TASK-`s with exact file paths and interpretation-free verify steps, rates each task's difficulty, assigns a **model tier**, and sets the definition of *done* — green **and** clean, a code-quality gate rather than passing tests alone — then hands off to the [`implementation`](../implementation/) skill to orchestrate the build (which in turn dispatches each task to a worker running [`implementation`](../implementation/)).
+- **Routed implementation plan:** decomposes the work into atomic `TASK-`s with exact file paths and interpretation-free verify steps, rates each task's difficulty, assigns a **model tier**, and sets the definition of *done* — green **and** clean, a code-quality gate rather than passing tests alone — then hands off to the [`chadgrant:implementation`](../implementation/) skill to orchestrate the build (which in turn dispatches each task to a worker running [`chadgrant:implementation`](../implementation/)).
 - **Keeps docs in sync:** one shared ID namespace (`REQ- / NFR- / ADR- / ENT- / NAV- / FLOW- / SCR- / CMP- / TOK- / REL- / SLO- / TASK- / TEST-`) is the spine. Three modes — **author** (whole set up front), **focused-loop** (one doc, one unit at a time, loop until done), and **re-sync** (reconcile docs with the code — a drift check when they exist, or reverse-engineering a brownfield repo into the doc set when they don't, marking `[extracted]` / `[inferred]` / `⚠ needs-confirmation` and never fabricating intent) — keep the requirements true instead of rotting.
 - **Connector-ready:** every doc carries machine-readable YAML front-matter, and the spine is the join key for pushing the doc set to a Confluence-style page tree and shredding `REQ-`/`TASK-` into Jira epics/stories. The mapping is specified in [`connectors.md`](connectors.md); live integrations are on the [`ROADMAP.md`](ROADMAP.md), not built yet.
 
@@ -23,31 +23,15 @@ An [Agent Skill](https://agentskills.io) that turns a planning loop into a **liv
 
 This is the **plan** stage of a three-skill pipeline:
 
-1. **`planning`** (this skill) — clarify → the requirements doc set (PRD, plus whatever the work warrants) → routed implementation plan → hand off.
-2. [`implementation`](../implementation/) — requires the spec/PRD and routed plan to exist first. Its orchestrator runs waves of workers, verifying and committing each task; each worker follows its worker manual and [`uncle-bob-clean-code`](../uncle-bob-clean-code/).
-3. [`clean-code-review`](../clean-code-review/) — reviews each task's files during the build, and the whole codebase when the last full review is stale.
+1. **`chadgrant:planning`** (this skill) — clarify → the requirements doc set (PRD, plus whatever the work warrants) → routed implementation plan → hand off.
+2. [`chadgrant:implementation`](../implementation/) — requires the spec/PRD and routed plan to exist first. Its orchestrator runs waves of workers, verifying and committing each task; each worker follows its worker manual and [`chadgrant:clean-code`](../clean-code/).
+3. [`chadgrant:code-review`](../code-review/) — reviews each task's files during the build, and the whole codebase when the last full review is stale.
 
 Use them together for an idea-to-shipped pipeline: talk requirements here, let the factory build them.
 
 ## Install
 
-This skill lives in the [`chadgrant/skills`](https://github.com/chadgrant/skills) collection under `planning/`. Clone the repo and copy that folder into your agent's skills directory.
-
-**Claude Code — everywhere (all projects):**
-
-```sh
-git clone https://github.com/chadgrant/skills /tmp/chadgrant-skills
-cp -r /tmp/chadgrant-skills/planning ~/.claude/skills/
-```
-
-**Claude Code — one project:**
-
-```sh
-git clone https://github.com/chadgrant/skills /tmp/chadgrant-skills
-cp -r /tmp/chadgrant-skills/planning .claude/skills/
-```
-
-**Other agents:** any agent supporting the [Agent Skills spec](https://agentskills.io/specification) can use this — copy the `planning/` folder into that agent's skills directory.
+Part of the `chadgrant` plugin; see the [top-level README](../../README.md#install).
 
 The skill triggers automatically on its description when you ask to write a PRD, spec something out, or keep requirements in sync.
 

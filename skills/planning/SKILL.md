@@ -7,7 +7,7 @@ description: Use when planning a feature, project, or migration that needs durab
 
 Announce: **"Using planning: pick the mode → clarify → write living docs → route the plan → hand off."**
 
-**Core principle: the requirements are the source of truth; the code is downstream.** The implementation plan is disposable. The PRD/ERD/DRD are what a human reads in six months to learn what was promised, how it was built, and what the data means, so they must outlive the plan and stay true to the code. One shared ID spine keeps them checkable. The routed plan goes to `implementation` (execute), which dispatches each task to a worker running `implementation`.
+**Core principle: the requirements are the source of truth; the code is downstream.** The implementation plan is disposable. The PRD/ERD/DRD are what a human reads in six months to learn what was promised, how it was built, and what the data means, so they must outlive the plan and stay true to the code. One shared ID spine keeps them checkable. The routed plan goes to `chadgrant:implementation` (execute), which dispatches each task to a worker running `chadgrant:implementation`.
 
 This is a self-contained loop (clarify → design → document); it doesn't depend on a separate brainstorming skill.
 
@@ -65,19 +65,19 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 ### A3. Build the routed plan
 
 - Decompose into atomic `TASK-###`s: exact file paths, the interface each produces, a `TEST-###` verify step needing no human interpretation.
-- Rate each task on its hardest aspect and assign a tier per `implementation`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `implementation` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
-- Add these **global constraints** once; `implementation` copies them into every brief:
+- Rate each task on its hardest aspect and assign a tier per `chadgrant:implementation`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `chadgrant:implementation` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
+- Add these **global constraints** once; `chadgrant:implementation` copies them into every brief:
   - **UI**: built with [Impeccable](https://github.com/pbakaus/impeccable) against the style guide's tokens and components.
-  - **Services** (API, worker, consumer, scheduled job): follow the [Twelve-Factor App](https://12factor.net); `implementation`'s `worker.md` carries the checklist. Each service task names its config keys and env var names, backing services, port and health endpoints, and shutdown behavior; migrations and admin jobs are their own tasks. A deviation is an `ADR` the task cites.
-  - **Quality bar**: done means the `TEST-` is green **and** the code is clean per `uncle-bob-clean-code`. Name the project's static gate command (format check, lint, type-check, complexity limit); every `TEST-` runs it alongside the task's tests. A `TEST-` that a bloated or over-engineered solution can still pass is not a complete acceptance criterion.
+  - **Services** (API, worker, consumer, scheduled job): follow the [Twelve-Factor App](https://12factor.net); `chadgrant:implementation`'s `worker.md` carries the checklist. Each service task names its config keys and env var names, backing services, port and health endpoints, and shutdown behavior; migrations and admin jobs are their own tasks. A deviation is an `ADR` the task cites.
+  - **Quality bar**: done means the `TEST-` is green **and** the code is clean per `chadgrant:clean-code`. Name the project's static gate command (format check, lint, type-check, complexity limit); every `TEST-` runs it alongside the task's tests. A `TEST-` that a bloated or over-engineered solution can still pass is not a complete acceptance criterion.
   - **Testing**: the plan names each command and tool; workers don't choose them.
     - *Coverage*: at least 90% line coverage, enforced by the coverage tool's fail-under threshold so it fails the run without anyone reading a report. Exclusions (generated or vendored code) are listed in the plan.
     - *Real backing services*: code that talks to a database, queue, or cache is tested against the real thing started by Docker Compose (a `compose.test.yaml` with health checks), never a mock or an in-memory substitute.
     - *End-to-end*: anything deployable or runnable gets e2e tests that drive it through its public surface, with the whole stack brought up by Docker Compose when it has backing services. Pick the driver by surface: browser UI → Playwright; HTTP API → requests against the running service; CLI → invoke the built binary and assert on output and exit code; library → none beyond tests of its public API. No Playwright without a browser UI.
     - The compose file and e2e harness are an M0 task; each e2e scenario is a `TC-` built by its own task.
-  - **Design**: per `uncle-bob-clean-code`: known patterns (its `patterns.md`) over invention; rich domains via its `domain-driven-design.md`, whose glossary and bounded contexts go in the PRD/ERD and inform module boundaries; a refactoring (its `refactoring.md`) is a plannable task type with a behavior-unchanged verify.
-  - **Simplicity**: the four rules in `uncle-bob-clean-code` bind the docs and the plan as well as the code. YAGNI: no requirement, entity, endpoint, or task without a stated need behind it; "future-proofing" is out of scope until someone asks for it. KISS: the ERD picks the simplest architecture that meets the PRD and records what it declined to add. DRY: each fact lives in one doc and the others cite its spine ID. Convention over configuration: the chosen stack's standard layout, naming, and tooling are the default; a deviation is an `ADR`.
-- Hand the plan to `implementation`. A single self-evident task needs neither a plan nor a handoff.
+  - **Design**: per `chadgrant:clean-code`: known patterns (its `patterns.md`) over invention; rich domains via its `domain-driven-design.md`, whose glossary and bounded contexts go in the PRD/ERD and inform module boundaries; a refactoring (its `refactoring.md`) is a plannable task type with a behavior-unchanged verify.
+  - **Simplicity**: the four rules in `chadgrant:clean-code` bind the docs and the plan as well as the code. YAGNI: no requirement, entity, endpoint, or task without a stated need behind it; "future-proofing" is out of scope until someone asks for it. KISS: the ERD picks the simplest architecture that meets the PRD and records what it declined to add. DRY: each fact lives in one doc and the others cite its spine ID. Convention over configuration: the chosen stack's standard layout, naming, and tooling are the default; a deviation is an `ADR`.
+- Hand the plan to `chadgrant:implementation`. A single self-evident task needs neither a plan nor a handoff.
 
 ### A4. Traceability check
 
@@ -188,4 +188,4 @@ The docs are connector-ready, not connected; nothing ships an integration yet.
 
 ---
 
-*Plan stage of the pipeline: **this skill** → `implementation` → `clean-code-review`. Inspired by [obra/superpowers](https://github.com/obra/superpowers), Google design docs, Amazon's working-backwards PR/FAQ, and Nygard-style ADRs.*
+*Plan stage of the pipeline: **this skill** → `chadgrant:implementation` → `chadgrant:code-review`. Inspired by [obra/superpowers](https://github.com/obra/superpowers), Google design docs, Amazon's working-backwards PR/FAQ, and Nygard-style ADRs.*

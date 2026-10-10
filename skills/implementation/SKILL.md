@@ -13,7 +13,7 @@ One skill, two roles. Find yours, open that file, and follow it. Don't read the 
 | A subagent handed a brief, or told "you are the worker" | [worker.md](worker.md) |
 | Building one self-evident task alone, with no plan and no subagents | [worker.md](worker.md). You hold both roles: every file is yours, and you commit when the user asks. |
 
-Pipeline: `planning` writes the docs and the routed plan → **`implementation`** builds it → `clean-code-review` reviews it. The standards for the code itself are `uncle-bob-clean-code`'s.
+Pipeline: `chadgrant:planning` writes the docs and the routed plan → **`chadgrant:implementation`** builds it → `chadgrant:code-review` reviews it. The standards for the code itself are `chadgrant:clean-code`'s.
 
 ## Rules for both roles
 

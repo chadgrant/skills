@@ -1,4 +1,4 @@
-# uncle-bob
+# clean-code
 
 An [Agent Skill](https://agentskills.io) that makes coding agents write and review code the Uncle Bob way — Robert C. Martin's *Clean Code* and SOLID, plus *Clean Architecture* and McConnell's *Code Complete* construction discipline — applied automatically whenever an agent writes, modifies, or reviews code. It also carries the design knowledge above unit-of-code altitude: the Gang of Four and Fowler pattern catalogs, Evans' domain-driven design, and Fowler's refactoring catalog, each in its own file that loads only when the problem calls for it.
 
@@ -19,28 +19,12 @@ An [Agent Skill](https://agentskills.io) that makes coding agents write and revi
 
 ## Install
 
-This skill lives in the [`chadgrant/skills`](https://github.com/chadgrant/skills) collection under `uncle-bob-clean-code/`. Clone the repo and copy that folder into your agent's skills directory.
+Part of the `chadgrant` plugin; see the [top-level README](../../README.md#install).
 
-**Claude Code — everywhere (all projects):**
-
-```sh
-git clone https://github.com/chadgrant/skills /tmp/chadgrant-skills
-cp -r /tmp/chadgrant-skills/uncle-bob-clean-code ~/.claude/skills/
-```
-
-**Claude Code — one project:**
-
-```sh
-git clone https://github.com/chadgrant/skills /tmp/chadgrant-skills
-cp -r /tmp/chadgrant-skills/uncle-bob-clean-code .claude/skills/
-```
-
-**Other agents:** any agent supporting the [Agent Skills spec](https://agentskills.io/specification) can use this — copy the `uncle-bob-clean-code/` folder into that agent's skills directory.
-
-The skill triggers automatically on its description ("Use when writing, modifying, or refactoring code… or when reviewing code…"). To make it unconditional in Claude Code, add one line to `~/.claude/CLAUDE.md`:
+The skill triggers automatically on its description. To make it unconditional, add to your `CLAUDE.md`:
 
 ```
-Whenever you write, modify, or review code, apply the uncle-bob-clean-code skill.
+Whenever you write, modify, or review code, apply the chadgrant:clean-code skill.
 ```
 
 ## How it was built

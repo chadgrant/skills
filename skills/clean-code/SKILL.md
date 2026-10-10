@@ -1,5 +1,5 @@
 ---
-name: uncle-bob-clean-code
+name: clean-code
 description: Use when writing, modifying, or refactoring code in any language, or when reviewing code, a diff, or a pull request — before the first line is written and before review feedback is sent. Also when a design problem appears: a growing conditional, swappable behavior, where domain logic or data access lives, modeling a business domain, or code that has become hard to change. Triggers: "which pattern", "GoF", "strategy vs state", "repository vs active record", "domain model", "DDD", "bounded context", "aggregate", "refactor this", "clean this up", "this smells".
 ---
 
@@ -86,7 +86,7 @@ Run three REQUIRED passes and report findings in this order. A review that conta
 2. **Design (SOLID + simplicity + architecture pass)** — walk the SOLID table and the simplicity table (KISS, YAGNI, DRY, convention over configuration) above against the diff, plus: flag arguments, functions doing several things, hidden side effects, train wrecks (`a.getB().getC().doIt()` — Law of Demeter), null returns/params, switch-on-type. At component scale, check the **Dependency Rule** (does policy depend on a detail? any dependency cycles?) and whether a **known pattern is missing or misapplied** ([patterns.md](patterns.md)), or the **domain model is anemic / an aggregate leaks** ([domain-driven-design.md](domain-driven-design.md)). Where a smell is real, name the **refactoring** that fixes it ([refactoring.md](refactoring.md)).
 3. **Readability** — names, magic numbers, commented-out code, comment quality, duplication (DRY).
 
-Reviewing someone else's work or auditing a codebase? `clean-code-review` wraps these passes in a full procedure: scope, security and Twelve-Factor checklists, a test lens, and the report format.
+Reviewing someone else's work or auditing a codebase? `chadgrant:code-review` wraps these passes in a full procedure: scope, security and Twelve-Factor checklists, a test lens, and the report format.
 
 For each finding: name the principle or smell, say concretely why it will hurt, and sketch the fix. End with an explicit verdict: blockers, should-fix, nits.
 

@@ -81,7 +81,7 @@ append_stamp_section() {
 
 $new_line
 
-Stale after $MAX_AGE_DAYS days or $MAX_COMMITS commits. When stale, run the \`clean-code-review\` skill over the whole codebase; it rewrites the line above.
+Stale after $MAX_AGE_DAYS days or $MAX_COMMITS commits. When stale, run the \`chadgrant:code-review\` skill over the whole codebase; it rewrites the line above.
 EOF
 }
 

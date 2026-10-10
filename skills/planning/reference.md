@@ -98,7 +98,7 @@ Sits above the per-task `TEST-` unit checks: scenario-level cases, non-functiona
 
 ## Implementation plan — the execution DAG
 
-The most rigid doc: an agent must execute each task with **no interpretation**. This is the input `implementation` consumes.
+The most rigid doc: an agent must execute each task with **no interpretation**. This is the input `chadgrant:implementation` consumes.
 
 | Section | Intent |
 |---|---|
@@ -113,7 +113,7 @@ The most rigid doc: an agent must execute each task with **no interpretation**. 
 
 **Anti-patterns:** ambiguous tasks requiring interpretation; tasks without file-path specificity; missing per-task verification; undeclared (hidden) ordering dependencies; placeholder text; a task that overlaps another wave's files (breaks parallel disjointness).
 
-**Difficulty → model tier:** rate each task on its hardest aspect and assign a tier per `implementation`'s table, which also owns the `observe` definition (true security/money spine only) and the tier→model mapping. Record tiers, not model names.
+**Difficulty → model tier:** rate each task on its hardest aspect and assign a tier per `chadgrant:implementation`'s table, which also owns the `observe` definition (true security/money spine only) and the tier→model mapping. Record tiers, not model names.
 
 ## User flows — IA & journeys ("where things live, how you move")
 
