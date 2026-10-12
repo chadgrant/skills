@@ -23,7 +23,7 @@ Every turn re-sends your whole context. Your context size times your turn count 
 
 Every run is timed, so slow stages can be found with data instead of guessed at. `J` below means `python3 <this skill's directory>/scripts/journal.py`; it appends to one file per project, `~/.claude/journal/<repo name>.jsonl` (`J path` prints it). Log as you go, one shell call per event; each call costs a few tokens and nothing else.
 
-The plugin's hooks already log every subagent on their own: its wall time, the share of that spent waiting on the model, requests, tokens, model, the API provider (Anthropic, Bedrock, Vertex, or a gateway), and every API failure. You don't log those. Your calls below add what only you know: which task, which wave, and how it turned out. `J report --providers` compares providers' speed and failure rates.
+The plugin's hooks already log every subagent on their own: its wall time, the share of that spent waiting on the model, requests, tokens, model, the API provider (Anthropic, Bedrock, Vertex, or a gateway), and every API failure. You don't log those. Your calls below add what only you know: which task, which wave, and how it turned out. `J report --providers` compares providers' speed and failure rates. Every event also records the skills' version and git commit, so `J report --versions` shows whether a change to these skills made runs faster or cleaner.
 
 | When | Call |
 |---|---|
