@@ -35,6 +35,8 @@ digraph modes {
 
 ### A0. Clarify
 
+Time the planning in the delivery journal (`python3 <this skill's directory>/../implementation/scripts/journal.py`; see `chadgrant:implementation`'s orchestrator for the full list): `begin run <YYYY-MM-DD-slug>` and write that id into the plan header, then `begin`/`end phase` around `clarify`, `docs`, and `plan`. The build continues the same run.
+
 Ask only questions whose answers change the docs: the problem and for whom, success metrics, scope in/out, fail modes, tenancy, data sensitivity, environment ceilings, decisions that fork the architecture.
 
 Work the open decisions as a tree, in **rounds**. A round is every question you can ask now without guessing at an answer you haven't heard. Number each question, give your recommended answer, and word it so "yes" accepts the recommendation; then wait. Each answer unblocks the next round. Facts are yours to find (send an `Explore` agent to the code, the docs, the environment); only decisions go to the user. Done when no decision is left assumed.

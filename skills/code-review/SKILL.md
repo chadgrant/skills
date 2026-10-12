@@ -33,6 +33,7 @@ A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane whi
 
 ## Full review
 
+0. **Time it**: `python3 <this skill's directory>/../implementation/scripts/journal.py begin review full`, and `end review full blockers=<n> should_fix=<n> nits=<n>` after the report, so full reviews show up in the project's journal.
 1. **Inventory.** `git ls-files`, minus vendored and generated code and lockfiles. Everything left is in scope: source, tests, migrations, CI config, Dockerfiles and Compose files, scripts. Partition it into units along component boundaries, each small enough to read completely (about 3,000 lines).
 2. **Run the gates first.** The static gate, the full test suite with coverage, the stack's dependency audit (`npm audit`, `pip-audit`, `govulncheck`, `cargo audit`), and a secret scan if one is installed. Their failures are findings; reviewers spend their attention on what tools can't see.
 3. **Fan out in one message.** Top tier here means Opus unless the user has approved Fable: inside a delivery run, follow the answer recorded in the plan; standalone, ask once before fanning out, and use Opus if there's no answer.

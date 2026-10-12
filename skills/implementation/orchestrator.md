@@ -19,6 +19,24 @@ Every turn re-sends your whole context. Your context size times your turn count 
 - **Filter command output.** Run gates so only failures and the summary come back (`2>&1 | tail -n 40`, or the runner's quiet or failures-only flag). Full logs and screenshots stay with the agent that needs them.
 - **Batch.** One shell call per check, not one per step.
 
+## The journal
+
+Every run is timed, so slow stages can be found with data instead of guessed at. `J` below means `python3 <this skill's directory>/scripts/journal.py`; it appends to one file per project, `~/.claude/journal/<repo name>.jsonl` (`J path` prints it). Log as you go, one shell call per event; each call costs a few tokens and nothing else.
+
+| When | Call |
+|---|---|
+| The run starts, unless the plan header or `STATUS.md` already names an open run | `J begin run <YYYY-MM-DD-slug> fable=<answer> tasks=<count>`, and write the run id into `STATUS.md` |
+| A milestone starts / ends | `J begin phase milestone m=<M1>` / `J end phase milestone m=<M1>` |
+| A wave is dispatched / verified | `J begin wave <M1-W1> tasks=<n>` / `J end wave <M1-W1> conflicts=<n>` |
+| A task is dispatched / its report arrives | `J begin task <TASK-007> tier=<tier> model=<model> difficulty=<d>` / `J end task <TASK-007> outcome=<green\|red\|escalated> attempt=<n> lines=<changed lines> tokens=<if the agent result gives them>` |
+| A gate runs | `J begin gate <fast\|full> m=<M1>` / `J end gate <fast\|full> outcome=<green\|red> failures=<n>` |
+| A milestone stage runs (`simplify`, `compact`, `retro`) | `J begin phase <stage> m=<M1>` / `J end phase <stage> m=<M1>` |
+| The feature review / the fix pass | `J begin review feature m=<M1>` / `J end review feature blockers=<n> should_fix=<n> nits=<n>`; `J begin fix pass m=<M1>` / `J end fix pass tasks=<n>` |
+| Something worth knowing later (an escalation and why, a zombie worker, a crash, a slow command) | `J note <one line>` |
+| The last milestone ends | `J end run <id>` |
+
+Names stay the same from run to run (`gate full`, `phase simplify`) so `J report --all` can compare runs; the milestone goes in a field. At each milestone summary, include the few lines of `J report` that matter: task count and median, and the longest stages.
+
 ## Phase 0: clarify
 
 Ask the questions whose answers change the plan: fail modes, tenancy, scope boundaries, environment ceilings, decisions that fork the architecture. Work the open decisions as a tree, in **rounds**. A round is every question you can ask now without guessing at an answer you haven't heard. Number each question, give your recommended answer, and word it so "yes" accepts the recommendation; then wait. Each answer unblocks the next round. Facts are yours to find (send an `Explore` agent to the code, the docs, the environment); only decisions go to the user. Done when no decision is left assumed. Record the answers. If `chadgrant:planning` has run, its spec and routed plan are the input.
@@ -113,7 +131,7 @@ Then update `STATUS.md` for the next milestone and end the session.
 - **Only the orchestrator writes shared files**: `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, the root `README`, and any doc no task owns. Workers and reviewers run in parallel and overwrite each other there, so they report notes instead. After each wave, apply the wave's **Notes for shared docs** yourself, one file at a time, merging duplicates and dropping what the file already says. A doc that a task must update (requirements docs, user docs, a package `README`) is changed by the task that changes the behavior it documents.
 - **`general-purpose` + model override, never a fork.** A fork inherits your commit authorization.
 - **Verify before committing.** A worker's "tests pass" is not evidence; the green wave run is, and the bigger the diff the more it matters.
-- **`STATUS.md` is the ledger**: active wave, done tasks, follow-ups, incidents, decisions. Update it every wave; it's how the next context window resumes.
+- **`STATUS.md` is the ledger**: the journal's run id, active wave, done tasks, follow-ups, incidents, decisions. Update it every wave; it's how the next context window resumes.
 - **Zombie check.** A worker can die silently with no output. When nothing has changed on disk for a while, check each in-flight worktree. A task that wrote nothing never ran, so re-dispatching the same brief is safe (the escalation rule is for tasks that ran and failed). A task that wrote partial output is treated as failed: escalate per step 5.
 - **Push once per milestone**, not per task. Each push burns CI.
 - **Global constraints exist before dispatch.** If the plan builds a deployable service and lacks the Twelve-Factor constraint, add it. If it lacks the test gates (90% coverage, Compose-backed services, surface-appropriate e2e), add them. Fail-mode per component class must be in the plan before dispatch: fail-closed for spend, auth, governance, budgets, safety; fail-open for soft quotas and rate limits.
