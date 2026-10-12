@@ -44,3 +44,10 @@ jira_project_key: null   # set by the Jira connector
 
 ## 7. Rate limits & SLAs
 <If public/consumed externally: quotas, throttling, availability target.>
+
+## Recent changes
+> One dated line per change to an existing item; the item itself is edited in place. Entries are deleted once shipped or after 14 days (see the skill's Path D). Ten at most.
+
+- <YYYY-MM-DD> · <ID> · <what changed, old → new> · <TASK-…>
+
+Retired IDs: <none>

@@ -38,7 +38,7 @@ Architecture, infrastructure, code patterns, interfaces, and the trade-offs behi
 | The design | Components, APIs, data flow, a system-context diagram, the patterns to follow, key trade-offs. |
 | Alternatives considered | Options evaluated and **why rejected**. This is the section that carries the reasoning. |
 | Cross-cutting concerns | Security, privacy, observability, cost, failure modes (fail-open vs fail-closed per component). |
-| Decisions `ADR-###` | One decision each: *Title · Status · Context · Decision · Consequences* + alternatives. Never edit an accepted ADR — **supersede and link**. |
+| Decisions `ADR-###` | One decision each: *Title · Status · Context · Decision · Consequences* + alternatives. A changed decision gets a new ADR that supersedes the old one; compaction (Path D) later folds the old one into a `Replaces:` line on the survivor. |
 
 **Anti-patterns:** no *alternatives-considered* section (obscures the reasoning); an implementation manual with no rationale or trade-offs; excessive length (>~20 pages → decompose); pasting full signatures/schemas that will rot; writing a design doc when there are genuinely no trade-offs to weigh.
 

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when reviewing code someone else wrote, or auditing a codebase: a dispatched reviewer checking a task, wave, or feature diff; a milestone gate; a standalone "review this repo"; or a full-review stamp in AGENTS.md that has gone stale. Triggers: "code review", "review this", "audit the codebase", "thorough review", "security review", "is this ready to merge".
+description: Use when reviewing code someone else wrote, or auditing a codebase: a dispatched reviewer checking a task, wave, or feature diff; a milestone gate; or a standalone "review this repo". Triggers: "code review", "review this", "audit the codebase", "thorough review", "security review", "is this ready to merge".
 ---
 
 # Clean code review
@@ -17,9 +17,10 @@ Pipeline position: `chadgrant:implementation`'s orchestrator dispatches reviewer
 |---|---|---|
 | A task brief, task ids, a diff range, or a file list | **Scoped** | Exactly those files. Nothing else. |
 | Nothing but the request to review (the skill run on its own) | **Full** | The entire codebase. |
-| The start of a delivery run, or a milestone gate, where the stamp reads `stale` | **Full** | The entire codebase. |
 
 The stamp is one line in the repo's `AGENTS.md`: `Last full review: <date> at commit <sha>`. Check it from the repo root with `bash <this skill's directory>/scripts/review-stamp.sh status`. It answers `fresh` or `stale` (14 days or 50 commits, whichever comes first; no stamp is stale).
+
+**A stale stamp is a nag, not a trigger.** Whoever sees `stale` tells the user in one line that a full review is due and carries on with their own work. A full review runs only when the user asks for one.
 
 ## Scoped review
 
@@ -45,7 +46,7 @@ A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane whi
 5. **Adjudicate.** Verify each blocker yourself or with a fresh verifier: reproduce it with a failing test or command, or trace the path with `file:line` at each hop. A blocker that can't be verified is downgraded or dropped.
 6. **Report** in the shape below.
 7. **Stamp**, only when every unit was read: `bash <this skill's directory>/scripts/review-stamp.sh stamp`. A review that skipped units lists them under `Unreviewed` and writes no stamp.
-8. **Hand off.** A mechanical finding with three or more occurrences is handed off as a lint rule or static-gate check plus the fixes, so tools catch it next time. Blockers and should-fix findings become work for someone else: `TASK-`s in the pipeline (structural ones as their own refactoring tasks per `chadgrant:clean-code`'s `refactoring.md`), or the list handed to the user when run standalone.
+8. **Hand off.** A mechanical finding with three or more occurrences is handed off as a lint rule or static-gate check plus the fixes, so tools catch it next time. The report goes to the user, who chooses what gets fixed; recommend the blockers and say roughly how much work the rest is. A full review of a living codebase always finds something, so the count alone is not a reason to fix everything. What the user picks becomes `TASK-`s (structural ones as their own refactoring tasks per `chadgrant:clean-code`'s `refactoring.md`).
 
 ## Re-review (after a fix)
 

@@ -53,11 +53,19 @@ jira_project_key: null   # set by the Jira connector
 - **Failure modes:** <per component: fail-open vs fail-closed.>
 
 ## 6. Decisions (ADRs)
-> One decision per ADR. Never edit an accepted ADR — add a new one that supersedes it and link both.
+> One decision per ADR. A changed decision gets a new ADR that supersedes the old one; compaction then deletes the old one and leaves a `Replaces:` line here.
 
 ### ADR-001: <Title>
-- **Status:** Proposed | Accepted | Superseded by ADR-###
+- **Status:** Proposed | Accepted | Superseded by ADR-### (until the next compaction)
+- **Replaces:** <only after compaction: the earlier decision and why it changed.>
 - **Context:** <forces at play.>
 - **Decision:** <what we chose.>
 - **Consequences:** <resulting trade-offs, good and bad.>
 - **Implemented by:** TASK-… <tasks that carry out this decision.>
+
+## Recent changes
+> One dated line per change to an existing item; the item itself is edited in place. Entries are deleted once shipped or after 14 days (see the skill's Path D). Ten at most.
+
+- <YYYY-MM-DD> · <ID> · <what changed, old → new> · <TASK-…>
+
+Retired IDs: <none>

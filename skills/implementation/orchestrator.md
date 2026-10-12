@@ -33,7 +33,7 @@ Ask the questions whose answers change the plan: fail modes, tenancy, scope boun
 
 Never dispatch a Fable agent without a recorded yes. An escalation under step 7 that would reach Fable without one stops and asks.
 
-**Check the review stamp** before planning on a repo that already has code: run `chadgrant:code-review`'s `review-stamp.sh status`. `stale` means its full review of the whole codebase runs first; the blockers and should-fix findings become tasks in the plan, so new work isn't built on unreviewed code. `fresh`, or a repo with no code yet: carry on.
+**Check the review stamp** on a repo that already has code: run `chadgrant:code-review`'s `review-stamp.sh status`. On `stale`, tell the user once, in one line, and carry on: "Full code review is stale (<the script's reason>). Run `chadgrant:code-review` on the whole codebase when you want it." A full review is exhaustive and its fixes are a project of their own, so it runs only when the user asks for it. Say it once here and once in the milestone summary, never per wave.
 
 ## Phase 1: plan
 
@@ -94,7 +94,11 @@ Repeat until the ledger is all green.
 
 ## Phase 4: milestone gate
 
-Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review with `chadgrant:code-review`. Run its `review-stamp.sh status` first: `fresh` means a scoped review of the milestone's accumulated diff; `stale` (14 days or 50 commits since the last full review, or none recorded in `AGENTS.md`) means its full review of the whole codebase, which rewrites the stamp. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
+Before declaring a milestone done: `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then a scoped `chadgrant:code-review` of the milestone's accumulated diff. Fix what's real, then run the full e2e suite on a fresh Compose stack along with the coverage run. Both green, note what's deferred and why, then push.
+
+**Compact the requirements** when they're due: run `chadgrant:planning`'s compaction (its Path D) on a mid-tier agent, committed on its own so the diff can be read. Due means any `Recent changes` entry that this milestone implemented or that is more than 14 days old.
+
+**Nag, don't review.** Run `review-stamp.sh status` again; on `stale`, end your milestone summary with the one-line nag from Phase 0.
 
 **Retro.** Before ending the session, have a mid-tier agent read this milestone's `.delivery/` reports and review files and return at most ten improvements to the environment, most costly problem first. You apply them or schedule them as tasks:
 
