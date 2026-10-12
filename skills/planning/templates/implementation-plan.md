@@ -35,21 +35,17 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 
 ## Phase GOAL-1: <milestone name>  ·  exit criterion: <what proves it done>
 
-### TASK-001: <component name>
+### TASK-001: <feature slice: what a user can now do>
 - **Satisfies:** REQ-… / NFR-…  ·  **Implements:** ADR-… (if any)
 - **Difficulty:** Easy | Medium | Hard  ·  **Model tier:** small | mid | top  ·  **Flags:** `observe` (if security/money/auth/data-integrity)
-- **Files:** Create `path/…` · Modify `path/…:LINES` · Test `path/…`
-- **Interfaces — Produces:** <exact signatures later tasks depend on.>
-- **Interfaces — Consumes:** <what earlier tasks/interfaces this needs.>
+- **Owns:** <directories or packages; disjoint from other tasks in the same phase>
+- **Interfaces — Exposes:** <signatures other tasks call; blank if none.>
+- **Interfaces — Consumes:** <what earlier tasks expose that this needs.>
 - **Depends on:** TASK-… (cross-phase ordering; blank if none)
-- **Steps:**
-  - [ ] Write the failing test — `<test code / name>`
-  - [ ] Run it, confirm it fails — `<command>` → expected: FAIL
-  - [ ] Implement — `<what, concretely>`
-  - [ ] Run tests, confirm pass — `<command>` → expected: PASS
+- **Delivers:** <the end-to-end behavior, through every layer it touches (schema, logic, API, UI).>
 - **TEST-001 (verify, no interpretation):** `<exact command>` → `<exact expected output>`  ·  proves REQ-…
 
-> Repeat per task. Tasks in the same phase must touch **disjoint files** so they can run in parallel.
+> Repeat per task: usually 5–15 per project, each a few hundred to about 1,500 changed lines. Tasks in the same phase own **disjoint directories** so they can run in parallel. A phase ends in one review of the whole feature.
 
 ---
 

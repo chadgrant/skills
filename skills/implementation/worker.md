@@ -12,12 +12,12 @@ Confirm you have all of these before typing:
 
 - **Task id and goal**
 - **Files**: your lane, disjoint from every other worker's by design
-- **Interface to produce**: a promise later tasks build on; match it exactly
+- **Interfaces**: the ones you expose to other tasks (match them exactly) and the ones you consume
 - **Verify step**: the exact command that proves the task done
-- **Difficulty / `observe`**: `observe` means a dedicated adversarial review; other Hard tasks are reviewed with their wave. Either way, write code that survives a reviewer trying to break it.
+- **Difficulty / `observe`**: the feature is reviewed as a whole at the milestone gate, with a security reviewer when it's `observe`. Write code that survives a reviewer trying to break it.
 - **Global constraints**: a pointer to the plan's header (stack, fail-mode, Impeccable for UI, Twelve-Factor for services). Read them there before you start.
 
-A brief may bundle several Easy tasks in one lane. Build and verify each in turn and report per task.
+A task is a whole feature slice: build it through every layer it needs, one test-then-code slice at a time, until its verify step is green.
 
 Missing or ambiguous? Two cases:
 - A gap that doesn't change the interface or observable behavior: take the smallest defensible interpretation, mark it `⚠` in your report, and continue.
@@ -47,7 +47,7 @@ Missing or ambiguous? Two cases:
 
    A waived factor is an `ADR` in your brief; anything else you can't meet is a `⚠` in your report.
 6. **Prove it green.** Run the exact verify step yourself. Red → the debug loop below.
-7. **Prove it clean.** The static gate in your verify step covers format, lint, types, and complexity; spend this step on what tools can't see. Run `chadgrant:clean-code`'s three review passes (correctness and security, design, readability) over your own diff, checking in particular for one thing per function, the four simplicity rules (KISS, YAGNI, DRY, convention over configuration), and patterns where the problem demands one and nowhere else. Code that passes its test but reads like a mess is not done. Fix, then re-verify.
+7. **Tidy before reporting.** The static gate covers format, lint, types, and complexity. Then read your diff once, start to finish, for what tools miss: a function doing several things, a speculative abstraction or setting, duplicated knowledge, a hardcoded value that belongs in config. Fix what you find and re-run the verify step. This is a quick pass, not a review; the review happens once per feature at the milestone gate.
 8. **Report** (format below).
 
 ## Debug loop (a test went red)

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when reviewing code someone else wrote, or auditing a codebase: a dispatched reviewer checking a task, wave, or feature diff; a milestone gate; or a standalone "review this repo". Triggers: "code review", "review this", "audit the codebase", "thorough review", "security review", "is this ready to merge".
+description: Use when reviewing code someone else wrote, or auditing a codebase: a finished feature or milestone diff; or a standalone "review this repo". Triggers: "code review", "review this", "audit the codebase", "thorough review", "security review", "is this ready to merge".
 ---
 
 # Clean code review
@@ -15,7 +15,7 @@ Pipeline position: `chadgrant:implementation`'s orchestrator dispatches reviewer
 
 | You were handed | Mode | You review |
 |---|---|---|
-| A task brief, task ids, a diff range, or a file list | **Scoped** | Exactly those files. Nothing else. |
+| A feature or milestone diff range, task ids, or a file list | **Scoped** | Exactly those files. Nothing else. |
 | Nothing but the request to review (the skill run on its own) | **Full** | The entire codebase. |
 
 The stamp is one line in the repo's `AGENTS.md`: `Last full review: <date> at commit <sha>`. Check it from the repo root with `bash <this skill's directory>/scripts/review-stamp.sh status`. It answers `fresh` or `stale` (14 days or 50 commits, whichever comes first; no stamp is stale).
@@ -26,7 +26,7 @@ The stamp is one line in the repo's `AGENTS.md`: `Last full review: <date> at co
 
 1. **Pin the lane.** The file list from the brief, or `git diff --name-only <range>`. That list is the whole review.
 2. **Read every file in the lane in full**, not only the changed hunks. Open a neighboring file only to read an interface the lane calls or implements; neighbors are context, never review targets.
-3. **Run the seven lenses** below over the lane. The spec for lens 1 is the task brief and the requirements it cites.
+3. **Run the seven lenses** below over the lane. The spec for lens 1 is the requirements the feature satisfies.
 4. **Write the report** in the shape below to the path in your brief (`.delivery/review-<id>.md`) and return only part 1, the verdict, per task, with the path. No path in the brief: return the report itself.
 
 A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane while reading an interface (an exploitable hole, data loss) gets one line under `Outside scope` and no further investigation.
@@ -47,10 +47,6 @@ A scoped reviewer leaves the stamp alone. A blocker noticed outside the lane whi
 6. **Report** in the shape below.
 7. **Stamp**, only when every unit was read: `bash <this skill's directory>/scripts/review-stamp.sh stamp`. A review that skipped units lists them under `Unreviewed` and writes no stamp.
 8. **Hand off.** A mechanical finding with three or more occurrences is handed off as a lint rule or static-gate check plus the fixes, so tools catch it next time. The report goes to the user, who chooses what gets fixed; recommend the blockers and say roughly how much work the rest is. A full review of a living codebase always finds something, so the count alone is not a reason to fix everything. What the user picks becomes `TASK-`s (structural ones as their own refactoring tasks per `chadgrant:clean-code`'s `refactoring.md`).
-
-## Re-review (after a fix)
-
-One round, on the small or mid tier. The scope is the original findings and the lines the fix changed (`git diff` of the fix), nothing else. For each finding: fixed, with the evidence, or still open. Then the seven lenses over the changed lines only. A finding still open goes back as an escalation, not a third round.
 
 ## The seven lenses
 

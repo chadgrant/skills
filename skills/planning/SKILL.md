@@ -69,7 +69,7 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 
 ### A3. Build the routed plan
 
-- Decompose into atomic `TASK-###`s: exact file paths, the interface each produces, a `TEST-###` verify step needing no human interpretation.
+- Decompose into `TASK-###` **feature slices**: each one user-visible capability built end to end by one worker, demoable on its own, sized to one agent session (a few hundred to about 1,500 changed lines). A project is usually 5–15 tasks; never split by layer. Each task names the `REQ`s it satisfies, the directories it owns, the interfaces it exposes where another task calls it, and a `TEST-###` verify step needing no human interpretation. Group the tasks into milestones, each a big feature that ends in one review.
 - Rate each task on its hardest aspect and assign a tier per `chadgrant:implementation`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `chadgrant:implementation` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
 - Add these **global constraints** once, under one heading in the plan; `chadgrant:implementation` points every brief at that heading, so they are written in one place and read from there:
   - **UI**: built with [Impeccable](https://github.com/pbakaus/impeccable) against the style guide's tokens and components.
@@ -160,7 +160,7 @@ One shared ID namespace links every doc and turns "keep them in sync" into a che
 | `TOK-###` | Style guide | A design token |
 | `REL-###` | Release plan | A rollout step or gate |
 | `SLO-###` | Observability | A service-level objective (cites the `NFR` it protects) |
-| `TASK-###` | Plan | An atomic unit of work |
+| `TASK-###` | Plan | A feature slice, built end to end by one worker |
 | `TEST-###` | Plan | A task's verify step; cites the `REQ` it proves |
 
 Extension IDs, only when their doc exists: `API-###` in the API contract (each cites the `REQ` it serves and the `ENT` it touches) · `TC-###` in the Test & QA plan (scenario test cases; each cites a `REQ`/`NFR`).
