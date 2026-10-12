@@ -4,12 +4,13 @@
     journal.py begin <kind> <name> [key=value ...]   start timing something
     journal.py end   <kind> <name> [key=value ...]   stop it; the duration is recorded
     journal.py note  <text>                          a free-form note on the current run
-    journal.py report [--all | --providers]          latest run, every run, or providers compared
+    journal.py report [--all | --providers | --versions]  latest run, every run, providers, or skill versions compared
     journal.py path                                  where this project's journal lives
     journal.py hook                                  called by the plugin's hooks with the event on stdin
 
 Kinds used by the skills: run, phase, wave, task, gate, review, fix.
 Kinds written by the hooks: agent (one per subagent), api_error.
+Every event carries the skills' version and git commit, so changes to the skills can be compared.
 One file per project: $CHADGRANT_JOURNAL_DIR (default ~/.claude/journal) / <repo name>.jsonl
 """
 import json
@@ -22,6 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import transcript  # noqa: E402  (sits beside this script)
+import version  # noqa: E402
 
 DEFAULT_JOURNAL_DIR = Path.home() / ".claude" / "journal"
 EXIT_USAGE = 2
@@ -62,7 +64,7 @@ def read_events(cwd=None):
 
 def append_event(event, cwd=None):
     with journal_path(cwd).open("a") as journal:
-        journal.write(json.dumps(event) + "\n")
+        journal.write(json.dumps({**event, **version.skills()}) + "\n")
 
 
 def parse_fields(pairs):
@@ -173,7 +175,8 @@ def percentile(values, fraction):
 
 def describe(event):
     extras = {k: v for k, v in event.items()
-              if k not in ("event", "kind", "name", "run", "at", "seconds", "session")}
+              if k not in ("event", "kind", "name", "run", "at", "seconds", "session",
+                           "skills_version", "skills_commit")}
     return " ".join(f"{k}={v}" for k, v in extras.items())
 
 
@@ -229,10 +232,42 @@ def report_providers(events):
               f"{output / max(1, model_seconds):>9.1f}")
 
 
+def outcome_count(events, kind, outcomes):
+    return sum(1 for e in events if e["kind"] == kind and e["event"] == "end" and e.get("outcome") in outcomes)
+
+
+def median_seconds(events, kind):
+    values = [e.get("seconds", 0) for e in events if e["kind"] == kind and e["event"] == "end"]
+    return minutes(statistics.median(values)).strip() if values else "-"
+
+
+def field_total(events, kind, field):
+    return sum(int(e.get(field, 0)) for e in events if e["kind"] == kind and e["event"] == "end")
+
+
+def report_versions(events):
+    """How each version of the skills performed: speed, rework, review findings, failures."""
+    print(f"  {'skills':<22} {'runs':>4} {'tasks':>5} {'task med':>8} {'red/esc':>7} {'agent med':>9} "
+          f"{'full red':>8} {'blockers':>8} {'should-fix':>10} {'api err':>7}")
+    for commit in sorted({e.get("skills_commit", "unknown") for e in events}):
+        mine = [e for e in events if e.get("skills_commit", "unknown") == commit]
+        label = f"{mine[0].get('skills_version', '?')}@{commit}"
+        tasks = sum(1 for e in mine if e["kind"] == "task" and e["event"] == "end")
+        full_gates = [e for e in mine if e["kind"] == "gate" and e["name"] == "full" and e["event"] == "end"]
+        print(f"  {label:<22} {sum(1 for e in mine if e['kind'] == 'run' and e['event'] == 'begin'):>4} "
+              f"{tasks:>5} {median_seconds(mine, 'task'):>8} "
+              f"{outcome_count(mine, 'task', ('red', 'escalated')):>7} {median_seconds(mine, 'agent'):>9} "
+              f"{sum(1 for e in full_gates if e.get('outcome') == 'red')}/{len(full_gates):<6} "
+              f"{field_total(mine, 'review', 'blockers'):>8} {field_total(mine, 'review', 'should_fix'):>10} "
+              f"{sum(1 for e in mine if e['kind'] == 'api_error') + field_total(mine, 'agent', 'api_errors'):>7}")
+
+
 def report(flags):
     events = read_events()
     if not events:
         print(f"journal: nothing recorded yet in {journal_path()}")
+    elif "--versions" in flags:
+        report_versions(events)
     elif "--providers" in flags:
         report_providers(events)
     elif "--all" in flags:
