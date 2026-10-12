@@ -1,0 +1,14 @@
+{
+  "description": "Logs every subagent's timing, tokens, model, and API provider, and every API failure, to the project's delivery journal.",
+  "hooks": {
+    "SubagentStart": [
+      { "matcher": ".+", "hooks": [ { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/skills/implementation/scripts/journal.py", "hook"], "timeout": 10 } ] }
+    ],
+    "SubagentStop": [
+      { "matcher": ".+", "hooks": [ { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/skills/implementation/scripts/journal.py", "hook"], "timeout": 20 } ] }
+    ],
+    "StopFailure": [
+      { "hooks": [ { "type": "command", "command": "python3", "args": ["${CLAUDE_PLUGIN_ROOT}/skills/implementation/scripts/journal.py", "hook"], "timeout": 10 } ] }
+    ]
+  }
+}
