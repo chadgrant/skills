@@ -11,9 +11,9 @@ The orchestrator above you owns routing, waves, commits, and the ledger.
 Confirm you have all of these before typing:
 
 - **Task id and goal**
-- **Files**: your lane, disjoint from every other worker's by design
+- **Worktree**: your own git worktree. Change any file the feature needs and nothing unrelated.
 - **Interfaces**: the ones you expose to other tasks (match them exactly) and the ones you consume
-- **Verify step**: the exact command that proves the task done
+- **Verify step**: the fast gate: unit tests and the static gate. It needs no Docker and no running services.
 - **Difficulty / `observe`**: the feature is reviewed as a whole at the milestone gate, with a security reviewer when it's `observe`. Write code that survives a reviewer trying to break it.
 - **Global constraints**: a pointer to the plan's header (stack, fail-mode, Impeccable for UI, Twelve-Factor for services). Read them there before you start.
 
@@ -25,12 +25,12 @@ Missing or ambiguous? Two cases:
 
 ## Build loop
 
-1. **Read the contract.** Your lane's files, the interfaces of the tasks you depend on, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
+1. **Read the contract.** The code the feature touches, the interfaces of the tasks you depend on, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
 2. **Verify-first.** Write the failing test from the verify step before the implementation; make it fail for the right reason, then pass. When the verify step is only a build, lint, or type-check (scaffolding, config, wiring), there is no test to write first: build it and run the verify step.
    - **One slice at a time**: one test, then the code that passes it, then the next test. Each test goes through the public interface your brief names and asserts on behavior a caller can see. Expected values come from the brief, the spec, or a worked example, never from recomputing them the way the code does.
-   - **Coverage**: your tests cover at least 90% of the lines in your lane's files, through assertions on behavior. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
-   - **Real backing services**: code that talks to a database, queue, or cache is tested against the real one from the plan's Compose file. Don't mock it or swap in an in-memory substitute.
-   - **End-to-end**, when your task is an e2e scenario: drive the public surface with the plan's driver (Playwright for browser UI, HTTP for an API, the built binary for a CLI) against the Compose stack. Never Playwright for something without a browser UI.
+   - **Coverage**: your tests cover at least 90% of the lines the feature adds or changes, through assertions on behavior. The milestone's full gate measures it; aim for it now. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
+   - **Backing services**: code that talks to a database, queue, or cache gets integration tests against the real service. Write them now; the orchestrator runs them in the milestone's full gate. Don't mock the service or swap in an in-memory substitute. Keep the logic around the I/O in plain functions your unit tests can reach.
+   - **End-to-end**, when your task is an e2e scenario: drive the public surface with the plan's driver (Playwright for browser UI, HTTP for an API, the built binary for a CLI) Write the scenario; the orchestrator runs it in the full gate. Never Playwright for something without a browser UI.
 3. **Write it per `chadgrant:clean-code`**, including its four simplicity rules: KISS (the simplest thing that passes the verify step), YAGNI (nothing the brief doesn't ask for), DRY (one home for each rule and constant), convention over configuration (the framework's and repo's standard layout, naming, and defaults before anything custom). For a design decision (how objects collaborate, how the domain is modeled) also open its `patterns.md` and, for a rich domain, its `domain-driven-design.md`. If the code you must change fights you, refactor first under green tests per its `refactoring.md`, then add the feature; never both in one diff.
 4. **UI → Impeccable.** Build user-facing surfaces with the [Impeccable](https://github.com/pbakaus/impeccable) skill against the style guide's `TOK-`/`CMP-` (`design-system/style-guide.md`). Wireframes give layout; the style guide gives visual language.
 5. **Service → Twelve-Factor.** A deployable service (API, worker, consumer, scheduled job) follows the [Twelve-Factor App](https://12factor.net):
@@ -57,7 +57,7 @@ Missing or ambiguous? Two cases:
 3. **One hypothesis at a time**, stated with its reason.
 4. **Root cause, not symptom.** A swallowed exception, a `+1`, a masking retry are symptom patches; review will find what you buried.
 5. **Minimal fix, then re-verify for the right reason**, not because you weakened the test.
-6. **Ceiling.** Three or four hypotheses tested and still red, or the fix needs a file outside your lane: stop and report what you tried and ruled out. Escalation is not failure; a silent wrong fix is.
+6. **Ceiling.** Three or four hypotheses tested and still red, or the fix needs a change outside the feature: stop and report what you tried and ruled out. Escalation is not failure; a silent wrong fix is.
 
 ## Receiving review
 
@@ -69,8 +69,9 @@ Missing or ambiguous? Two cases:
 
 ## Iron rules
 
-- **Stay in your lane.** Need a file that isn't yours? Report it; don't touch it.
-- **Shared files belong to the orchestrator.** Never create or edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, the root `README`, or any other file outside your lane, including to record a learning, a convention, or progress. Several workers run at once and overwrite each other there. Put what you'd have written under **Notes for shared docs** in your report; the orchestrator applies it. A documentation file you may edit is one your brief lists in your lane.
+- **Stay in your feature.** Change what the feature needs; leave unrelated code alone and mention it in the report.
+- **Never run Docker** or start a database, queue, or any other backing service. Other workers run in parallel on the same machine.
+- **Shared files belong to the orchestrator.** Never create or edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, or the root `README`, including to record a learning, a convention, or progress. Several workers run at once and overwrite each other there. Put what you'd have written under **Notes for shared docs** in your report; the orchestrator applies it. Any other doc the feature changes is yours to edit.
 - **Never `git commit`.** Even when certain.
 - **Run the verify step before reporting.** Report its actual result, not a claim.
 - **Match conventions, not defects.** Naming and layout yes; blob functions and status-code returns no.
@@ -81,10 +82,10 @@ Missing or ambiguous? Two cases:
 Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 lines per task with no pasted code or full logs, and return only one line per task: `TASK-### · green|red · <verify summary> · ⚠ <count> · notes <count> · <report path>`. The orchestrator pays for everything you return on every later turn, and opens the file only when the line says red, `⚠`, or notes. No path in the brief: return the report itself.
 
 - **Task:** `TASK-###`, one line
-- **Files changed:** a subset of your lane
+- **Files changed:** the list, with any file outside the feature's obvious area explained
 - **Interface produced:** verbatim signatures
-- **Verify:** the command, its exit status, and the summary lines of its output (pass/fail counts, line coverage for your lane's files), not "tests pass". Include failure output only for a failure you couldn't fix.
+- **Verify:** the command, its exit status, and the summary lines of its output (pass/fail counts, coverage of the lines you changed), not "tests pass". Include failure output only for a failure you couldn't fix.
 - **Quality:** the self-review outcome and what you refactored, one or two lines
 - **Deviations / ⚠:** assumptions, unverifiable items (with the runbook for any real-environment step), differences from the brief
-- **Notes for shared docs:** anything that belongs in `CLAUDE.md`, `AGENTS.md`, or docs outside your lane (a convention you established, a command, a gotcha, a doc that is now out of date), each as the target file and the exact text to add or change. Omit when there is nothing.
+- **Notes for shared docs:** anything that belongs in `CLAUDE.md`, `AGENTS.md`, (a convention you established, a command, a gotcha, a doc that is now out of date), each as the target file and the exact text to add or change. Omit when there is nothing.
 - **Review response** (only after a review): per finding, fixed with re-verify evidence, or refuted with the proving case

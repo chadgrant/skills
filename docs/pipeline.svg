@@ -36,7 +36,7 @@
 <polyline points="755,610 755,630" fill="none" stroke="#2563eb" stroke-width="1.8"/>
 <polyline points="175,630 755,630" fill="none" stroke="#2563eb" stroke-width="1.8"/>
 <polyline points="465,630 465,648" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
-<text x="612" y="622" text-anchor="middle" class="lbl" style="fill:#2563eb">one-line reports, full report on disk</text>
+<text x="612" y="622" text-anchor="middle" class="lbl" style="fill:#2563eb">commit + merge each branch</text>
 <polyline points="345,700 48,700 48,570 63,570" fill="none" stroke="#ea580c" stroke-width="1.8" marker-end="url(#m-orange)"/>
 <text x="196" y="692" text-anchor="middle" class="lbl" style="fill:#ea580c">red: send back, or escalate a tier</text>
 <polyline points="465,750 465,778" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
@@ -73,29 +73,29 @@
 <text x="790.0" y="318.0" text-anchor="middle" class="s">review is due, carry on</text>
 <rect x="315" y="430" width="300" height="56" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
 <text x="465.0" y="455.0" text-anchor="middle" class="t">Pick the wave</text>
-<text x="465.0" y="471.0" text-anchor="middle" class="s">every ready task, disjoint directories</text>
+<text x="465.0" y="471.0" text-anchor="middle" class="s">every task whose inputs are merged</text>
 <rect x="65" y="530" width="220" height="80" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
 <text x="175.0" y="559.0" text-anchor="middle" class="t">Worker · one feature slice</text>
-<text x="175.0" y="575.0" text-anchor="middle" class="s">test → code, one slice at a time</text>
-<text x="175.0" y="592.0" text-anchor="middle" class="s">read own diff once, report</text>
+<text x="175.0" y="575.0" text-anchor="middle" class="s">own worktree · test → code</text>
+<text x="175.0" y="592.0" text-anchor="middle" class="s">fast gate · one-line report</text>
 <rect x="355" y="530" width="220" height="80" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
 <text x="465.0" y="559.0" text-anchor="middle" class="t">Worker · one feature slice</text>
-<text x="465.0" y="575.0" text-anchor="middle" class="s">test → code, one slice at a time</text>
-<text x="465.0" y="592.0" text-anchor="middle" class="s">read own diff once, report</text>
+<text x="465.0" y="575.0" text-anchor="middle" class="s">own worktree · test → code</text>
+<text x="465.0" y="592.0" text-anchor="middle" class="s">fast gate · one-line report</text>
 <rect x="645" y="530" width="220" height="80" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
 <text x="755.0" y="559.0" text-anchor="middle" class="t">Worker · one feature slice</text>
-<text x="755.0" y="575.0" text-anchor="middle" class="s">test → code, one slice at a time</text>
-<text x="755.0" y="592.0" text-anchor="middle" class="s">read own diff once, report</text>
+<text x="755.0" y="575.0" text-anchor="middle" class="s">own worktree · test → code</text>
+<text x="755.0" y="592.0" text-anchor="middle" class="s">fast gate · one-line report</text>
 <polygon points="465,650 585,700 465,750 345,700" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
-<text x="465" y="697" text-anchor="middle" class="t">Wave gate green?</text>
-<text x="465" y="714" text-anchor="middle" class="s">tests · 90% coverage · lint</text>
+<text x="465" y="697" text-anchor="middle" class="t">Fast gate green?</text>
+<text x="465" y="714" text-anchor="middle" class="s">unit tests · lint</text>
 <rect x="315" y="780" width="300" height="46" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
-<text x="465.0" y="808.0" text-anchor="middle" class="t">Check lanes · commit each task</text>
+<text x="465.0" y="808.0" text-anchor="middle" class="t">Wave verified · drop worktrees</text>
 <rect x="60" y="935" width="200" height="64" rx="9" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
-<text x="160.0" y="964.0" text-anchor="middle" class="t">/simplify</text>
-<text x="160.0" y="980.0" text-anchor="middle" class="s">dedupe, dead code</text>
+<text x="160.0" y="964.0" text-anchor="middle" class="t">Full gate</text>
+<text x="160.0" y="980.0" text-anchor="middle" class="s">Docker · integration · e2e</text>
 <rect x="300" y="935" width="300" height="64" rx="9" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
-<text x="450.0" y="956.0" text-anchor="middle" class="t">Feature review  (code-review)</text>
+<text x="450.0" y="956.0" text-anchor="middle" class="t">/simplify + feature review</text>
 <text x="450.0" y="972.0" text-anchor="middle" class="s">7 lenses against the REQs</text>
 <text x="450.0" y="989.0" text-anchor="middle" class="s">+ security reviewer for spine tasks</text>
 <rect x="640" y="935" width="230" height="64" rx="9" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
@@ -103,8 +103,8 @@
 <text x="755.0" y="972.0" text-anchor="middle" class="s">blockers + should-fix</text>
 <text x="755.0" y="989.0" text-anchor="middle" class="s">nits listed, not fixed</text>
 <rect x="60" y="1050" width="180" height="64" rx="9" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
-<text x="150.0" y="1079.0" text-anchor="middle" class="t">Gate + full e2e</text>
-<text x="150.0" y="1095.0" text-anchor="middle" class="s">fresh Compose stack</text>
+<text x="150.0" y="1079.0" text-anchor="middle" class="t">Full gate again</text>
+<text x="150.0" y="1095.0" text-anchor="middle" class="s">after the fixes</text>
 <rect x="264" y="1050" width="180" height="64" rx="9" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
 <text x="354.0" y="1079.0" text-anchor="middle" class="t">Push</text>
 <text x="354.0" y="1095.0" text-anchor="middle" class="s">once per milestone</text>
@@ -126,5 +126,5 @@
 <text x="438" y="1264" class="s">loop</text>
 <line x1="560" y1="1260" x2="600" y2="1260" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#m-gray)"/>
 <text x="608" y="1264" class="s">reminder only</text>
-<text x="50" y="1292" class="s">No review happens inside a wave: a wave is proven by its gate. A whole-codebase review runs only when you ask for it.</text>
+<text x="50" y="1292" class="s">No review and no Docker inside a wave: the orchestrator runs the full gate once per milestone. Whole-codebase review only on request.</text>
 </svg>

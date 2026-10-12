@@ -106,12 +106,12 @@ The most rigid doc: an agent must execute each task with **no interpretation**. 
 | Introduction | The outcome in one paragraph. |
 | Requirements & constraints | The `REQ-`/`NFR-` this plan satisfies + global constraints (version floors, naming/copy rules) copied verbatim. |
 | Phases & tasks `TASK-###` | Phases (`GOAL-`, one big feature each, reviewed once at its end) of feature-slice tasks. Tasks within a phase are parallelizable; cross-phase order is **declared**, forming the DAG. |
-| Per task | The directories it owns, the interfaces it exposes where another task calls it, `TEST-###` (automatic pass criteria), the `REQ` it cites, difficulty, and **model tier**. |
+| Per task | The hot files it touches, the interfaces it exposes where another task calls it, `TEST-###` (automatic pass criteria), the `REQ` it cites, difficulty, and **model tier**. |
 | Alternatives / dependencies / risks | Rejected approaches, external deps + ordering, risks & assumptions. |
 
 **Service tasks (Twelve-Factor):** when the plan builds a deployable service, the plan carries a *services follow Twelve-Factor* global constraint. Each service task names its config keys and env var names, its backing services, and its port/health endpoints. Migrations and one-off admin jobs are their own tasks. A deviation is an `ADR`.
 
-**Anti-patterns:** ambiguous tasks requiring interpretation; tasks split by layer instead of by feature, or too small to be worth a brief; missing per-task verification; undeclared (hidden) ordering dependencies; placeholder text; a task that overlaps another wave's files (breaks parallel disjointness).
+**Anti-patterns:** ambiguous tasks requiring interpretation; tasks split by layer instead of by feature, or too small to be worth a brief; missing per-task verification; undeclared (hidden) ordering dependencies; placeholder text; hot files left unprepared, so every merge conflicts.
 
 **Difficulty → model tier:** rate each task on its hardest aspect and assign a tier per `chadgrant:implementation`'s table, which also owns the `observe` definition (true security/money spine only) and the tier→model mapping. Record tiers, not model names.
 

@@ -17,10 +17,11 @@ Pipeline: `chadgrant:planning` writes the docs and the routed plan → **`chadgr
 
 ## Rules for both roles
 
-- **One writer per file.** Each task owns its files. `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, and the root `README` belong to the orchestrator; workers and reviewers report notes for them.
+- **One worktree per task.** Workers change what their feature needs in their own worktree; the orchestrator merges. `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, and the root `README` belong to the orchestrator alone; workers and reviewers report notes for them.
+- **Only the orchestrator runs Docker.** Workers run the fast gate (unit tests, static checks); the full gate with backing services runs once per milestone.
 - **Only the orchestrator commits.**
 - **Reports on disk, one line back.** Full reports go to `.delivery/<id>.md`; what returns to the caller is one line.
-- **Evidence, not claims.** "Done" is the verify command's actual result, green, with coverage at or above 90%, against real backing services.
+- **Evidence, not claims.** A task is done when its fast gate is actually green. A milestone is done when the full gate is green: integration tests against real backing services where the project has them, coverage at or above 90%, e2e.
 - **Honest environment ceiling.** Without real cloud, certs, or live services, "done" means code-complete, tested with fakes, plus a runbook for the real step. Never imply production-verified.
 
 ---

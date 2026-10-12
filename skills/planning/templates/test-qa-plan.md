@@ -18,8 +18,9 @@ jira_project_key: null   # set by the Jira connector
 ## 2. Test strategy
 <Levels and where each runs: unit · integration · end-to-end · manual/exploratory. Tooling, test environments, and CI stage for each.>
 
-- **Coverage:** `<command>` fails under 90% line coverage. Exclusions: <generated / vendored paths, or none>.
-- **Backing services:** `<compose.test.yaml>` starts <real Postgres / queue / cache> for integration and e2e tests. No mocks or in-memory substitutes.
+- **Fast gate:** `<command>`: unit tests and static checks, no services. Run by every worker.
+- **Coverage** (full gate): `<command>` fails under 90% line coverage. Exclusions: <generated / vendored paths, or none>.
+- **Backing services:** `<compose.test.yaml>` starts <real Postgres / queue / cache> for integration and e2e tests in the full gate, which only the orchestrator runs, once per milestone. No mocks or in-memory substitutes.
 - **End-to-end:** `<command>` brings the stack up with Docker Compose and drives <browser UI → Playwright · HTTP API → requests to the running service · CLI → the built binary>. Use the driver that fits the surface; no Playwright without a browser UI.
 
 ## 3. Test matrix

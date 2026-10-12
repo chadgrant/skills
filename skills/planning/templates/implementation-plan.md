@@ -24,9 +24,9 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 <Version floors, dependency limits, naming/copy rules, platform requirements — one line each, copied verbatim from the PRD/ERD. Every task implicitly includes these.>
 
 - **Static gate:** `<command>` (format check, lint, type-check, complexity limit)
-- **Coverage:** `<command>` fails under 90% line coverage. Exclusions: <paths, or none>
-- **Backing services for tests:** `<compose.test.yaml>` (real database / queue / cache; no mocks)
-- **End-to-end:** `<command>`, driver: <Playwright for browser UI · HTTP for an API · the built binary for a CLI · n/a for a library>
+- **Fast gate:** `<command>` (unit tests + static gate; no Docker, no services; workers run it)
+- **Full gate:** `<command>` (integration tests against `<compose.test.yaml or n/a>`, coverage failing under 90%, e2e with <Playwright for browser UI · HTTP for an API · the built binary for a CLI · n/a>; the orchestrator runs it once per milestone). Coverage exclusions: <paths, or none>
+- **Hot files:** <files every feature edits, and how M0 prepares them to take additions without conflict>
 
 ## Requirements covered
 <REQ-/NFR- IDs this plan satisfies. Every one must map to ≥1 task below.>
@@ -38,14 +38,14 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 ### TASK-001: <feature slice: what a user can now do>
 - **Satisfies:** REQ-… / NFR-…  ·  **Implements:** ADR-… (if any)
 - **Difficulty:** Easy | Medium | Hard  ·  **Model tier:** small | mid | top  ·  **Flags:** `observe` (if security/money/auth/data-integrity)
-- **Owns:** <directories or packages; disjoint from other tasks in the same phase>
+- **Hot files:** <which of the plan's hot files this task adds to, if any>
 - **Interfaces — Exposes:** <signatures other tasks call; blank if none.>
 - **Interfaces — Consumes:** <what earlier tasks expose that this needs.>
 - **Depends on:** TASK-… (cross-phase ordering; blank if none)
 - **Delivers:** <the end-to-end behavior, through every layer it touches (schema, logic, API, UI).>
 - **TEST-001 (verify, no interpretation):** `<exact command>` → `<exact expected output>`  ·  proves REQ-…
 
-> Repeat per task: usually 5–15 per project, each a few hundred to about 1,500 changed lines. Tasks in the same phase own **disjoint directories** so they can run in parallel. A phase ends in one review of the whole feature.
+> Repeat per task: usually 5–15 per project, each a few hundred to about 1,500 changed lines. Each task runs in its own worktree; tasks in a phase run in parallel and are merged by the orchestrator. A phase ends in one review of the whole feature.
 
 ---
 
