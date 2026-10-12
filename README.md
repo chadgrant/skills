@@ -13,6 +13,16 @@ Three of these form one pipeline — **plan → implement → review** — so yo
 | [`chadgrant:code-review`](skills/code-review/) | **Review** | The adversarial reviewer. Seven lenses (spec, correctness, security, tests, design, Twelve-Factor, readability), every finding with `file:line` and a breaking case. The design lens prescribes by name ("use a Decorator here", "this needs a Repository") from evidence in the code, and flags patterns to remove. Scoped to a task or feature's files when dispatched by the pipeline; the entire codebase when run on its own. Keeps a `Last full review` stamp in the repo's `AGENTS.md`; when it goes stale (14 days or 50 commits) the pipeline reminds you that a full review is due and leaves the decision to you. |
 | [`chadgrant:clean-code`](skills/clean-code/) | *(standards)* | How to write and review any unit of code well: Robert C. Martin's *Clean Code* + SOLID, the four simplicity rules every other skill cites (**KISS**, **YAGNI**, **DRY**, **convention over configuration**), **Clean Architecture**, and **Construction** (McConnell's *Code Complete*). Its reference files, opened only when the problem calls for one, carry the **Gang of Four** and **Fowler PoEAA** pattern catalogs, **Evans' domain-driven design**, and **Fowler's refactoring** catalog. Applied whenever the agent writes, modifies, or reviews code. |
 
+## How it works
+
+A build runs top down: plan the milestones, run each milestone as waves of parallel workers proven by one gate per wave, then review each finished feature once.
+
+![How a build runs: plan, waves, one review per feature](docs/pipeline.svg)
+
+Workers run in parallel in one working tree without colliding because every task owns its directories, a wave never puts two tasks in the same directory, and only the orchestrator writes the shared files.
+
+![Disjoint lanes: how parallel workers never collide](docs/disjoint-lanes.svg)
+
 ## Install
 
 These ship as one Claude Code plugin, `chadgrant`:

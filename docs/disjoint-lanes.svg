@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 1250" width="980" height="1250">
+<defs>
+<marker id="m-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/></marker>
+<marker id="m-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/></marker>
+<marker id="m-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/></marker>
+<filter id="sh" x="-10%" y="-20%" width="120%" height="150%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.12"/></filter>
+<style>text{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:#0f172a}.t{font-size:13.5px;font-weight:600}.s{font-size:11.5px;fill:#475569}.h{font-size:14px;font-weight:700}.lbl{font-size:11.5px;font-weight:600}.m{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}</style>
+</defs>
+<rect width="980" height="1250" fill="#ffffff"/>
+<text x="40" y="40" style="font-size:20px;font-weight:700">Disjoint lanes: how parallel workers never collide</text>
+<text x="40" y="60" class="s">Every task owns its directories. One writer per file, so no merges and no clobbered edits.</text>
+<rect x="30" y="80" width="870" height="226" rx="12" fill="#f8fafc" stroke="#475569" stroke-dasharray="6,4"/>
+<text x="50" y="104" class="h" style="fill:#475569">1 · Plan: each task owns directories</text>
+<rect x="30" y="330" width="870" height="190" rx="12" fill="#f8fafc" stroke="#475569" stroke-dasharray="6,4"/>
+<text x="50" y="354" class="h" style="fill:#475569">2 · Pick the wave</text>
+<rect x="30" y="545" width="870" height="310" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-dasharray="6,4"/>
+<text x="50" y="569" class="h" style="fill:#2563eb">3 · Run in parallel</text>
+<rect x="30" y="900" width="870" height="230" rx="12" fill="#f0fdf4" stroke="#059669" stroke-dasharray="6,4"/>
+<text x="50" y="924" class="h" style="fill:#059669">4 · Integrate</text>
+<polyline points="490,306 490,373" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="490,425 490,438" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+<polyline points="280,438 700,438" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+<polyline points="280,438 280,448" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="700,438 700,448" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#m-gray)"/>
+<polyline points="280,500 280,592" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+<polyline points="185,592 765,592" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+<polyline points="185,592 185,608" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="475,592 475,608" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="765,592 765,608" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<text x="292" y="584" text-anchor="start" class="lbl" style="fill:#2563eb">dispatch wave 1</text>
+<polyline points="500,780 500,880 250,880 250,958" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<text x="512" y="874" text-anchor="start" class="lbl" style="fill:#2563eb">one-line reports</text>
+<polyline points="300,990 338,990" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="580,990 628,990" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="760,1020 760,1058" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<polyline points="890,1082 940,1082 940,475 882,475" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<rect x="60" y="118" width="270" height="38" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
+<text x="195.0" y="142.0" text-anchor="middle" class="t">TASK-1 · Sign-up</text>
+<rect x="60" y="164" width="270" height="38" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
+<text x="195.0" y="188.0" text-anchor="middle" class="t">TASK-2 · Billing</text>
+<rect x="60" y="210" width="270" height="38" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.6" filter="url(#sh)"/>
+<text x="195.0" y="234.0" text-anchor="middle" class="t">TASK-3 · Reports</text>
+<rect x="60" y="256" width="270" height="38" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6" filter="url(#sh)"/>
+<text x="195.0" y="280.0" text-anchor="middle" class="t">TASK-4 · Invoice email</text>
+<rect x="380" y="112" width="500" height="182" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="398" y="132" class="lbl" style="fill:#475569">Repository</text>
+<rect x="400" y="142" width="145" height="30" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="472.5" y="162.0" text-anchor="middle" class="m">api/accounts/</text>
+<rect x="560" y="142" width="145" height="30" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.6"/>
+<text x="632.5" y="162.0" text-anchor="middle" class="m">api/billing/</text>
+<rect x="720" y="142" width="145" height="30" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.6"/>
+<text x="792.5" y="162.0" text-anchor="middle" class="m">api/reports/</text>
+<rect x="400" y="182" width="145" height="30" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6"/>
+<text x="472.5" y="202.0" text-anchor="middle" class="m">web/signup/</text>
+<rect x="560" y="182" width="145" height="30" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.6"/>
+<text x="632.5" y="202.0" text-anchor="middle" class="m">web/billing/</text>
+<rect x="720" y="182" width="145" height="30" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="792.5" y="202.0" text-anchor="middle" class="m">mail/</text>
+<rect x="400" y="226" width="465" height="54" rx="8" fill="#f9fafb" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5,3"/>
+<text x="632.5" y="250.0" text-anchor="middle" class="m">CLAUDE.md · AGENTS.md · STATUS.md · plan · README</text>
+<text x="632.5" y="266.0" text-anchor="middle" class="s">shared files: only the orchestrator writes them</text>
+<rect x="230" y="375" width="520" height="50" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.6" filter="url(#sh)"/>
+<text x="490.0" y="397.0" text-anchor="middle" class="t">Same directory, or calls an interface not built yet?</text>
+<text x="490.0" y="413.0" text-anchor="middle" class="s">then it waits for a later wave (or the plan is re-seamed)</text>
+<rect x="100" y="450" width="360" height="50" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
+<text x="280.0" y="472.0" text-anchor="middle" class="t">Wave 1: TASK-1 · TASK-2 · TASK-3</text>
+<text x="280.0" y="488.0" text-anchor="middle" class="s">no two share a directory</text>
+<rect x="520" y="450" width="360" height="50" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6" stroke-dasharray="5,3" filter="url(#sh)"/>
+<text x="700.0" y="472.0" text-anchor="middle" class="t">Wave 2: TASK-4</text>
+<text x="700.0" y="488.0" text-anchor="middle" class="s">calls TASK-2's billing interface, so it waits</text>
+<rect x="60" y="610" width="250" height="170" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
+<text x="185" y="638" text-anchor="middle" class="t">Worker · TASK-1</text>
+<text x="185" y="660" text-anchor="middle" class="m">api/accounts/ · web/signup/</text>
+<text x="185" y="692" text-anchor="middle" class="s">edits only these directories</text>
+<text x="185" y="713" text-anchor="middle" class="s">builds its slice test-first</text>
+<text x="185" y="734" text-anchor="middle" class="s">report → .delivery/TASK-1.md</text>
+<text x="185" y="755" text-anchor="middle" class="s">CLAUDE.md notes go in the report</text>
+<rect x="350" y="610" width="250" height="170" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
+<text x="475" y="638" text-anchor="middle" class="t">Worker · TASK-2</text>
+<text x="475" y="660" text-anchor="middle" class="m">api/billing/ · web/billing/</text>
+<text x="475" y="692" text-anchor="middle" class="s">edits only these directories</text>
+<text x="475" y="713" text-anchor="middle" class="s">builds its slice test-first</text>
+<text x="475" y="734" text-anchor="middle" class="s">report → .delivery/TASK-2.md</text>
+<text x="475" y="755" text-anchor="middle" class="s">CLAUDE.md notes go in the report</text>
+<rect x="640" y="610" width="250" height="170" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.6" filter="url(#sh)"/>
+<text x="765" y="638" text-anchor="middle" class="t">Worker · TASK-3</text>
+<text x="765" y="660" text-anchor="middle" class="m">api/reports/</text>
+<text x="765" y="692" text-anchor="middle" class="s">edits only these directories</text>
+<text x="765" y="713" text-anchor="middle" class="s">builds its slice test-first</text>
+<text x="765" y="734" text-anchor="middle" class="s">report → .delivery/TASK-3.md</text>
+<text x="765" y="755" text-anchor="middle" class="s">CLAUDE.md notes go in the report</text>
+<rect x="60" y="795" width="410" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.6" filter="url(#sh)"/>
+<text x="265.0" y="815.0" text-anchor="middle" class="t">Needs a file outside its lane?</text>
+<text x="265.0" y="831.0" text-anchor="middle" class="s">reports it, never edits it</text>
+<rect x="530" y="795" width="360" height="46" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.6" filter="url(#sh)"/>
+<text x="710.0" y="815.0" text-anchor="middle" class="t">Risky task flagged isolate</text>
+<text x="710.0" y="831.0" text-anchor="middle" class="s">gets its own git worktree</text>
+<rect x="60" y="960" width="240" height="60" rx="8" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
+<text x="180.0" y="987.0" text-anchor="middle" class="t">Check the lanes</text>
+<text x="180.0" y="1003.0" text-anchor="middle" class="s">git diff --stat per task</text>
+<rect x="340" y="960" width="240" height="60" rx="8" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
+<text x="460.0" y="987.0" text-anchor="middle" class="t">Commit each task</text>
+<text x="460.0" y="1003.0" text-anchor="middle" class="s">stage only its paths, never -A</text>
+<rect x="630" y="960" width="260" height="60" rx="8" fill="#ffffff" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
+<text x="760.0" y="987.0" text-anchor="middle" class="t">Apply the notes</text>
+<text x="760.0" y="1003.0" text-anchor="middle" class="s">to the shared files, one writer</text>
+<rect x="630" y="1060" width="260" height="44" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="1.6" filter="url(#sh)"/>
+<text x="760.0" y="1087.0" text-anchor="middle" class="t">Next wave: TASK-4 is ready</text>
+<text x="50" y="1170" class="h">Legend</text>
+<line x1="50" y1="1192" x2="90" y2="1192" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<text x="98" y="1196" class="s">flow</text>
+<line x1="220" y1="1192" x2="260" y2="1192" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<text x="268" y="1196" class="s">next wave</text>
+<line x1="390" y1="1192" x2="430" y2="1192" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#m-gray)"/>
+<text x="438" y="1196" class="s">held back</text>
+<text x="50" y="1224" class="s">Colour = owner. A directory has exactly one owner per wave, so workers share one tree without stepping on each other.</text>
+</svg>
