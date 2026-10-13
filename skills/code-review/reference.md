@@ -17,7 +17,7 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 | Files and network | Path traversal through user-supplied names; SSRF through user-supplied URLs; uploads without type and size limits; TLS verification disabled |
 | Failure mode | Spend, auth, governance, and safety decisions that fail open on error or timeout; exceptions swallowed around a security check |
 | Data exposure | Personal or sensitive data in logs; over-wide API responses (whole records serialized); stack traces returned to clients |
-| Dependencies | Audit-tool findings; unpinned or abandoned packages; a dependency pulled at build time from an unverified source |
+| Dependencies | Audit-tool findings; unpinned or abandoned packages; a dependency pulled at build time from an unverified source (the dependencies lens covers versions) |
 | Concurrency | Check-then-act on balances, quotas, or uniqueness without a transaction or lock; non-idempotent handlers behind a retrying queue |
 
 ## Tests lens
@@ -35,6 +35,20 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 | Tautological tests: the assertion recomputes the expected value the way the code does, or asserts a constant against itself | They pass by construction and can never disagree with the code |
 | All the tests written in one batch before any implementation | They test imagined behavior and the shape of things; tests should arrive one slice at a time |
 | Error paths and boundaries untested while the happy path has five tests | The bugs live at the edges |
+
+## Dependencies lens: commands
+
+Look each dependency up in its registry; the version an agent remembers is usually a year or more old.
+
+| Ecosystem | Latest stable | Outdated | Vulnerabilities |
+|---|---|---|---|
+| npm · pnpm · yarn | `npm view <pkg> version` | `npm outdated` · `pnpm outdated` | `npm audit` · `pnpm audit` |
+| Python (pip · uv · poetry) | `pip index versions <pkg>` | `pip list --outdated` · `uv pip list --outdated` · `poetry show --outdated` | `pip-audit` |
+| Go | `go list -m -versions <module>` | `go list -u -m all` | `govulncheck ./...` |
+| Rust | `cargo search <crate> --limit 1` | `cargo outdated` | `cargo audit` |
+| .NET | `dotnet package search <pkg> --exact-match` | `dotnet list package --outdated` | `dotnet list package --vulnerable` |
+| Java · Kotlin (Maven · Gradle) | the Maven Central search API | `mvn versions:display-dependency-updates` · Gradle versions plugin | OWASP `dependency-check` |
+| Container base images | the image's registry tags | compare the `FROM` tag to the latest stable tag | `trivy image` · `docker scout cves` |
 
 ## Reuse lens: the Decorator, by example
 
