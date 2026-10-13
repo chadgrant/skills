@@ -12,12 +12,12 @@ Confirm you have all of these before typing:
 
 - **Task id and goal**
 - **Worktree**: your own git worktree. Change any file the feature needs and nothing unrelated.
-- **Interfaces**: the ones you expose to other tasks (match them exactly) and the ones you consume
+- **Contracts**: the `CON`s you implement (their interface files and contract tests) and the `CON`s you consume. They are already merged.
 - **Verify step**: the fast gate: unit tests and the static gate. It needs no Docker and no running services.
 - **Difficulty / `observe`**: the feature is reviewed as a whole at the milestone gate, with a security reviewer when it's `observe`. Write code that survives a reviewer trying to break it.
 - **Global constraints**: a pointer to the plan's header (stack, fail-mode, Impeccable for UI, Twelve-Factor for services). Read them there before you start.
 
-A task is a whole feature slice: build it through every layer it needs, one test-then-code slice at a time, until its verify step is green.
+A task implements a group of contracts: build them through every layer they need, one test-then-code slice at a time, until the contract tests and the fast gate are green.
 
 Missing or ambiguous? Two cases:
 - A gap that doesn't change the interface or observable behavior: take the smallest defensible interpretation, mark it `⚠` in your report, and continue.
@@ -25,8 +25,8 @@ Missing or ambiguous? Two cases:
 
 ## Build loop
 
-1. **Read the contract.** The code the feature touches, the interfaces of the tasks you depend on, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
-2. **Verify-first.** Write the failing test from the verify step before the implementation; make it fail for the right reason, then pass. When the verify step is only a build, lint, or type-check (scaffolding, config, wiring), there is no test to write first: build it and run the verify step.
+1. **Read the contract.** Your contracts' doc comments and contract tests are the spec. Build against the contracts you consume, never against another task's implementation: while you work, those are stubs that throw. Then read the code the feature touches, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
+2. **Verify-first.** Your contracts' contract tests are already written and red; making them pass is most of the task. For what they don't cover, write the failing test before the implementation; make it fail for the right reason, then pass. When the verify step is only a build, lint, or type-check (scaffolding, config, wiring), there is no test to write first: build it and run the verify step.
    - **One slice at a time**: one test, then the code that passes it, then the next test. Each test goes through the public interface your brief names and asserts on behavior a caller can see. Expected values come from the brief, the spec, or a worked example, never from recomputing them the way the code does.
    - **Coverage**: your tests cover at least 90% of the lines the feature adds or changes, through assertions on behavior. The milestone's full gate measures it; aim for it now. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
    - **Backing services**: code that talks to a database, queue, or cache gets integration tests against the real service. Write them now; the orchestrator runs them in the milestone's full gate. Don't mock the service or swap in an in-memory substitute. Keep the logic around the I/O in plain functions your unit tests can reach.
@@ -69,6 +69,8 @@ Missing or ambiguous? Two cases:
 
 ## Iron rules
 
+- **Contracts are frozen.** Never edit an interface, abstract class, shared type, or contract test, even to fix it, and never work around one (a cast, `any`, an extra public method, reaching into another module's internals). If a contract is wrong or missing something, build what you can and put a **contract change request** in your report.
+- **Coordinate through artifacts only.** You never message another worker; the contracts, the plan, and your report are how you agree.
 - **Stay in your feature.** Change what the feature needs; leave unrelated code alone and mention it in the report.
 - **Never run Docker** or start a database, queue, or any other backing service. Other workers run in parallel on the same machine.
 - **Shared files belong to the orchestrator.** Never create or edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, or the root `README`, including to record a learning, a convention, or progress. Several workers run at once and overwrite each other there. Put what you'd have written under **Notes for shared docs** in your report; the orchestrator applies it. Any other doc the feature changes is yours to edit.
@@ -79,11 +81,12 @@ Missing or ambiguous? Two cases:
 
 ## Report format
 
-Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 lines per task with no pasted code or full logs, and return only one line per task: `TASK-### · green|red · <verify summary> · ⚠ <count> · notes <count> · <report path>`. The orchestrator pays for everything you return on every later turn, and opens the file only when the line says red, `⚠`, or notes. No path in the brief: return the report itself.
+Write the report to the path in your brief (`.delivery/<task-id>.md`), about 25 lines per task with no pasted code or full logs, and return only one line per task: `TASK-### · green|red · <verify summary> · ⚠ <count> · notes <count> · contract changes <count> · <report path>`. The orchestrator pays for everything you return on every later turn, and opens the file only when the line says red, `⚠`, or notes. No path in the brief: return the report itself.
 
 - **Task:** `TASK-###`, one line
 - **Files changed:** the list, with any file outside the feature's obvious area explained
-- **Interface produced:** verbatim signatures
+- **Contracts implemented:** the `CON`s, and their contract tests' pass counts
+- **Contract change requests:** per request, the contract, the change, and why; omit when there are none
 - **Verify:** the command, its exit status, and the summary lines of its output (pass/fail counts, coverage of the lines you changed), not "tests pass". Include failure output only for a failure you couldn't fix.
 - **Quality:** the self-review outcome and what you refactored, one or two lines
 - **Deviations / ⚠:** assumptions, unverifiable items (with the runbook for any real-environment step), differences from the brief

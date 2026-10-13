@@ -71,7 +71,8 @@ Add by hand when warranted: a threat model for security / money / auth work; an 
 
 ### A3. Build the routed plan
 
-- Decompose into `TASK-###` **feature slices**: each one user-visible capability built end to end by one worker, demoable on its own, sized to one agent session (a few hundred to about 1,500 changed lines). A project is usually 5–15 tasks; never split by layer. Each task names the `REQ`s it satisfies, the hot files it touches, the interfaces it exposes where another task calls it, and a `TEST-###` verify step needing no human interpretation. Group the tasks into milestones, each a big feature that ends in one review.
+- **Contracts first.** For each milestone, list its `CON-###` contracts before its tasks: every interface, abstract class, protocol, and shared type that its tasks call across each other, each with its final file path, its members, and the behavior, errors, and invariants its doc comment will state, in the glossary's words. The ERD's design and the API contract feed these; the contracts are their code-level form. The first task of every milestone writes them as code, with stubs and contract tests.
+- Decompose the rest into `TASK-###`s that **implement contracts**: each a cohesive group of `CON`s (a module, or one bounded context's part of the feature) built by one worker, sized to one agent session (a few hundred to about 1,500 changed lines). Exactly one task implements each `CON`; tasks depend on contracts, not on each other, so a milestone is usually one parallel wave. A project is usually 5–15 tasks; never split by layer. When a milestone has fewer than three independent tasks or is one tightly coupled piece, make it one task: a single agent wins on small work. Each task names the `REQ`s it satisfies, the `CON`s it implements and consumes, the hot files it touches, and a `TEST-###` verify step needing no human interpretation. Group the tasks into milestones, each a big feature that ends in one review.
 - Rate each task on its hardest aspect and assign a tier per `chadgrant:implementation`'s table; record tiers, not model names. Which model the top tier maps to is the user's call: `chadgrant:implementation` asks before using Fable and defaults to Opus. Flag `observe` only per its definition there (the true security/money spine). It should mark a small minority of tasks; a third or more flagged means re-rate.
 - Add these **global constraints** once, under one heading in the plan; `chadgrant:implementation` points every brief at that heading, so they are written in one place and read from there:
   - **UI**: built with [Impeccable](https://github.com/pbakaus/impeccable) against the style guide's tokens and components.
@@ -161,12 +162,13 @@ One shared ID namespace links every doc and turns "keep them in sync" into a che
 | `TOK-###` | Style guide | A design token |
 | `REL-###` | Release plan | A rollout step or gate |
 | `SLO-###` | Observability | A service-level objective (cites the `NFR` it protects) |
-| `TASK-###` | Plan | A feature slice, built end to end by one worker |
+| `CON-###` | Plan | A code contract: an interface, abstract class, protocol, or shared type, with its file path and doc-comment spec |
+| `TASK-###` | Plan | Implements a cohesive group of `CON`s, built by one worker |
 | `TEST-###` | Plan | A task's verify step; cites the `REQ` it proves |
 
 Extension IDs, only when their doc exists: `API-###` in the API contract (each cites the `REQ` it serves and the `ENT` it touches) · `TC-###` in the Test & QA plan (scenario test cases; each cites a `REQ`/`NFR`).
 
-**Linking rules:** every `TASK` cites the `REQ`/`NFR` it satisfies; every `REQ` has ≥1 `TASK` and a `TEST-`; `ENT`s trace to the `REQ`s that need them; `ADR`s are cited by the tasks that implement them; PII `ENT`s carry a classification and a retention rule; every user-facing `REQ` has ≥1 `SCR`; every `SCR` traces to a `REQ` and appears in a `FLOW`; every `SLO`/alert cites the `NFR` it protects; every irreversible `REL` step has a rollback or an explicit forward-fix-only note.
+**Linking rules:** every `TASK` cites the `REQ`/`NFR` it satisfies and the `CON`s it implements; every `CON` is implemented by exactly one `TASK`; every `REQ` has ≥1 `TASK` and a `TEST-`; `ENT`s trace to the `REQ`s that need them; `ADR`s are cited by the tasks that implement them; PII `ENT`s carry a classification and a retention rule; every user-facing `REQ` has ≥1 `SCR`; every `SCR` traces to a `REQ` and appears in a `FLOW`; every `SLO`/alert cites the `NFR` it protects; every irreversible `REL` step has a rollback or an explicit forward-fix-only note.
 
 **ID scope:** unique within its prefix across the whole doc set (one continuous `TASK-` sequence across all phases).
 

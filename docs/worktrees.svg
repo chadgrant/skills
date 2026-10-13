@@ -57,25 +57,25 @@
 <rect x="60" y="218" width="460" height="36" rx="8" fill="#ffffff" stroke="#475569" stroke-width="1.6" stroke-dasharray="5,3"/>
 <text x="290.0" y="241.0" text-anchor="middle" class="t">Billing and accounts can both change in one feature</text>
 <rect x="60" y="266" width="820" height="40" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6" stroke-dasharray="5,3"/>
-<text x="470.0" y="291.0" text-anchor="middle" class="t">Wave 2: TASK-4 waits only because it calls TASK-2's billing interface. Sharing files is fine.</text>
+<text x="470.0" y="291.0" text-anchor="middle" class="t">Contracts merged first: TASK-4 calls billing through its contract stub, so it doesn't wait.</text>
 <rect x="60" y="410" width="250" height="168" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1.6" filter="url(#sh)"/>
 <text x="185" y="436" text-anchor="middle" class="t">Worker · TASK-1</text>
 <text x="185" y="458" text-anchor="middle" class="m">worktree: task-1</text>
-<text x="185" y="488" text-anchor="middle" class="s">changes any file the feature needs</text>
+<text x="185" y="488" text-anchor="middle" class="s">implements its contracts</text>
 <text x="185" y="509" text-anchor="middle" class="s">test → code, slice by slice</text>
 <text x="185" y="530" text-anchor="middle" class="s">fast gate: unit tests + lint</text>
 <text x="185" y="551" text-anchor="middle" class="s">no Docker, no database</text>
 <rect x="350" y="410" width="250" height="168" rx="10" fill="#d1fae5" stroke="#059669" stroke-width="1.6" filter="url(#sh)"/>
 <text x="475" y="436" text-anchor="middle" class="t">Worker · TASK-2</text>
 <text x="475" y="458" text-anchor="middle" class="m">worktree: task-2</text>
-<text x="475" y="488" text-anchor="middle" class="s">changes any file the feature needs</text>
+<text x="475" y="488" text-anchor="middle" class="s">implements its contracts</text>
 <text x="475" y="509" text-anchor="middle" class="s">test → code, slice by slice</text>
 <text x="475" y="530" text-anchor="middle" class="s">fast gate: unit tests + lint</text>
 <text x="475" y="551" text-anchor="middle" class="s">no Docker, no database</text>
 <rect x="640" y="410" width="250" height="168" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="1.6" filter="url(#sh)"/>
 <text x="765" y="436" text-anchor="middle" class="t">Worker · TASK-3</text>
 <text x="765" y="458" text-anchor="middle" class="m">worktree: task-3</text>
-<text x="765" y="488" text-anchor="middle" class="s">changes any file the feature needs</text>
+<text x="765" y="488" text-anchor="middle" class="s">implements its contracts</text>
 <text x="765" y="509" text-anchor="middle" class="s">test → code, slice by slice</text>
 <text x="765" y="530" text-anchor="middle" class="s">fast gate: unit tests + lint</text>
 <text x="765" y="551" text-anchor="middle" class="s">no Docker, no database</text>

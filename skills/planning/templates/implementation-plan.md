@@ -35,17 +35,23 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 
 ## Phase GOAL-1: <milestone name>  ·  exit criterion: <what proves it done>
 
-### TASK-001: <feature slice: what a user can now do>
+### Contracts (written first, by one task, before any other task starts)
+
+| ID | Kind | File | Members | Behavior the doc comment states (errors, invariants, an example) |
+|---|---|---|---|---|
+| CON-001 | <interface · abstract class · protocol · shared type> | `<final path>` | <signatures> | <…> |
+
+### TASK-001: <the module or part of the feature it implements>
 - **Satisfies:** REQ-… / NFR-…  ·  **Implements:** ADR-… (if any)
 - **Difficulty:** Easy | Medium | Hard  ·  **Model tier:** small | mid | top  ·  **Flags:** `observe` (if security/money/auth/data-integrity)
 - **Hot files:** <which of the plan's hot files this task adds to, if any>
-- **Interfaces — Exposes:** <signatures other tasks call; blank if none.>
-- **Interfaces — Consumes:** <what earlier tasks expose that this needs.>
-- **Depends on:** TASK-… (cross-phase ordering; blank if none)
+- **Implements:** CON-… (exactly one task per contract)
+- **Consumes:** CON-… (built against their stubs; no waiting)
+- **Depends on:** TASK-… (only when a stub can't stand in; usually blank)
 - **Delivers:** <the end-to-end behavior, through every layer it touches (schema, logic, API, UI).>
 - **TEST-001 (verify, no interpretation):** `<exact command>` → `<exact expected output>`  ·  proves REQ-…
 
-> Repeat per task: usually 5–15 per project, each a few hundred to about 1,500 changed lines. Each task runs in its own worktree; tasks in a phase run in parallel and are merged by the orchestrator. A phase ends in one review of the whole feature.
+> Repeat per task: usually 5–15 per project, each a few hundred to about 1,500 changed lines. Each task runs in its own worktree against the merged contracts; tasks in a phase run in parallel and are merged by the orchestrator. A phase ends in one review of the whole feature.
 
 ---
 

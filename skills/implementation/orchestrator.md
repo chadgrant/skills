@@ -1,6 +1,6 @@
 # Orchestrator: deliver a multi-task plan
 
-Announce: **"Using implementation as orchestrator: plan feature slices → dispatch full waves → verify → commit → review each finished feature once."**
+Announce: **"Using implementation as orchestrator: contracts first → implement them in parallel → verify → commit → review each finished feature once."**
 
 **Core principle: you run a fleet; you don't type code.** Every task is routed, including the quick ones; your work is judgment and verification. Two roles, kept separate:
 
@@ -32,7 +32,7 @@ The plugin's hooks already log every subagent on their own: its wall time, the s
 | A wave is dispatched / verified | `J begin wave <M1-W1> tasks=<n>` / `J end wave <M1-W1> conflicts=<n>` |
 | A task is dispatched / its report arrives | `J begin task <TASK-007> tier=<tier> model=<model> difficulty=<d>` / `J end task <TASK-007> outcome=<green\|red\|escalated> attempt=<n> lines=<changed lines> tokens=<if the agent result gives them>` |
 | A gate runs | `J begin gate <fast\|full> m=<M1>` / `J end gate <fast\|full> outcome=<green\|red> failures=<n>` |
-| A milestone stage runs (`simplify`, `compact`, `retro`) | `J begin phase <stage> m=<M1>` / `J end phase <stage> m=<M1>` |
+| A milestone stage runs (`contracts`, `simplify`, `compact`, `retro`) | `J begin phase <stage> m=<M1>` / `J end phase <stage> m=<M1>` |
 | The feature review / the fix pass | `J begin review feature m=<M1>` / `J end review feature blockers=<n> should_fix=<n> nits=<n>`; `J begin fix pass m=<M1>` / `J end fix pass tasks=<n>` |
 | Something worth knowing later (an escalation and why, a zombie worker, a crash, a slow command) | `J note <one line>` |
 | The last milestone ends | `J end run <id>` |
@@ -65,11 +65,13 @@ Write `IMPLEMENTATION.md` (or `docs/plans/<date>-<name>.md`):
   - **Fast gate**: unit and other self-contained tests plus the static gate. No Docker, no database, no network services, so it runs anywhere, in parallel, cheaply. Workers run it in their worktrees; you run it once per wave on the merged tree.
   - **Full gate**: integration tests against real backing services (started with Docker Compose when the project has it), coverage with its 90% fail-under threshold, and the e2e suite with a driver that fits the surface (Playwright for browser UI, HTTP for an API, the built binary for a CLI; no Playwright without a browser UI). Only you run it, once per milestone, before `/simplify` and review. A project without backing services or Compose has a full gate of whatever integration and e2e commands it has.
   - The harness for both is an M0 task; each e2e scenario belongs to the feature that needs it.
-- **Per task**: stable id; the hot files it touches; the interface it exposes to other tasks, only where another task calls it; difficulty; tier; `observe` flag. Every task's verify step is the fast gate.
-- **A task is a feature slice**: one user-visible capability (one or a few `REQ`s) built end to end through every layer it needs (schema, logic, API, UI, tests) by one worker, and demoable on its own. Size it to what one agent can build and verify in one session, typically a few hundred to about 1,500 changed lines. A project is usually 5–15 tasks, not 50. Two tasks that would each change under about 100 lines, or that share files, are one task. Never split by layer (a model task, then a repository task, then a handler task); that multiplies briefs, interfaces, and verify cycles for no gain.
+- **Per task**: stable id; the `CON`s it implements and the `CON`s it consumes; the hot files it touches; difficulty; tier; `observe` flag. Every task's verify step is the fast gate, which includes its contracts' contract tests.
+- **Contracts**: the `CON-###` entries for each milestone (the plan's contract table): every interface, abstract class, protocol, and shared type the milestone's tasks call across each other, each with its final file path, its members, and the behavior its doc comment will state. Writing them is the first task of every milestone (Phase 3).
+- **A task implements contracts**: a cohesive group of `CON`s (one module, or one bounded context's part of the feature) built with its tests by one worker, sized to one agent session, typically a few hundred to about 1,500 changed lines. Exactly one task implements each contract. Group by cohesion, never by layer of one feature. A project is usually 5–15 tasks, not 50; two tasks that would each change under about 100 lines are one task.
+- **Choose the team size.** Parallel workers pay off only when the work splits into independent contracts. A milestone with fewer than three independent implementation tasks, or one tightly coupled piece (a parser, an algorithm, a single state machine), goes to one worker who writes the contracts and builds them in sequence. On small work a single agent beats a team; a plan of one task is a valid plan.
 - **A milestone is a big feature**: a set of slices that together deliver something a user would notice. It ends at the milestone gate, which is where review happens.
 - **Every task runs in its own git worktree**, so tasks in one wave may touch the same files and you merge them. **Hot files**, the few that every feature edits (route registry, dependency wiring, migration numbering, a shared enum), are set up in M0 to take additions without conflict: one file per route group, timestamped migrations, registration by convention. Name them in the plan.
-- **Simplicity** (the four rules in `chadgrant:clean-code`). YAGNI: every task traces to a stated requirement; no task builds for a future one. KISS: the plan takes the simplest architecture that meets the requirements. DRY: a shared rule or type is one task's interface that others consume, not something several tasks each write. Convention over configuration: the stack's standard layout, naming, and tooling; a deviation is an `ADR`.
+- **Simplicity** (the four rules in `chadgrant:clean-code`). YAGNI: every task traces to a stated requirement; no task builds for a future one. KISS: the plan takes the simplest architecture that meets the requirements. DRY: a shared rule or type is a contract, written once in the contract task, that every other task consumes. Convention over configuration: the stack's standard layout, naming, and tooling; a deviation is an `ADR`.
 - No "TBD", no "similar to task N". A worker can't recover from an undefined detail; it guesses wrong.
 - A "reduce burden" refactor is a valid task (verify: tests green and the target smell gone), scheduled as its own task and commit per `chadgrant:clean-code`'s `refactoring.md`.
 
@@ -87,17 +89,40 @@ Rate on the **hardest aspect**, not the average.
 - Security / money / auth / data-integrity is **Hard regardless of size**.
 - **`observe`** marks the true spine only: key storage, credential or token minting, authn/authz decisions, money movement, tenancy isolation. "Hard" or "auth-adjacent" does not qualify. It adds a security reviewer at the milestone gate; it does not add a review per task.
 
-## Phase 3: the wave loop
+## Phase 3: contracts first (every milestone)
+
+No implementation is dispatched until the milestone's contracts are merged. This is where the parallel speedup comes from: once every task builds against an agreed, checked interface instead of another task's code, nothing waits on anything else, and the milestone is usually one wave. Agents building to a bare signature do about half as well as one agent doing everything; with a full written spec the gap closes.
+
+1. **Write the contracts as code**, at their final file paths, in the language's own construct:
+
+   | Language | Contract | Stub that compiles until implemented |
+   |---|---|---|
+   | TypeScript | `interface` / `type`, exported | a class that `implements` it and throws `new Error("not implemented")` |
+   | Python | `typing.Protocol` or `abc.ABC` with `@abstractmethod`, fully type-hinted | a class whose methods raise `NotImplementedError` |
+   | Go | `interface` | a struct whose methods `panic("not implemented")` |
+   | Java · Kotlin · C# | `interface` (or abstract class) | a class that throws `UnsupportedOperationException` / `NotImplementedException` |
+   | Rust | `trait` | an impl whose methods call `todo!()` |
+
+   Data shapes (DTOs, events, error types, enums, schema types) are written in full, not stubbed.
+2. **The doc comment is the spec.** Every member states its behavior, inputs, outputs, the errors it raises and when, its invariants, and one worked example, in the glossary's words. A bare signature is not a finished contract.
+3. **Contract tests.** For each contract with behavior, a test suite written against the interface, run against the stub, failing for the right reason. Whoever implements the contract makes it pass; it is the reference that lets workers build without talking to each other.
+4. **Wire the stubs** into the composition root (or the convention that replaces it), so the app builds and the static gate passes with every stub in place.
+5. **One author.** One agent writes all of the milestone's contracts in one task, on the mid tier (top tier when they cover `observe` work and the user approved Fable), because contracts must agree with each other. Its verify step: the static gate green, the contract tests compiling and red.
+6. **You read the contract diff.** It's the one diff worth your context: check it against the milestone's `REQ`s and the glossary, and check every task in the milestone has what it consumes. Then commit it on its own (`contracts: M1`). Journal it as `phase contracts`.
+7. **Contracts are frozen.** Workers never edit contract files or contract tests. A worker that needs a change finishes what it can and reports a **contract change request**. You decide: make the change yourself or as a small contract task, merge it, and mark every task that consumes or implements that contract **stale**: continue each in-flight one with `SendMessage` naming the change, and fold the change into the brief of any not yet dispatched. Record it in `STATUS.md` and `J note contract change <CON-###> <why>`. More than a couple of change requests in a milestone means the contracts were under-specified: fix that in the plan before the next milestone.
+8. **Agents coordinate only through artifacts**: contracts, contract tests, the plan, and reports. Workers never message each other, and you don't relay conversation between them. Talking reduces merge conflicts but not failures; checked contracts do both.
+
+## Phase 4: the wave loop
 
 Repeat until the ledger is all green.
 
-1. **Pick the whole wave.** Every ready task: the interfaces it consumes are merged. Shared files don't hold a task back; worktrees and the merge handle them.
-2. **Dispatch all in one message.** Each brief carries: the task's goal and the `REQ`s it satisfies, the interfaces it exposes or consumes, the fast gate command, a pointer to the plan's global constraints (the file and heading; the worker reads them there, you don't restate them), "use the `chadgrant:implementation` skill as the worker (its `worker.md`)", **never `git commit`**, **never run Docker or start backing services**, never edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan (notes for those go in the report), the path to `GLOSSARY.md` when the repo has one, and the absolute report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override and `isolation: "worktree"`.
+1. **Pick the whole wave.** With the contracts merged, every implementation task depends only on contracts, so normally the whole milestone is one wave. Hold a task back only when it needs another task's running implementation, not just its contract (rare: data a migration in another task produces).
+2. **Dispatch all in one message.** Each brief carries: the task's goal and the `REQ`s it satisfies, the `CON`s it implements (their files and contract tests) and the ones it consumes, the fast gate command, a pointer to the plan's global constraints (the file and heading; the worker reads them there, you don't restate them), "use the `chadgrant:implementation` skill as the worker (its `worker.md`)", **never `git commit`**, **never run Docker or start backing services**, **never edit a contract file or contract test** (change requests go in the report), never edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, or the plan (notes for those go in the report), the path to `GLOSSARY.md` when the repo has one, and the absolute report path `.delivery/<task-id>.md` with the one-line return. Use `general-purpose` with a `model:` override and `isolation: "worktree"`.
 3. **Merge the wave.** For each green task, in dependency order: `git diff --stat` its worktree (the size fits the task, nothing unrelated changed), commit its changes on its branch (you commit, not the worker), and merge the branch into the integration branch. A conflict goes to that task's worker (continue it with `SendMessage`): it merges the integration branch into its worktree, resolves, re-runs the fast gate, and reports; you commit and merge. Remove each worktree once it's merged.
 4. **Verify the wave once.** Run the fast gate on the merged tree. Green verifies the wave; dispatch the next one. Red: run the failing tests' packages to find the task, and send it back to its worker. Integration and e2e tests wait for the milestone's full gate.
-5. **Escalate, then re-plan.** A task that ends red: never re-dispatch the same brief at the same tier. Bump the tier when the brief was sound and the worker couldn't do it; split the task when it was too big to verify in one piece; fix the plan when the interface itself was wrong. Re-plan when a task reveals new work.
+5. **Escalate, then re-plan.** A task that ends red: never re-dispatch the same brief at the same tier. Bump the tier when the brief was sound and the worker couldn't do it; split the task when it was too big to verify in one piece; fix the contract (Phase 3, step 7) when the interface itself was wrong. Re-plan when a task reveals new work.
 
-## Phase 4: milestone gate
+## Phase 5: milestone gate
 
 Before declaring a milestone done, run the **full gate** yourself on the merged tree: start the backing services (Docker Compose, when the project has it), run the integration tests, coverage, and e2e suite, then stop the services. Failures go back as fix tasks at the owning task's tier, each in a fresh worktree; re-run the full gate until it's green. Then `/simplify` over the accumulated diff (dedupe, dead code, collapse parallel solutions to the same concern), then review the feature.
 
