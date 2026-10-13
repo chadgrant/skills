@@ -36,6 +36,26 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 | All the tests written in one batch before any implementation | They test imagined behavior and the shape of things; tests should arrive one slice at a time |
 | Error paths and boundaries untested while the happy path has five tests | The bugs live at the edges |
 
+## Reuse lens: the Decorator, by example
+
+Cross-cutting code repeated around business calls is the commonest duplication. The fix keeps the interface and wraps it:
+
+```ts
+// Before: every method repeats the same timing and retry code around its real work.
+// After: one Decorator holds the concern; the composition root wraps the real implementation.
+class RetryingPaymentGateway implements PaymentGateway {
+  constructor(private readonly inner: PaymentGateway, private readonly policy: RetryPolicy) {}
+  charge(request: ChargeRequest): Promise<Receipt> {
+    return this.policy.run(() => this.inner.charge(request));
+  }
+}
+const gateway = new RetryingPaymentGateway(new StripePaymentGateway(config), retryPolicy);
+```
+
+The same shape in Python is a class taking the wrapped object (or a function decorator for a single callable), in Go a struct embedding the interface, in Java or C# a class implementing the interface around an inner instance. When the framework has middleware, interceptors, or filters for the concern, that is the Decorator to use.
+
+Decorators stack (retry around timing around caching around the real call), which is why they replace duplication so well: each concern lives once, and each call site gets them by wiring, not by copying.
+
 ## Design lens: evidence → pattern to prescribe
 
 A prescription needs evidence in the code today. State it as the finding: the evidence with its count, the pattern, and where it goes. All three are files in `chadgrant:clean-code`: catalogs and the "don't use when" column in `patterns.md`, domain building blocks in `domain-driven-design.md`, the steps to get there in `refactoring.md`.
@@ -89,7 +109,7 @@ Services only. A factor waived by an `ADR` is not a finding.
 
 Each cross-cutting reviewer gets the unit map from the inventory and reads across units. Each returns findings in the skill's report shape.
 
-**Architecture.** Draw the dependency graph between components from the imports. Report: policy depending on detail (domain code importing the framework, the ORM, or the transport); dependency cycles; a component with several unrelated reasons to change; the same concept implemented twice in different units; bounded contexts sharing a model or a table; a layer bypassed (a controller reaching the database around the service or repository); the same cross-cutting concern or structural problem solved differently in different units (convention over configuration: one way per codebase); machinery nothing uses (YAGNI). Prescribe the pattern or refactoring that resolves each, from the design-lens table above.
+**Architecture.** Draw the dependency graph between components from the imports. Report: policy depending on detail (domain code importing the framework, the ORM, or the transport); dependency cycles; a component with several unrelated reasons to change; the same concept implemented twice in different units (run the stack's duplicate-code detector across the whole tree, and look for helpers each unit wrote for itself); bounded contexts sharing a model or a table; a layer bypassed (a controller reaching the database around the service or repository); the same cross-cutting concern or structural problem solved differently in different units (convention over configuration: one way per codebase); machinery nothing uses (YAGNI). Prescribe the pattern or refactoring that resolves each, from the design-lens table above.
 
 **Security.** List every entry point in the codebase, then walk the security lens table for each one end to end, across unit boundaries, following input from the boundary to every sink it reaches. Unit reviewers see one unit; this role finds the hole between two units that each look fine alone. Also read CI config, Dockerfiles, and Compose files for secrets, privileged containers, and unpinned base images.
 

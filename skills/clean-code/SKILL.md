@@ -64,7 +64,9 @@ Not for: vendored or generated code, or scripts the user explicitly calls throwa
 | DRY | Every piece of knowledge has one authoritative home | The same rule, constant, or schema edited in several places |
 | Convention over configuration | Follow the language's, framework's, and repo's standard layout, naming, and defaults; configure only where you truly differ | A setting nobody varies; a home-made mechanism where the framework has a standard one; wiring a naming convention would make unnecessary |
 
-Where they pull apart: code that looks alike but changes for different reasons is not duplication, so KISS and YAGNI outrank DRY until the third occurrence (the rule of three, [refactoring.md](refactoring.md)). Convention decides how few settings exist; the ones that remain still come from the environment (Twelve-Factor).
+**Reuse before you write.** Before writing a helper, search the codebase, the framework, and the standard library for one; calling what exists beats a fresh copy. Cross-cutting code (logging, retries, timing, caching, auth checks, metrics, error translation, transactions) wrapped around more than one call goes into a Decorator, or the framework's middleware, at the second occurrence.
+
+Where they pull apart: code that looks alike but changes for different reasons is not duplication, so for business logic KISS and YAGNI outrank DRY until the third occurrence (the rule of three, [refactoring.md](refactoring.md)). Reinvented code and repeated cross-cutting code are not covered by that wait: they are known duplication, not a guess about the future. Convention decides how few settings exist; the ones that remain still come from the environment (Twelve-Factor).
 
 **Existing messy codebase?** Match its conventions — naming case, formatting, module layout — never its defects. "Match our style" means style, not smells: single-letter names, status-code returns, and blob functions are defects, not style. Apply the Boy Scout Rule to lines you touch; don't launch drive-by rewrites of code the task doesn't touch.
 
