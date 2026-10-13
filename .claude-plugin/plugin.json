@@ -1,7 +1,7 @@
 {
   "name": "chadgrant",
   "description": "A plan → implement → review pipeline for coding agents, built on Clean Code, SOLID, known design patterns, TDD, and Twelve-Factor.",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "author": { "name": "Chad Grant" },
   "homepage": "https://github.com/chadgrant/skills",
   "repository": "https://github.com/chadgrant/skills",

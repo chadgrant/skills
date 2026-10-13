@@ -130,6 +130,7 @@ def hook_event(payload, kind, event, **fields):
     append_event({"event": event, "kind": kind, "name": payload.get("agent_id", ""),
                   "run": current_run(read_events(cwd)), "at": now().isoformat(),
                   "agent_type": payload.get("agent_type", ""), "session": payload.get("session_id", ""),
+                  "effort": (payload.get("effort") or {}).get("level", ""),
                   "provider": transcript.provider(), **fields}, cwd)
 
 

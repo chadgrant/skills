@@ -27,6 +27,7 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 - **Fast gate:** `<command>` (unit tests + static gate; no Docker, no services; workers run it)
 - **Full gate:** `<command>` (integration tests against `<compose.test.yaml or n/a>`, coverage failing under 90%, e2e with <Playwright for browser UI · HTTP for an API · the built binary for a CLI · n/a>; the orchestrator runs it once per milestone). Coverage exclusions: <paths, or none>
 - **Hot files:** <files every feature edits, and how M0 prepares them to take additions without conflict>
+- **max_parallel:** 4 <the most workers running at once>
 
 ## Requirements covered
 <REQ-/NFR- IDs this plan satisfies. Every one must map to ≥1 task below.>
