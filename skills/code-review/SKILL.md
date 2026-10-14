@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Use when reviewing code someone else wrote, or auditing a codebase: a finished feature or milestone diff; or a standalone "review this repo". Triggers: "code review", "review this", "audit the codebase", "thorough review", "security review", "is this ready to merge".
+description: Use when asked to review, check, or look over code before it merges: a PR, a diff, a change, a branch, a single file, or a dependency change (package.json, requirements, go.mod, a lockfile); or to audit a whole codebase. Triggers: "review this", "can you review", "review my PR", "review this file", "look over this change", "is this ready to merge", "check these dependencies", "code review", "security review", "audit the codebase".
 ---
 
 # Clean code review

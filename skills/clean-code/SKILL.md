@@ -1,6 +1,6 @@
 ---
 name: clean-code
-description: Use when writing, modifying, or refactoring code in any language, or when reviewing code, a diff, or a pull request — before the first line is written and before review feedback is sent. Also when a design problem appears: a growing conditional, swappable behavior, where domain logic or data access lives, modeling a business domain, or code that has become hard to change. Triggers: "which pattern", "GoF", "strategy vs state", "repository vs active record", "domain model", "DDD", "bounded context", "aggregate", "refactor this", "clean this up", "this smells".
+description: Use whenever you write or change code in any language: a function, helper, class, module, script, snippet, fix, or refactor, however small, before the first line is written. Also for design questions: a growing conditional, swappable behavior, where domain logic or data access lives, modeling a business domain, code that has become hard to change. Triggers: "write a function", "add a helper", "implement", "fix this", "refactor this", "clean this up", "which pattern", "DDD", "this smells".
 ---
 
 # Uncle Bob Clean Code
