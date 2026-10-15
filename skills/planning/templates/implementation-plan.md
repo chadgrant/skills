@@ -52,7 +52,7 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 - **Delivers:** <the end-to-end behavior, through every layer it touches (schema, logic, API, UI).>
 - **TEST-001 (verify, no interpretation):** `<exact command>` → `<exact expected output>`  ·  proves REQ-…
 
-> Repeat per task: usually 5–15 per project, each a few hundred to about 1,500 changed lines. Each task runs in its own worktree against the merged contracts; tasks in a phase run in parallel and are merged by the orchestrator. A phase ends in one review of the whole feature.
+> Repeat per task: each up to about 400 changed lines and one screen, endpoint group, or module. Each task runs in its own worktree against the merged contracts; tasks in a phase run in parallel and are merged by the orchestrator. A phase ends in one review of the whole feature.
 
 ---
 

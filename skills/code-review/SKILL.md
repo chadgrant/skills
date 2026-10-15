@@ -25,7 +25,7 @@ The stamp is one line in the repo's `AGENTS.md`: `Last full review: <date> at co
 ## Scoped review
 
 1. **Pin the lane.** The file list from the brief, or `git diff --name-only <range>`. That list is the whole review.
-2. **Read every file in the lane in full**, not only the changed hunks. Open a neighboring file only to read an interface the lane calls or implements; neighbors are context, never review targets.
+2. **Read the changed code with its surroundings**: every changed hunk with enough of the code around it to judge it, and the whole file when it's under about 400 lines. When the brief sets a budget (a time, a tool-call count), write the report within it, most severe findings first; an unfinished lane goes under `Unreviewed`. Open a neighboring file only to read an interface the lane calls or implements; neighbors are context, never review targets.
 3. **Run the nine lenses** below over the lane. The spec for lens 1 is the requirements the feature satisfies.
 4. **Write the report** in the shape below to the path in your brief (`.delivery/review-<id>.md`) and return only part 1, the verdict, per task, with the path. No path in the brief: return the report itself.
 

@@ -165,6 +165,14 @@ def hook():
 
 # --- reports ---
 
+def format_minutes(seconds):
+    return "-" if seconds is None else minutes(seconds).strip()
+
+
+def format_tokens(count):
+    return "-" if count is None else f"{count / 1000:.0f}k"
+
+
 def minutes(seconds):
     return f"{seconds / SECONDS_PER_MINUTE:7.1f}m"
 
@@ -246,10 +254,16 @@ def field_total(events, kind, field):
     return sum(int(e.get(field, 0)) for e in events if e["kind"] == kind and e["event"] == "end")
 
 
+def agent_median(events, field):
+    values = [e[field] for e in events if e["kind"] == "agent" and e["event"] == "end"
+              and isinstance(e.get(field), (int, float))]
+    return statistics.median(values) if values else None
+
+
 def report_versions(events):
     """How each version of the skills performed: speed, rework, review findings, failures."""
     print(f"  {'skills':<22} {'runs':>4} {'tasks':>5} {'task med':>8} {'red/esc':>7} {'agent med':>9} "
-          f"{'full red':>8} {'blockers':>8} {'should-fix':>10} {'api err':>7}")
+          f"{'full red':>8} {'blockers':>8} {'should-fix':>10} {'api err':>7} {'1st edit':>8} {'peak ctx':>8}")
     for commit in sorted({e.get("skills_commit", "unknown") for e in events}):
         mine = [e for e in events if e.get("skills_commit", "unknown") == commit]
         label = f"{mine[0].get('skills_version', '?')}@{commit}"
@@ -260,7 +274,8 @@ def report_versions(events):
               f"{outcome_count(mine, 'task', ('red', 'escalated')):>7} {median_seconds(mine, 'agent'):>9} "
               f"{sum(1 for e in full_gates if e.get('outcome') == 'red')}/{len(full_gates):<6} "
               f"{field_total(mine, 'review', 'blockers'):>8} {field_total(mine, 'review', 'should_fix'):>10} "
-              f"{sum(1 for e in mine if e['kind'] == 'api_error') + field_total(mine, 'agent', 'api_errors'):>7}")
+              f"{sum(1 for e in mine if e['kind'] == 'api_error') + field_total(mine, 'agent', 'api_errors'):>7} "
+              f"{format_minutes(agent_median(mine, 'first_edit_seconds')):>8} {format_tokens(agent_median(mine, 'peak_context')):>8}")
 
 
 def report(flags):

@@ -12,6 +12,8 @@ Confirm you have all of these before typing:
 
 - **Task id and goal**
 - **Worktree**: your own git worktree. Change any file the feature needs and nothing unrelated.
+- **Map**: the files and line ranges to change, the code to call or copy, the tests to update, and the wiring lines. Start there.
+- **Base commit**: the SHA to start from.
 - **Contracts**: the `CON`s you implement (their interface files and contract tests) and the `CON`s you consume. They are already merged.
 - **Verify step**: the fast gate: unit tests and the static gate. It needs no Docker and no running services.
 - **Difficulty / `observe`**: the feature is reviewed as a whole at the milestone gate, with a security reviewer when it's `observe`. Write code that survives a reviewer trying to break it.
@@ -25,7 +27,9 @@ Missing or ambiguous? Two cases:
 
 ## Build loop
 
-1. **Read the contract.** Your contracts' doc comments and contract tests are the spec. Build against the contracts you consume, never against another task's implementation: while you work, those are stubs that throw. Then read the code the feature touches, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
+0. **Start from the right base.** `git merge --ff-only <base commit>` in your worktree, then set it up as the architecture note in `AGENTS.md` says (install dependencies). If the fast-forward fails, report it; never build on a stale base.
+1. **Read the contract.** Your contracts' doc comments and contract tests are the spec. Build against the contracts you consume, never against another task's implementation: while you work, those are stubs that throw. Then read the `## Architecture` note in `AGENTS.md` and go to what your map names. Read the code the feature touches, and `GLOSSARY.md` when your brief names one: its terms are the names you use in code and tests. Not the whole tree.
+   - **Keep your context small; it is your speed.** Every turn re-sends everything you have read, so a turn at 250k tokens is several times slower than one at 40k. Read line ranges, not whole files; grep with `-n` or `-l` and cap the output (`| head -40`); don't re-read a file you've read. If you've read about 15 files and still don't know where your first edit goes, the map is missing something: start from what you know, and add a `map gap` line to your report saying what was missing, so the next maps include it.
 2. **Verify-first.** Your contracts' contract tests are already written and red; making them pass is most of the task. For what they don't cover, write the failing test before the implementation; make it fail for the right reason, then pass. When the verify step is only a build, lint, or type-check (scaffolding, config, wiring), there is no test to write first: build it and run the verify step.
    - **One slice at a time**: one test, then the code that passes it, then the next test. Each test goes through the public interface your brief names and asserts on behavior a caller can see. Expected values come from the brief, the spec, or a worked example, never from recomputing them the way the code does.
    - **Coverage**: your tests cover at least 90% of the lines the feature adds or changes, through assertions on behavior. The milestone's full gate measures it; aim for it now. A test that executes code without asserting on it is a defect, and so is excluding a file from coverage; exclusions belong to the plan.
@@ -74,6 +78,7 @@ Missing or ambiguous? Two cases:
 - **Contracts are frozen.** Never edit an interface, abstract class, shared type, or contract test, even to fix it, and never work around one (a cast, `any`, an extra public method, reaching into another module's internals). If a contract is wrong or missing something, build what you can and put a **contract change request** in your report.
 - **Coordinate through artifacts only.** You never message another worker; the contracts, the plan, and your report are how you agree.
 - **Stay in your feature.** Change what the feature needs; leave unrelated code alone and mention it in the report.
+- **Run anything that could hang under `timeout`** (installs, archive tools like `unzip`, servers, network calls), and never a command that waits for input.
 - **Never run Docker** or start a database, queue, or any other backing service. Other workers run in parallel on the same machine.
 - **Shared files belong to the orchestrator.** Never create or edit `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, or the root `README`, including to record a learning, a convention, or progress. Several workers run at once and overwrite each other there. Put what you'd have written under **Notes for shared docs** in your report; the orchestrator applies it. Any other doc the feature changes is yours to edit.
 - **Never `git commit`.** Even when certain.
