@@ -4,12 +4,15 @@
     journal.py begin <kind> <name> [key=value ...]   start timing something
     journal.py end   <kind> <name> [key=value ...]   stop it; the duration is recorded
     journal.py note  <text>                          a free-form note on the current run
-    journal.py report [--all | --providers | --versions]  latest run, every run, providers, or skill versions compared
+    journal.py report [--all | --providers | --versions | --timeline]
+                                                     latest run, every run, providers, skill versions,
+                                                     or the latest run's events in order with the gaps between them
     journal.py path                                  where this project's journal lives
     journal.py hook                                  called by the plugin's hooks with the event on stdin
 
 Kinds used by the skills: run, phase, wave, task, gate, review, fix.
-Kinds written by the hooks: agent (one per subagent), api_error.
+Kinds written by the hooks: agent (one per subagent), dispatch (each brief sent: size, map references),
+skill (each skill loaded), turn (each main-session turn: time, tool calls, context), api_error.
 Every event carries the skills' version and git commit, so changes to the skills can be compared.
 One file per project: $CHADGRANT_JOURNAL_DIR (default ~/.claude/journal) / <repo name>.jsonl
 """
@@ -145,7 +148,36 @@ def on_stop_failure(payload):
                details=str(payload.get("error_details", ""))[:300])
 
 
+def on_dispatch(payload):
+    tool = payload.get("tool_input", {})
+    hook_event(payload, "dispatch", "note", description=tool.get("description", ""),
+               subagent_type=tool.get("subagent_type", ""), model=tool.get("model", ""),
+               isolation=tool.get("isolation", ""), **transcript.brief_stats(tool.get("prompt", "")))
+
+
+def on_skill_loaded(payload):
+    hook_event(payload, "skill", "note", skill=payload.get("tool_input", {}).get("skill", ""))
+
+
+def on_main_turn_end(payload):
+    path = payload.get("transcript_path")
+    stats = transcript.last_turn(path) if path else {}
+    if stats:
+        hook_event(payload, "turn", "note", **stats)
+
+
+TOOL_HANDLERS = {"Agent": on_dispatch, "Skill": on_skill_loaded}
+
+
+def on_tool(payload):
+    handler = TOOL_HANDLERS.get(payload.get("tool_name"))
+    if handler:
+        handler(payload)
+
+
 HOOK_HANDLERS = {
+    "PreToolUse": on_tool,
+    "Stop": on_main_turn_end,
     "SubagentStart": lambda payload: hook_event(payload, "agent", "begin"),
     "SubagentStop": on_subagent_stop,
     "StopFailure": on_stop_failure,
@@ -278,12 +310,32 @@ def report_versions(events):
               f"{format_minutes(agent_median(mine, 'first_edit_seconds')):>8} {format_tokens(agent_median(mine, 'peak_context')):>8}")
 
 
+TIMELINE_FIELDS = ("description", "task", "skill", "subagent_type", "model", "effort", "brief_chars", "map_refs", "seconds",
+                   "model_seconds", "tool_calls", "agents_dispatched", "context", "peak_context",
+                   "first_edit_seconds", "outcome", "error", "text")
+
+
+def report_timeline(events, run):
+    """Every event of a run in order, with the gap since the one before: where the time actually went."""
+    mine = [e for e in events if e.get("run") == run]
+    print(f"Timeline of run {run}: {len(mine)} events")
+    previous = None
+    for event in mine:
+        at = datetime.fromisoformat(event["at"])
+        gap = f"+{minutes((at - previous).total_seconds()).strip()}" if previous else ""
+        previous = at
+        details = " ".join(f"{k}={event[k]}" for k in TIMELINE_FIELDS if event.get(k) not in (None, ""))
+        print(f"  {at:%H:%M:%S} {gap:>8}  {event['kind']:<8} {event['event']:<5} {event['name'][:24]:<24} {details}")
+
+
 def report(flags):
     events = read_events()
     if not events:
         print(f"journal: nothing recorded yet in {journal_path()}")
     elif "--versions" in flags:
         report_versions(events)
+    elif "--timeline" in flags:
+        report_timeline(events, current_run(events))
     elif "--providers" in flags:
         report_providers(events)
     elif "--all" in flags:

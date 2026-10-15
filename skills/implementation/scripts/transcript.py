@@ -135,3 +135,62 @@ def summarize(path):
         "task": task.group(0) if task else "",
         **{f"tokens_{name}": count for name, count in requests.tokens.items()},
     }
+
+
+FILE_LINE_REF = re.compile(r"[\w./-]+\.\w+:\d+")
+PLUGIN_SKILL = re.compile(r'"skill"\s*:\s*"chadgrant:')
+
+
+def is_user_turn_start(entry):
+    """A message the person typed, as opposed to a tool result fed back to the model."""
+    if entry.get("type") != "user" or entry.get("isMeta"):
+        return False
+    content = entry.get("message", {}).get("content")
+    if isinstance(content, str):
+        return True
+    return isinstance(content, list) and not any(
+        isinstance(block, dict) and block.get("type") == "tool_result" for block in content)
+
+
+def uses_plugin(entries):
+    return any(PLUGIN_SKILL.search(json.dumps(tool.get("input", {}))) or tool.get("name") == "Skill"
+               and str(tool.get("input", {}).get("skill", "")).startswith("chadgrant:")
+               for entry in entries for tool in tool_uses(entry))
+
+
+def last_turn(path):
+    """The main session's latest turn: how long it took, its tool calls and output, and the context it ended at.
+
+    Empty when the session never loaded one of this plugin's skills, so other sessions stay out of the journal."""
+    entries = read_entries(path)
+    if not entries or not uses_plugin(entries):
+        return {}
+    starts = [i for i, entry in enumerate(entries) if is_user_turn_start(entry)]
+    turn = entries[starts[-1]:] if starts else entries
+    requests = Requests()
+    previous = None
+    tools = []
+    for entry in turn:
+        if entry.get("type") == "assistant":
+            requests.add(entry, previous)
+            tools += [tool.get("name") for tool in tool_uses(entry)]
+        previous = entry
+    skills = [tool.get("input", {}).get("skill", "") for entry in entries for tool in tool_uses(entry)
+              if tool.get("name") == "Skill"]
+    return {
+        "seconds": round((timestamp(turn[-1]) - timestamp(turn[0])).total_seconds()),
+        "model_seconds": round(requests.wait_seconds),
+        "requests": requests.count,
+        "tool_calls": len(tools),
+        "agents_dispatched": tools.count("Agent"),
+        "context": requests.peak_context,
+        "tokens_output": requests.tokens["output"],
+        "skill": skills[-1] if skills else "",
+    }
+
+
+def brief_stats(prompt):
+    """What a dispatched brief contained: its size, the task it names, and how many file:line references it gives."""
+    task = TASK_ID.search(prompt)
+    return {"brief_chars": len(prompt), "brief_lines": prompt.count("\n") + 1,
+            "task": task.group(0) if task else "", "map_refs": len(FILE_LINE_REF.findall(prompt))}

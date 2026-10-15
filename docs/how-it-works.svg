@@ -1,0 +1,256 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 2473" width="1240" height="2473">
+<defs>
+<marker id="m-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/></marker>
+<marker id="m-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/></marker>
+<marker id="m-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/></marker>
+<marker id="m-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/></marker>
+<marker id="m-teal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#0d9488"/></marker>
+<marker id="m-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#059669"/></marker>
+<marker id="m-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/></marker>
+<style>text{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:#0f172a}.t{font-size:13.5px;font-weight:600}.s{font-size:11.5px;fill:#334155}.h{font-size:14.5px;font-weight:700}.ph{font-size:12px;font-weight:700;fill:#475569}.lbl{font-size:11.5px;font-weight:600}.note{font-size:11.5px;font-style:italic}.tag{font-size:10.5px;font-weight:600;fill:#ffffff}.m{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:#0f172a}</style>
+</defs>
+<rect width="1240" height="2473" fill="#ffffff"/>
+<text x="40" y="44" style="font-size:22px;font-weight:700">How the chadgrant skills run a build, and where to look when it's slow</text>
+<text x="40" y="68" class="s">Top to bottom is the order things happen. Left: each step and who runs it. Right: what the step writes, and the journal events that record it.</text>
+<text x="40" y="86" class="s">Every subagent is a separate model session; each one's time grows with how much it reads, because every turn re-sends its whole context.</text>
+<rect x="30" y="120" width="1180" height="413" rx="12" fill="#fcfaff" stroke="#7c3aed" stroke-dasharray="6,4"/>
+<rect x="30" y="563" width="1180" height="262" rx="12" fill="#f8fafc" stroke="#475569" stroke-dasharray="6,4"/>
+<rect x="30" y="855" width="1180" height="202" rx="12" fill="#f7fefd" stroke="#0d9488" stroke-dasharray="6,4"/>
+<rect x="30" y="1087" width="1180" height="649" rx="12" fill="#f8fbff" stroke="#2563eb" stroke-dasharray="6,4"/>
+<rect x="30" y="1766" width="1180" height="365" rx="12" fill="#f7fdf9" stroke="#059669" stroke-dasharray="6,4"/>
+<rect x="30" y="2161" width="1180" height="228" rx="12" fill="#fdf2f8" stroke="#be185d" stroke-dasharray="6,4"/>
+<rect x="80" y="160" width="720" height="32" rx="8" fill="#fdf2f8" stroke="#be185d" stroke-width="1.6"/>
+<text x="92" y="180" text-anchor="start" class="t">You ask for a feature, or say "spec this out"</text>
+<polyline points="440,192 440,210" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="210" width="720" height="68" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="230" text-anchor="start" class="t">Clarify in rounds</text>
+<rect x="702.4" y="217" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="230" text-anchor="middle" class="tag">main session</text>
+<text x="92" y="250" text-anchor="start" class="s">Every question it can ask now, numbered, each with a recommended answer; it looks facts up itself.</text>
+<text x="92" y="267" text-anchor="start" class="s">You answer; it asks the next round until no decision is left assumed.</text>
+<polyline points="440,278 440,296" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="296" width="720" height="68" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="316" text-anchor="start" class="t">Write the requirements docs</text>
+<rect x="702.4" y="303" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="316" text-anchor="middle" class="tag">main session</text>
+<text x="92" y="336" text-anchor="start" class="s">GLOSSARY first, then PRD, and ERD / DRD / API contract / UX / ops docs only where the work needs them.</text>
+<text x="92" y="353" text-anchor="start" class="s">Written by the main session itself, one doc after another, so every doc stays in its context.</text>
+<polyline points="440,364 440,382" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="382" width="720" height="85" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="402" text-anchor="start" class="t">Write the routed plan</text>
+<rect x="702.4" y="389" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="402" text-anchor="middle" class="tag">main session</text>
+<text x="92" y="422" text-anchor="start" class="s">Milestones (each a feature that ends in one review). Per milestone: its contracts (CON-###) first,</text>
+<text x="92" y="439" text-anchor="start" class="s">then tasks (TASK-###) that implement them: about 400 changed lines and one module each, never one per layer.</text>
+<text x="92" y="456" text-anchor="start" class="s">Each task: difficulty → tier, observe flag, hot files. Header: stack versions looked up, gates, max_parallel.</text>
+<text x="80" y="489" text-anchor="start" class="note" style="fill:#be185d">Why this stage feels slow: one session writes every document and the plan, and each later turn re-sends all of it.</text>
+<text x="80" y="505" text-anchor="start" class="note" style="fill:#be185d">Check: journal "turn" events (seconds, context, tool_calls) during planning.</text>
+<rect x="838" y="160" width="370" height="0" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="850" y="180" text-anchor="start" class="ph">Writes</text>
+<text x="856" y="197" text-anchor="start" class="m">docs/requirements/GLOSSARY.md</text>
+<text x="856" y="213" text-anchor="start" class="m">docs/requirements/prd.md (+ erd, drd, api…)</text>
+<text x="856" y="229" text-anchor="start" class="m">docs/plans/&lt;plan&gt;.md</text>
+<text x="850" y="251" text-anchor="start" class="ph">Journal (written by the skill)</text>
+<text x="856" y="268" text-anchor="start" class="m">run begin &lt;id&gt;</text>
+<text x="856" y="284" text-anchor="start" class="m">phase clarify / docs / plan</text>
+<text x="850" y="306" text-anchor="start" class="ph">Journal (written by the hooks)</text>
+<text x="856" y="323" text-anchor="start" class="m">skill  chadgrant:planning</text>
+<text x="856" y="339" text-anchor="start" class="m">turn   each main-session turn:</text>
+<text x="856" y="355" text-anchor="start" class="m">       seconds, tool_calls, context</text>
+<text x="60" y="144" text-anchor="start" class="h" style="fill:#7c3aed">1 · Plan · chadgrant:planning</text>
+<polyline points="440,533 440,601" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<rect x="80" y="603" width="720" height="51" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="623" text-anchor="start" class="t">Ask once: may Fable be used?</text>
+<rect x="702.4" y="610" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="623" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="643" text-anchor="start" class="s">No answer means Opus for everything Hard. The answer is saved in the plan header and STATUS.md.</text>
+<polyline points="440,654 440,672" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="672" width="720" height="51" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="692" text-anchor="start" class="t">Check the full-review stamp</text>
+<rect x="702.4" y="679" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="692" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="712" text-anchor="start" class="s">Stale (14 days or 50 commits)? A one-line reminder to you. It never starts a full review by itself.</text>
+<polyline points="440,723 440,741" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="741" width="720" height="68" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="92" y="761" text-anchor="start" class="t">Architecture note (existing codebase, once)</text>
+<rect x="733.9" y="748" width="58.1" height="18" rx="9" fill="#ea580c"/>
+<text x="762.95" y="761" text-anchor="middle" class="tag">1 agent</text>
+<text x="92" y="781" text-anchor="start" class="s">One mid-tier agent writes "## Architecture" in AGENTS.md, about 60 lines: how screens mount, how routes and</text>
+<text x="92" y="798" text-anchor="start" class="s">sub-tabs register, where files live, hot files, test commands, worktree setup. The orchestrator reads and commits it.</text>
+<rect x="838" y="603" width="370" height="0" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="850" y="623" text-anchor="start" class="ph">Writes</text>
+<text x="856" y="640" text-anchor="start" class="m">AGENTS.md  ## Architecture</text>
+<text x="856" y="656" text-anchor="start" class="m">STATUS.md  run id, Fable answer</text>
+<text x="850" y="678" text-anchor="start" class="ph">Journal</text>
+<text x="856" y="695" text-anchor="start" class="m">dispatch  the note writer's brief</text>
+<text x="856" y="711" text-anchor="start" class="m">agent     its time, tokens, context</text>
+<text x="60" y="587" text-anchor="start" class="h" style="fill:#475569">2 · Start the run · orchestrator</text>
+<polyline points="440,825 440,893" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<rect x="80" y="895" width="720" height="68" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="92" y="915" text-anchor="start" class="t">One agent writes every contract for the milestone</text>
+<rect x="733.9" y="902" width="58.1" height="18" rx="9" fill="#ea580c"/>
+<text x="762.95" y="915" text-anchor="middle" class="tag">1 agent</text>
+<text x="92" y="935" text-anchor="start" class="s">Interfaces, abstract classes, protocols, shared types at their final paths; the doc comment is the spec</text>
+<text x="92" y="952" text-anchor="start" class="s">(behaviour, errors, invariants, an example); stubs that compile; contract tests that fail until implemented.</text>
+<polyline points="440,963 440,981" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="981" width="720" height="51" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="1001" text-anchor="start" class="t">Orchestrator reads the contract diff</text>
+<rect x="702.4" y="988" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="1001" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="1021" text-anchor="start" class="s">Against the milestone's REQs and the glossary; every task must have what it consumes. Then commit and freeze.</text>
+<rect x="838" y="895" width="370" height="0" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="850" y="915" text-anchor="start" class="ph">Writes</text>
+<text x="856" y="932" text-anchor="start" class="m">src/**  interfaces, types, stubs</text>
+<text x="856" y="948" text-anchor="start" class="m">contract tests (red)</text>
+<text x="856" y="964" text-anchor="start" class="m">commit  "contracts: M1"</text>
+<text x="850" y="986" text-anchor="start" class="ph">Journal</text>
+<text x="856" y="1003" text-anchor="start" class="m">phase contracts</text>
+<text x="856" y="1019" text-anchor="start" class="m">dispatch / agent  the contract author</text>
+<text x="60" y="879" text-anchor="start" class="h" style="fill:#0d9488">3 · Contracts first · every milestone</text>
+<polyline points="440,1057 440,1125" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<rect x="80" y="1127" width="720" height="51" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="1147" text-anchor="start" class="t">1 · Pick the wave</text>
+<rect x="702.4" y="1134" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="1147" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="1167" text-anchor="start" class="s">At most max_parallel tasks (default 4). Tasks depend only on contracts, so the cap sets the number of waves.</text>
+<polyline points="440,1178 440,1196" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1196" width="720" height="68" rx="8" fill="#f9fafb" stroke="#6b7280" stroke-width="1.6"/>
+<text x="92" y="1216" text-anchor="start" class="t">2 · Map each task</text>
+<rect x="715.0" y="1203" width="77.0" height="18" rx="9" fill="#6b7280"/>
+<text x="753.5" y="1216" text-anchor="middle" class="tag">1 per task</text>
+<text x="92" y="1236" text-anchor="start" class="s">One small-tier Explore agent per task, all at once. Returns ≤40 lines: files and line ranges to change, code to call</text>
+<text x="92" y="1253" text-anchor="start" class="s">or copy, tests to update, wiring lines (route, registry, shell mount), helpers to reuse. Goes into the brief verbatim.</text>
+<polyline points="440,1264 440,1282" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1282" width="720" height="68" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="1302" text-anchor="start" class="t">3 · Dispatch the wave in one message</text>
+<rect x="702.4" y="1289" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="1302" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="1322" text-anchor="start" class="s">Brief: goal, REQs, CONs to implement and consume, the map, base commit, fast gate command, rules, report path.</text>
+<text x="92" y="1339" text-anchor="start" class="s">chadgrant:worker, medium effort, for Easy (Haiku) and Medium (Opus); general-purpose for Hard; one worktree each.</text>
+<polyline points="440,1350 440,1368" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1368" width="720" height="153" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="92" y="1388" text-anchor="start" class="t">Each worker, in parallel  (worker.md)</text>
+<rect x="683.5" y="1375" width="108.5" height="18" rx="9" fill="#2563eb"/>
+<text x="737.75" y="1388" text-anchor="middle" class="tag">up to 4 at once</text>
+<text x="92" y="1408" text-anchor="start" class="s">0  git merge --ff-only &lt;base commit&gt;; set up the worktree as the architecture note says</text>
+<text x="92" y="1425" text-anchor="start" class="s">1  read the contracts, contract tests, architecture note, and the map; read line ranges, not whole files</text>
+<text x="92" y="1442" text-anchor="start" class="s">2  contract tests red → green; then one test → code slice at a time for the rest</text>
+<text x="92" y="1459" text-anchor="start" class="s">3  reuse first: search for existing code; Decorator for cross-cutting code; a dependency only at its latest stable release</text>
+<text x="92" y="1476" text-anchor="start" class="s">4  fast gate: unit + contract tests, lint, types (never Docker); read its own diff once</text>
+<text x="92" y="1493" text-anchor="start" class="s">5  report to .delivery/TASK-###.md; one line back: green|red, verify summary, ⚠, notes, contract changes</text>
+<text x="92" y="1510" text-anchor="start" class="s">Never: commit, run Docker, edit a contract or a shared file (CLAUDE.md, AGENTS.md, STATUS.md, plan)</text>
+<polyline points="440,1521 440,1539" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1539" width="720" height="68" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="92" y="1559" text-anchor="start" class="t">4 · Merge the wave</text>
+<rect x="702.4" y="1546" width="89.6" height="18" rx="9" fill="#7c3aed"/>
+<text x="747.2" y="1559" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="1579" text-anchor="start" class="s">The orchestrator commits each green branch and merges it into the integration branch, in dependency order.</text>
+<text x="92" y="1596" text-anchor="start" class="s">A conflict goes back to the worker that wrote it. Notes for shared docs are applied by the orchestrator.</text>
+<polyline points="440,1607 440,1625" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1625" width="720" height="51" rx="8" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.6"/>
+<text x="92" y="1645" text-anchor="start" class="t">5 · Fast gate on the merged tree</text>
+<rect x="702.4" y="1632" width="89.6" height="18" rx="9" fill="#0d9488"/>
+<text x="747.2" y="1645" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="1665" text-anchor="start" class="s">Green: drop the worktrees, next wave. Red: back to its worker; red again: a higher tier, a split task, or a fixed contract.</text>
+<polyline points="800,1650.5 818,1650.5 818,1147 802,1147" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<text x="832" y="1398.75" transform="rotate(-90 832 1398.75)" text-anchor="middle" class="lbl" style="fill:#7c3aed">next wave</text>
+<text x="80" y="1698" text-anchor="start" class="note" style="fill:#be185d">"Very small chunks"? Check dispatch brief_chars and how many tasks each wave has. "Workers slow"? Check agent</text>
+<text x="80" y="1714" text-anchor="start" class="note" style="fill:#be185d">peak_context and first_edit_seconds: a high first edit means the map was thin.</text>
+<rect x="838" y="1127" width="370" height="0" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="850" y="1147" text-anchor="start" class="ph">Writes</text>
+<text x="856" y="1164" text-anchor="start" class="m">git worktrees, one branch per task</text>
+<text x="856" y="1180" text-anchor="start" class="m">.delivery/TASK-###.md  full reports</text>
+<text x="856" y="1196" text-anchor="start" class="m">merge commits on the integration branch</text>
+<text x="850" y="1218" text-anchor="start" class="ph">Journal (orchestrator)</text>
+<text x="856" y="1235" text-anchor="start" class="m">wave begin/end  tasks, conflicts</text>
+<text x="856" y="1251" text-anchor="start" class="m">task begin/end  tier, model, outcome,</text>
+<text x="856" y="1267" text-anchor="start" class="m">                attempt, lines</text>
+<text x="856" y="1283" text-anchor="start" class="m">gate fast  outcome, failures</text>
+<text x="850" y="1305" text-anchor="start" class="ph">Journal (hooks, every agent)</text>
+<text x="856" y="1322" text-anchor="start" class="m">dispatch  task, brief_chars, map_refs,</text>
+<text x="856" y="1338" text-anchor="start" class="m">          subagent_type, model</text>
+<text x="856" y="1354" text-anchor="start" class="m">agent     seconds, model_seconds,</text>
+<text x="856" y="1370" text-anchor="start" class="m">          peak_context, first_edit_seconds,</text>
+<text x="856" y="1386" text-anchor="start" class="m">          reads_before_first_edit, tokens,</text>
+<text x="856" y="1402" text-anchor="start" class="m">          effort, provider, api_errors</text>
+<text x="60" y="1111" text-anchor="start" class="h" style="fill:#2563eb">4 · Wave loop · until all tasks merged</text>
+<polyline points="440,1736 440,1804" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<rect x="80" y="1806" width="720" height="68" rx="8" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.6"/>
+<text x="92" y="1826" text-anchor="start" class="t">Full gate</text>
+<rect x="702.4" y="1813" width="89.6" height="18" rx="9" fill="#0d9488"/>
+<text x="747.2" y="1826" text-anchor="middle" class="tag">orchestrator</text>
+<text x="92" y="1846" text-anchor="start" class="s">The orchestrator alone starts Docker (if the project has it): integration tests, 90% coverage, e2e. Then stops it.</text>
+<text x="92" y="1863" text-anchor="start" class="s">Failures become fix tasks at the owning task's tier, each in a fresh worktree.</text>
+<polyline points="440,1874 440,1892" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1892" width="720" height="68" rx="8" fill="#f0fdf4" stroke="#059669" stroke-width="1.6"/>
+<text x="92" y="1912" text-anchor="start" class="t">/simplify, then one feature review</text>
+<rect x="715.0" y="1899" width="77.0" height="18" rx="9" fill="#059669"/>
+<text x="753.5" y="1912" text-anchor="middle" class="tag">1–2 agents</text>
+<text x="92" y="1932" text-anchor="start" class="s">chadgrant:code-review over the milestone diff, mid tier, ~45-minute budget. Nine lenses: spec, correctness, security,</text>
+<text x="92" y="1949" text-anchor="start" class="s">tests, reuse, design, dependencies, Twelve-Factor, readability. Plus a top-tier security reviewer for observe tasks.</text>
+<polyline points="440,1960 440,1978" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="1978" width="720" height="51" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="92" y="1998" text-anchor="start" class="t">One fix pass, then the full gate again</text>
+<rect x="733.9" y="1985" width="58.1" height="18" rx="9" fill="#2563eb"/>
+<text x="762.95" y="1998" text-anchor="middle" class="tag">workers</text>
+<text x="92" y="2018" text-anchor="start" class="s">Blockers and should-fix go back to the owning workers; nits are listed, not fixed. No second review.</text>
+<polyline points="440,2029 440,2047" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
+<rect x="80" y="2047" width="720" height="68" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="92" y="2067" text-anchor="start" class="t">Push · compact the docs · retro · STATUS.md · end the session</text>
+<rect x="727.6" y="2054" width="64.4" height="18" rx="9" fill="#ea580c"/>
+<text x="759.8" y="2067" text-anchor="middle" class="tag">2 agents</text>
+<text x="92" y="2087" text-anchor="start" class="s">Compaction folds requirement changes into the docs; the retro turns repeated findings into lint rules or AGENTS.md lines.</text>
+<text x="92" y="2104" text-anchor="start" class="s">A stale review stamp gets its one-line reminder here.</text>
+<rect x="838" y="1806" width="370" height="0" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="850" y="1826" text-anchor="start" class="ph">Writes</text>
+<text x="856" y="1843" text-anchor="start" class="m">.delivery/review-M1.md</text>
+<text x="856" y="1859" text-anchor="start" class="m">commit  docs compaction</text>
+<text x="856" y="1875" text-anchor="start" class="m">AGENTS.md  retro updates</text>
+<text x="856" y="1891" text-anchor="start" class="m">STATUS.md  next milestone</text>
+<text x="850" y="1913" text-anchor="start" class="ph">Journal</text>
+<text x="856" y="1930" text-anchor="start" class="m">gate full  outcome, failures</text>
+<text x="856" y="1946" text-anchor="start" class="m">phase simplify / compact / retro</text>
+<text x="856" y="1962" text-anchor="start" class="m">review feature  blockers, should_fix,</text>
+<text x="856" y="1978" text-anchor="start" class="m">               nits</text>
+<text x="856" y="1994" text-anchor="start" class="m">fix pass  tasks</text>
+<text x="60" y="1790" text-anchor="start" class="h" style="fill:#059669">5 · Milestone gate · once per milestone</text>
+<polyline points="80,2091 48,2091 48,915 78,915" fill="none" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#m-purple)"/>
+<text x="44" y="1493.0" transform="rotate(-90 44 1493.0)" text-anchor="middle" class="lbl" style="fill:#7c3aed">next milestone: a fresh session reads STATUS.md and starts at its contracts</text>
+<text x="60" y="2185" text-anchor="start" class="h" style="fill:#be185d">Debugging: question → where to look   (journal.py is in the plugin at skills/implementation/scripts/)</text>
+<text x="60" y="2211" text-anchor="start" class="t">Where did the time go?</text>
+<text x="330" y="2211" text-anchor="start" class="m">journal.py report --timeline</text>
+<text x="640" y="2211" text-anchor="start" class="s">every event in order, with the gap before each</text>
+<text x="60" y="2235" text-anchor="start" class="t">Is planning the slow part?</text>
+<text x="330" y="2235" text-anchor="start" class="m">report --timeline, "turn" events</text>
+<text x="640" y="2235" text-anchor="start" class="s">main-session seconds, context, tool_calls</text>
+<text x="60" y="2259" text-anchor="start" class="t">Are briefs too small or thin?</text>
+<text x="330" y="2259" text-anchor="start" class="m">"dispatch" events</text>
+<text x="640" y="2259" text-anchor="start" class="s">brief_chars, map_refs, tasks per wave</text>
+<text x="60" y="2283" text-anchor="start" class="t">Are workers slow, and why?</text>
+<text x="330" y="2283" text-anchor="start" class="m">"agent" events</text>
+<text x="640" y="2283" text-anchor="start" class="s">model_seconds vs seconds, peak_context, first_edit_seconds</text>
+<text x="60" y="2307" text-anchor="start" class="t">Did a change to the skills help?</text>
+<text x="330" y="2307" text-anchor="start" class="m">journal.py report --versions</text>
+<text x="640" y="2307" text-anchor="start" class="s">medians per skills commit</text>
+<text x="60" y="2331" text-anchor="start" class="t">Is Bedrock the problem?</text>
+<text x="330" y="2331" text-anchor="start" class="m">journal.py report --providers</text>
+<text x="640" y="2331" text-anchor="start" class="s">speed and failures per provider</text>
+<text x="60" y="2355" text-anchor="start" class="t">Where is the journal?</text>
+<text x="330" y="2355" text-anchor="start" class="m">journal.py path</text>
+<text x="640" y="2355" text-anchor="start" class="s">~/.claude/journal/&lt;repo&gt;.jsonl</text>
+<text x="60" y="2413" text-anchor="start" class="h">Who runs each step</text>
+<rect x="60" y="2429" width="16" height="16" rx="4" fill="#fdf2f8" stroke="#be185d" stroke-width="1.6"/>
+<text x="82" y="2442" text-anchor="start" class="s">you</text>
+<rect x="123.8" y="2429" width="16" height="16" rx="4" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="145.8" y="2442" text-anchor="start" class="s">main session (your model)</text>
+<rect x="332.8" y="2429" width="16" height="16" rx="4" fill="#f9fafb" stroke="#6b7280" stroke-width="1.6"/>
+<text x="354.8" y="2442" text-anchor="start" class="s">Explore agent, small tier</text>
+<rect x="541.8" y="2429" width="16" height="16" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="563.8" y="2442" text-anchor="start" class="s">general-purpose agent</text>
+<rect x="724.4" y="2429" width="16" height="16" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="746.4" y="2442" text-anchor="start" class="s">chadgrant:worker</text>
+<rect x="874.0" y="2429" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#059669" stroke-width="1.6"/>
+<text x="896.0" y="2442" text-anchor="start" class="s">reviewer agent</text>
+<rect x="1010.4" y="2429" width="16" height="16" rx="4" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.6"/>
+<text x="1032.4" y="2442" text-anchor="start" class="s">gate: commands, no model</text>
+</svg>
