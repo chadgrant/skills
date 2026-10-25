@@ -1,6 +1,8 @@
 # Clean code review: checklists and briefs
 
-Open the section the lens or the reviewer role calls for.
+Search headings and read only the section the lens or reviewer role needs; do not load the whole reference for each review.
+
+**Sections:** [Security lens](#security-lens) · [Tests lens](#tests-lens) · [Dependencies lens: commands](#dependencies-lens-commands) · [Reuse lens: the Decorator, by example](#reuse-lens-the-decorator-by-example) · [Design lens: evidence → pattern to prescribe](#design-lens-evidence--pattern-to-prescribe) · [Twelve-Factor lens](#twelve-factor-lens) · [Cross-cutting reviewer briefs](#cross-cutting-reviewer-briefs-full-review) · [Unit reviewer brief](#unit-reviewer-brief-full-review)
 
 ## Security lens
 
@@ -33,7 +35,6 @@ For each entry point (HTTP route, queue consumer, CLI argument, file import, web
 | An e2e driver that doesn't fit the surface (Playwright without a browser UI) | Slow and proves the wrong thing |
 | Implementation-coupled tests: mocking internal collaborators, testing private methods, or checking through a side channel (querying the database instead of the interface) | They break on a refactoring that changed no behavior |
 | Tautological tests: the assertion recomputes the expected value the way the code does, or asserts a constant against itself | They pass by construction and can never disagree with the code |
-| All the tests written in one batch before any implementation | They test imagined behavior and the shape of things; tests should arrive one slice at a time |
 | Error paths and boundaries untested while the happy path has five tests | The bugs live at the edges |
 
 ## Dependencies lens: commands

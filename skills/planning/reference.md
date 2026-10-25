@@ -4,6 +4,8 @@ Per-section guidance for each document. Use this to fill the templates well, not
 
 ---
 
+**Sections:** [PRD — product requirements](#prd--product-requirements-what--why) · [ERD — engineering requirements](#erd--engineering-requirements-how-we-build-it) · [DRD — data requirements](#drd--data-requirements-the-data-model) · [API contract — the interface](#api-contract--the-interface-what-callers-can-rely-on) · [Test & QA plan — the proof](#test--qa-plan--the-proof-how-we-know-it-works) · [Implementation plan — the execution DAG](#implementation-plan--the-execution-dag) · [User flows — IA & journeys](#user-flows--ia--journeys-where-things-live-how-you-move) · [Wireframes — layout & interaction](#wireframes--layout--interaction-what-the-screen-shows-and-does) · [Style guide — the design system](#style-guide--the-design-system-the-visual-language) · [Release plan — ship it](#release-plan--ship-it-how-it-reaches-prod-and-how-we-undo-it) · [Observability — is it healthy?](#observability--is-it-healthy-how-wed-know-it-broke) · [User docs — the deliverable](#user-docs--the-deliverable-what-ships-to-end-users) · [Which diagram belongs where](#which-diagram-belongs-where) · [Cross-linking](#cross-linking-the-sync-guarantee)
+
 ## PRD — product requirements ("what & why")
 
 Reads like an evidenced narrative, not a feature list. It states the *problem* and lets the solution stay directional; the ERD owns the "how".
@@ -38,7 +40,7 @@ Architecture, infrastructure, code patterns, interfaces, and the trade-offs behi
 | The design | Components, APIs, data flow, a system-context diagram, the patterns to follow, key trade-offs. |
 | Alternatives considered | Options evaluated and **why rejected**. This is the section that carries the reasoning. |
 | Cross-cutting concerns | Security, privacy, observability, cost, failure modes (fail-open vs fail-closed per component). |
-| Decisions `ADR-###` | One decision each: *Title · Status · Context · Decision · Consequences* + alternatives. A changed decision gets a new ADR that supersedes the old one; compaction (Path D) later folds the old one into a `Replaces:` line on the survivor. |
+| Decisions `ADR-###` | One decision each: *Title · Status · Context · Decision · Consequences* + alternatives. A changed decision gets a new ADR that supersedes the old one; compaction ([Path D](compact.md)) later folds the old one into a `Replaces:` line on the survivor. |
 
 **Anti-patterns:** no *alternatives-considered* section (obscures the reasoning); an implementation manual with no rationale or trade-offs; excessive length (>~20 pages → decompose); pasting full signatures/schemas that will rot; writing a design doc when there are genuinely no trade-offs to weigh.
 

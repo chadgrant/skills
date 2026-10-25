@@ -118,15 +118,15 @@
 <text x="92" y="1216" text-anchor="start" class="t">2 · Map each task</text>
 <rect x="715.0" y="1203" width="77.0" height="18" rx="9" fill="#6b7280"/>
 <text x="753.5" y="1216" text-anchor="middle" class="tag">1 per task</text>
-<text x="92" y="1236" text-anchor="start" class="s">One small-tier Explore agent per task, all at once. Returns ≤40 lines: files and line ranges to change, code to call</text>
-<text x="92" y="1253" text-anchor="start" class="s">or copy, tests to update, wiring lines (route, registry, shell mount), helpers to reuse. Goes into the brief verbatim.</text>
+<text x="92" y="1236" text-anchor="start" class="s">Reuse maps or batch discovery in a Fork. Each map: ≤40 lines with file ranges, reusable code, tests, and wiring.</text>
+<text x="92" y="1253" text-anchor="start" class="s">Do trivial lookups directly. Pass the map in the brief; reference requirements already inherited by the worker.</text>
 <polyline points="440,1264 440,1282" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
 <rect x="80" y="1282" width="720" height="68" rx="8" fill="#faf5ff" stroke="#7c3aed" stroke-width="1.6"/>
 <text x="92" y="1302" text-anchor="start" class="t">3 · Dispatch the wave in one message</text>
 <rect x="702.4" y="1289" width="89.6" height="18" rx="9" fill="#7c3aed"/>
 <text x="747.2" y="1302" text-anchor="middle" class="tag">orchestrator</text>
 <text x="92" y="1322" text-anchor="start" class="s">Brief: goal, REQs, CONs to implement and consume, the map, base commit, fast gate command, rules, report path.</text>
-<text x="92" y="1339" text-anchor="start" class="s">chadgrant:worker, medium effort, for Easy (Haiku) and Medium (Opus); general-purpose for Hard; one worktree each.</text>
+<text x="92" y="1339" text-anchor="start" class="s">Prefer Forks with worktree isolation; use non-fork workers when model, effort, or tool restrictions require it.</text>
 <polyline points="440,1350 440,1368" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#m-blue)"/>
 <rect x="80" y="1368" width="720" height="153" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
 <text x="92" y="1388" text-anchor="start" class="t">Each worker, in parallel  (worker.md)</text>

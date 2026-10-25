@@ -44,7 +44,7 @@ jira_project_key: null   # set by the Jira connector — PRD→epic, TASK-→sto
 
 ### TASK-001: <the module or part of the feature it implements>
 - **Satisfies:** REQ-… / NFR-…  ·  **Implements:** ADR-… (if any)
-- **Difficulty:** Easy | Medium | Hard  ·  **Model tier:** small | mid | top  ·  **Flags:** `observe` (if security/money/auth/data-integrity)
+- **Difficulty:** Easy | Medium | Hard  ·  **Model tier:** small | mid | top  ·  **Flags:** `observe` (only key/token handling, auth decisions, money movement, or tenancy isolation)
 - **Hot files:** <which of the plan's hot files this task adds to, if any>
 - **Implements:** CON-… (exactly one task per contract)
 - **Consumes:** CON-… (built against their stubs; no waiting)

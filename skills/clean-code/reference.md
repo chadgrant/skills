@@ -1,6 +1,8 @@
 # Uncle Bob Reference — Clean Code, SOLID, Clean Architecture, and Construction in Full
 
-Distilled from Robert C. Martin's *Clean Code*, *The Clean Coder*, *Clean Architecture*, and *Agile Software Development: Principles, Patterns, and Practices*. Load this when you need the detail behind a rule in SKILL.md.
+Distilled from Robert C. Martin's *Clean Code*, *The Clean Coder*, *Clean Architecture*, and *Agile Software Development: Principles, Patterns, and Practices*. Read only the section needed to clarify a rule in SKILL.md. These book-derived examples support that entry point; language idioms, public contracts, and scoped simplicity rules take precedence over literal application.
+
+**Sections:** [Meaningful Names](#meaningful-names-clean-code-ch-2) · [Functions](#functions-clean-code-ch-3) · [Comments](#comments-clean-code-ch-4) · [Formatting](#formatting-clean-code-ch-5) · [Objects and Data Structures](#objects-and-data-structures-clean-code-ch-6) · [Error Handling](#error-handling-clean-code-ch-7) · [Boundaries](#boundaries-clean-code-ch-8) · [Unit Tests](#unit-tests-clean-code-ch-9) · [Classes](#classes-clean-code-ch-10) · [SOLID](#solid-agile-software-development--clean-architecture) · [Clean Architecture](#clean-architecture-clean-architecture-martin) · [Construction](#construction-code-complete-mcconnell) · [Code Smells](#code-smells-clean-code-ch-17-selected) · [The Clean Coder — professional conduct](#the-clean-coder--professional-conduct) · [Worked Example — before/after](#worked-example--beforeafter)
 
 ## Meaningful Names (Clean Code ch. 2)
 
@@ -25,7 +27,7 @@ Distilled from Robert C. Martin's *Clean Code*, *The Clean Coder*, *Clean Archit
 - **No side effects.** `checkPassword()` that also initializes a session lies about what it does. If it must change state, the name must say so.
 - **Command–query separation:** `set("username", "bob")` returning a boolean invites `if (set(...))` — is that "was it set?" or "did it succeed?" Do, or answer, never both.
 - **No output arguments.** `appendFooter(report)` — is report the source or the target? Make it `report.appendFooter()`.
-- **DRY:** duplication is the root of most evil in software. Every repeated block is a missed abstraction.
+- **DRY:** remove duplicated knowledge, not merely similar text. Follow the entry point's reuse and rule-of-three guidance.
 
 ## Comments (Clean Code ch. 4)
 
@@ -53,8 +55,8 @@ Distilled from Robert C. Martin's *Clean Code*, *The Clean Coder*, *Clean Archit
 - **Provide context:** every exception carries what operation failed and why.
 - **Define exceptions by caller's needs** — wrap third-party APIs so one exception type represents "the port failed" rather than leaking vendor exception taxonomies.
 - **Special Case pattern:** instead of null + if-checks, return an object that represents the empty case (`Collections.emptyList()`, a `NullEmployee` whose pay is zero).
-- **Don't return null.** Every null return creates a landmine for callers; one missing check = NullPointerException in production.
-- **Don't pass null.** No rational caller-side meaning; forbid it by policy and validate at boundaries.
+- **Absence:** prefer an explicit option/result or empty collection where meaningful. Preserve documented nullable contracts and validate their use.
+- **Inputs:** make optional values explicit in the contract and validate at boundaries; avoid unexpected nulls.
 
 ## Boundaries (Clean Code ch. 8)
 

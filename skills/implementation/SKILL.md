@@ -1,30 +1,25 @@
 ---
 name: implementation
-description: Use when building from a plan or a brief. As the orchestrator: delivering a multi-task build (a project, milestone, or migration) by running waves of subagents whose results are verified and committed. As the worker: building one task from a plan or a dispatched brief. Triggers: "build the plan", "contracts first", "run the waves", "orchestrate this", "execute IMPLEMENTATION.md", "implement TASK-###", "build this task", "you are the worker", "the test is failing", "address the review". Not for writing the requirements or the plan.
+description: Execute an existing implementation plan or task brief, either coordinating a multi-task build or implementing and verifying one assigned task. Includes debugging and review fixes within that delivery; excludes authoring requirements or plans from scratch.
 ---
 
 # Implementation
 
-One skill, two roles. Find yours, open that file, and follow it. Don't read the other one; it isn't your job and it costs context.
+Choose your role and read only its manual. Code standards come from [clean-code](../clean-code/SKILL.md); requirements and plans come from `chadgrant:planning`.
 
-| You are | Open |
+| Role | Read |
 |---|---|
-| Delivering a plan with more than one task, dispatching subagents | [orchestrator.md](orchestrator.md) |
-| A subagent handed a brief, or told "you are the worker" | [worker.md](worker.md) |
-| Building one self-evident task alone, with no plan and no subagents | [worker.md](worker.md). You hold both roles: every file is yours, and you commit when the user asks. |
+| Delivering a multi-task plan | [orchestrator.md](orchestrator.md) |
+| Assigned a task, including a Fork of the orchestrator | [worker.md](worker.md) |
+| Implementing one self-evident task alone | [worker.md](worker.md), using the solo exception below |
 
-Pipeline: `chadgrant:planning` writes the docs and the routed plan → **`chadgrant:implementation`** builds it → `chadgrant:code-review` reviews it. The standards for the code itself are `chadgrant:clean-code`'s.
+Prefer **Forks whenever available** for delegation; use [delegation.md](delegation.md) for context reuse, worktree isolation, and model/tool fallbacks. A forked worker remains a worker despite inheriting the orchestrator's conversation.
 
-## Rules for both roles
+## Shared rules
 
-- **One worktree per task.** Workers change what their feature needs in their own worktree; the orchestrator merges. `CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, and the root `README` belong to the orchestrator alone; workers and reviewers report notes for them.
-- **Only the orchestrator runs Docker.** Workers run the fast gate (unit tests, static checks); the full gate with backing services runs once per milestone.
-- **Contracts first.** Every milestone starts with its interfaces, abstract classes, and shared types written as code, with doc-comment specs, stubs, and contract tests, merged before any implementation is dispatched. Workers build against contracts and never change them; agents coordinate only through these artifacts, never by messaging each other.
-- **Only the orchestrator commits.**
-- **Reports on disk, one line back.** Full reports go to `.delivery/<id>.md`; what returns to the caller is one line.
-- **Evidence, not claims.** A task is done when its fast gate is actually green. A milestone is done when the full gate is green: integration tests against real backing services where the project has them, coverage at or above 90%, e2e.
-- **Honest environment ceiling.** Without real cloud, certs, or live services, "done" means code-complete, tested with fakes, plus a runbook for the real step. Never imply production-verified.
-
----
-
-*Structure, debug loop, and review discipline inspired by [obra/superpowers](https://github.com/obra/superpowers).*
+- **Delegated workers:** one worktree per task; only the orchestrator creates commits, merges into the integration branch, runs Docker/backing services, or edits shared files (`CLAUDE.md`, `AGENTS.md`, `STATUS.md`, the plan, root `README`, unowned docs). Workers may fast-forward their own worktree to the supplied base or merge the integration branch into it for conflict recovery without creating a commit. Workers report proposed shared-doc changes.
+- **Contracts first:** merge milestone interfaces, shared types, doc-comment specs, stubs, and contract tests before parallel implementation. Workers never edit frozen contracts/tests or bypass them; report contract change requests. Coordinate through these artifacts and reports, not worker-to-worker messages.
+- **Verification:** workers run the fast gate; the orchestrator runs the full gate with real backing services where applicable, at least 90% coverage, and surface-appropriate e2e. Reports contain actual evidence.
+- **Context:** full reports go to `.delivery/<id>.md`; return one-line status and path. Read only relevant skill sections and task files; avoid reloading inherited, unchanged context.
+- **Environment limits:** distinguish code-complete/tested-with-fakes from production-verified; provide a runbook for unavailable live steps.
+- **Solo exception:** with no delegation, use the existing checkout unless isolation is needed; you own necessary files and verification. Commit only when requested. Do not require a worktree, formal contracts, ledger, or orchestrator handoff for a self-evident task.

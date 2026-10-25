@@ -4,14 +4,14 @@ An [Agent Skill](https://agentskills.io) that makes coding agents write and revi
 
 ## What it does
 
-- **When writing code:** small single-purpose functions, intention-revealing names, no flag arguments, exceptions over status codes, no magic numbers, no commented-out code, SOLID at genuine seams, Clean Architecture's dependency rule, and defensive-programming construction — plus a "don't over-apply" table so agents don't turn a 40-line feature into an enterprise class hierarchy.
+- **When writing code:** small single-purpose functions, intention-revealing names, no flag arguments, idiomatic errors over ambiguous status codes, no magic numbers, no commented-out code, SOLID at genuine seams, Clean Architecture's dependency rule, and defensive-programming construction — with explicit limits on abstraction so agents don't turn a 40-line feature into an enterprise class hierarchy.
 - **When reviewing code:** three required passes in severity order — correctness & security, design (SOLID + architecture: dependency rule, missing/misapplied pattern, anemic domain model), readability — with each finding named by principle or smell and an explicit blockers / should-fix / nits verdict.
 - **For design problems:** a table routes a recurring design problem, a domain-modeling need, or accumulated burden to `patterns.md`, `domain-driven-design.md`, or `refactoring.md`.
-- **Under pressure:** a rationalization table counters the classic excuses ("no time", "match the existing style", "don't gold-plate it", "just LGTM it") that make agents ship smells.
+- **Proportionate scope:** keep the quality bar under time pressure without adding speculative machinery or unrelated cleanup.
 
 ## Files
 
-- [`SKILL.md`](SKILL.md) — the operative skill: rules, review passes, the design-problem routing table, rationalization table, red flags
+- [`SKILL.md`](SKILL.md) — the operative skill: writing/design rules, review guidance, and links to conditional references
 - [`patterns.md`](patterns.md) — Gang of Four and Fowler's PoEAA: the discipline, the common forks, the over-apply table, and the catalogs
 - [`domain-driven-design.md`](domain-driven-design.md) — Evans' DDD: strategic and tactical design, aggregate rules, the over-apply table
 - [`refactoring.md`](refactoring.md) — Fowler's refactoring: the two-hats discipline, when to and when not to, the smell → refactoring catalog

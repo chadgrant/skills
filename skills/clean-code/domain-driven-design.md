@@ -2,6 +2,8 @@
 
 **Core principle: the model and the language are the same artifact.** The names in the code are the names the domain experts use — if the business says "policy" and the code says "record", the model has already failed. DDD is how you turn a tangled business into a model that protects its own rules and can be reasoned about a piece at a time. It pays off when the domain is **rich and changing**; for thin/CRUD domains it is overhead (use a Transaction Script per [patterns.md](patterns.md) and move on). Full detail in the detail below.
 
+**Sections:** [Strategic design — carve the space before modeling](#strategic-design--carve-the-space-before-modeling) · [Tactical design — model inside one context](#tactical-design--model-inside-one-context) · [Keep the domain pure](#keep-the-domain-pure-dependency-rule) · [Simplicity in the model](#simplicity-in-the-model) · [Red flags: don't over-apply](#red-flags-dont-over-apply) · [Detail](#detail) · [Strategic design](#strategic-design) · [Tactical design](#tactical-design) · [The layered / hexagonal arrangement](#the-layered--hexagonal-arrangement-dependency-rule)
+
 ## Strategic design — carve the space before modeling
 
 Do this first; tactical modeling inside the wrong boundary is wasted.

@@ -2,6 +2,8 @@
 
 **Core principle: a pattern is a named solution to a recurring problem: vocabulary, not decoration.** You reach for one because you *have* the problem it solves, never because it would look sophisticated. The catalog stops you reinventing a solved wheel and gives a name two engineers can say out loud ("that's a Strategy"). The full catalogs are below.
 
+**Sections:** [How to use a pattern](#how-to-use-a-pattern-the-discipline) · [Choosing among the common forks](#choosing-among-the-common-forks) · [Red flags: don't over-apply](#red-flags-dont-over-apply) · [Catalog](#catalog) · [Gang of Four — Creational](#gang-of-four--creational) · [Gang of Four — Structural](#gang-of-four--structural) · [Gang of Four — Behavioral](#gang-of-four--behavioral) · [Fowler PoEAA — Domain logic](#fowler-poeaa--domain-logic) · [Fowler PoEAA — Data source & Object-Relational](#fowler-poeaa--data-source--object-relational) · [Fowler PoEAA — Web presentation](#fowler-poeaa--web-presentation) · [Fowler PoEAA — Distribution, concurrency, base](#fowler-poeaa--distribution-concurrency-base)
+
 ## How to use a pattern (the discipline)
 
 1. **State the problem first, in plain terms.** "This function switches on a type code and a third case is coming." Not "I want to use a pattern." If you can't name the problem without naming the pattern, you don't have the problem yet.

@@ -2,6 +2,8 @@
 
 **Core principle: refactoring changes structure, never behavior — and it's driven by a real burden, not by taste.** You refactor because the code is *now* hard to work with (you're about to add a feature and it fights you; the same change has to be made in three places; a smell is slowing everyone). You do it in **small, reversible steps with the tests green between each**, so at every moment you can stop and ship. The smell → refactoring catalog below is the map.
 
+**Sections:** [The discipline](#the-discipline-do-not-skip) · [When to refactor — and when not](#when-to-refactor--and-when-not) · [In the pipeline](#in-the-pipeline) · [Red flags: don't over-apply](#red-flags-dont-over-apply) · [Catalog](#catalog) · [Code smells → what to do](#code-smells--what-to-do) · [The core refactorings](#the-core-refactorings-the-ones-you-use-constantly) · [Characterization tests](#characterization-tests-refactoring-without-a-safety-net)
+
 ## The discipline (do not skip)
 
 1. **Green tests first — or write them.** Refactoring without a test harness is just editing and hoping. If the code isn't covered, add characterization tests that pin current behavior *before* you touch structure.
