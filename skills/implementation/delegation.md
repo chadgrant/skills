@@ -1,6 +1,6 @@
 # Delegation: prefer Forks
 
-Use **Forks whenever available** for implementation, investigation, and review that can reuse the current context. Check the available Agent tool capabilities; do not assume a client supports them or change user settings to enable them.
+For authorized delegation, prefer **Forks whenever available** for implementation and investigation that benefit from inherited context. Prefer fresh context for independent code review, supplying requirements, the diff, and raw evidence without the implementer's conclusions. Check available capabilities; do not change user settings to enable delegation. Read [hosts.md](hosts.md) only when adapting calls between Claude and Codex.
 
 Claude Code Forks inherit the parent's conversation, system prompt, tools, and model. Their first request can reuse the parent's prompt cache; subsequent tool output stays in the fork and its result returns to the parent. This is inherited context at launch, not live synchronization between workers. `isolation: "worktree"` gives a fork a separate checkout. See [Claude's Fork documentation](https://code.claude.com/docs/en/sub-agents#fork-the-current-conversation).
 
@@ -13,7 +13,7 @@ Claude Code Forks inherit the parent's conversation, system prompt, tools, and m
 
 ## Fallbacks and cost
 
-Use a non-fork subagent when Forks are unavailable, a required model/effort differs from the parent, or restricted tools/fresh context are necessary. Follow [routing.md](routing.md); use `chadgrant:worker` for Easy/Medium implementation and `general-purpose` for Hard work or contracts. An independent review may need fresh context to avoid inheriting the implementer's conclusions.
+Use a non-fork subagent when Forks are unavailable, a required model/effort differs from the parent, or restricted tools/fresh context are necessary. Follow [routing.md](routing.md); use `chadgrant:worker` for Easy/Medium implementation and `general-purpose` for Hard work or contracts. When fresh context is unavailable, perform a separate evidence-based pass and disclose that the review reused implementation context; do not claim independence.
 
 Do not spawn an agent for a lookup that one bounded local command resolves. Prefer resuming the existing worker for follow-ups. Cache reuse can reduce repeated input cost, but a fork still inherits the context and consumes tokens; compare journal results instead of assuming a fixed saving.
 

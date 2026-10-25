@@ -23,21 +23,21 @@ Keep reads targeted (`rg -n`, file ranges, bounded output). If discovery spans r
 
 ## Debugging and review fixes
 
-Reproduce the failure, read the actual error, then test one reasoned hypothesis at a time. Fix the root cause and re-verify without weakening tests. After three or four failed hypotheses, or when a fix needs out-of-scope changes, report attempts and escalate. If a failure cannot be reproduced, report that uncertainty rather than masking it.
+Reproduce the failure, read the actual error, then test one reasoned hypothesis at a time. Fix the root cause and re-verify without weakening tests. After three or four failed hypotheses, or when a fix needs out-of-scope changes, report attempts and escalate. If a failure cannot be reproduced, report that uncertainty rather than masking it. Use [investigation](../investigation/SKILL.md) for a substantial causal trace; it does not relax worker boundaries.
 
-For each review finding, reproduce or trace it before editing. Report **fixed** with verification evidence or **refuted** with the exact proving case. Do not implement a finding merely because a reviewer asserted it.
+For each review finding, reproduce or trace it before editing. Report **fixed** with verification evidence, **refuted** with counter-evidence, or **unresolved** with the missing check/blocker. Do not implement a finding merely because a reviewer asserted it.
 
 ## Report
 
 Write about 25 lines per task to the brief's absolute report path, with no pasted code or full logs:
 
-- **Task / files changed:** ID, changed paths, and explanations for unexpected paths.
+- **Task / files changed:** ID, base/tested revision (including uncommitted changes), changed paths, and explanations for unexpected paths.
 - **Contracts implemented:** `CON` IDs and contract-test pass counts.
 - **Contract change requests:** contract, proposed change, reason; omit if none.
 - **Verify:** command, exit status, pass/fail counts, measured coverage if available. Include failure details only for unresolved failures; do not claim full-gate results you did not run.
 - **Quality:** self-check outcome and refactoring, one or two lines.
 - **Deviations / ⚠:** assumptions, map gaps, unmet constraints, and unverifiable steps with a runbook.
 - **Notes for shared docs:** target file and exact proposed text for the orchestrator; omit if none.
-- **Review response:** fixed/refuted evidence per finding, only after a review.
+- **Review response:** fixed/refuted evidence or unresolved check per finding, only after a review.
 
 Return only: `TASK-### · green|red · <verify summary> · ⚠ <count> · notes <count> · contract changes <count> · <report path>`. With no report path, return the report itself.

@@ -1,12 +1,14 @@
 {
   "name": "chadgrant-skills",
-  "description": "Chad Grant's plan → implement → review pipeline for coding agents.",
-  "owner": { "name": "Chad Grant" },
+  "description": "Chad Grant's investigation-to-review skills for coding agents.",
+  "owner": {
+    "name": "Chad Grant"
+  },
   "plugins": [
     {
       "name": "chadgrant",
       "source": "./",
-      "description": "A plan → implement → review pipeline for coding agents, built on Clean Code, SOLID, known design patterns, TDD, and Twelve-Factor."
+      "description": "Focused investigation, planning, implementation, runtime verification, and code review with shared clean-code standards."
     }
   ]
 }

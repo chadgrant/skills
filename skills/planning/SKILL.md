@@ -25,6 +25,6 @@ Requirements record what was promised; code records what exists. Keep them linke
 
 ## Handoff and connectors
 
-A routed plan goes to `chadgrant:implementation`; code quality follows `chadgrant:clean-code`. Single self-evident tasks need no routed plan.
+A routed plan goes to `chadgrant:implementation`; code quality follows `chadgrant:clean-code`. Use [investigation](../investigation/SKILL.md) for material unknowns about current behavior and [verification](../verification/SKILL.md) for a missing runtime-proof recipe. Preserve IDs and evidence through [handoffs.md](../implementation/handoffs.md). Single self-evident tasks need no routed plan.
 
 Templates carry YAML metadata (`doc`, `title`, `status`, `owner`, `last_synced`, `confluence_page_id`, `jira_project_key`). Preserve existing identifiers and update `last_synced` on changes. Read [connectors.md](connectors.md) only when mapping a doc set to Confluence/Jira; [ROADMAP.md](ROADMAP.md) distinguishes planned integration from built features.

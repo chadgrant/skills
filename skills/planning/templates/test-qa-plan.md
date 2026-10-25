@@ -23,6 +23,8 @@ jira_project_key: null   # set by the Jira connector
 - **Backing services:** `<compose.test.yaml>` starts <real Postgres / queue / cache> for integration and e2e tests in the full gate, which only the orchestrator runs, once per milestone. No mocks or in-memory substitutes.
 - **End-to-end:** `<command>` brings the stack up with Docker Compose and drives <browser UI → Playwright · HTTP API → requests to the running service · CLI → the built binary>. Use the driver that fits the surface; no Playwright without a browser UI.
 
+- **Runtime recipe:** <link existing launch/doctor/drive/cleanup instructions; use the verification skill if missing>. Record the tested build, action and result evidence, owned-resource cleanup, and artifact paths that survive teardown.
+
 ## 3. Test matrix
 > Each `TC-###` verifies one or more `REQ-`/`NFR-` and rolls up to a release gate. Per-task `TEST-` (in the plan) are the unit-level checks; these are the scenario-level cases above them.
 
